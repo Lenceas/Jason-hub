@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- 背景圆 -->
+  <circle cx="60" cy="60" r="60" fill="#DBEAFE"/>
+  <!-- 深色内圈 -->
+  <circle cx="60" cy="60" r="54" fill="#EFF6FF" stroke="#3B82F6" stroke-width="2"/>
+  <!-- 人物剪影（简约风格） -->
+  <circle cx="60" cy="48" r="16" fill="#3B82F6" opacity="0.8"/>
+  <ellipse cx="60" cy="82" rx="24" ry="20" fill="#3B82F6" opacity="0.6"/>
+</svg>

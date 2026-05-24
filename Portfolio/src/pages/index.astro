@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import ProjectGrid from '../components/ProjectGrid.astro';
+import Footer from '../components/Footer.astro';
+
+import projects from '../data/projects.json';
+---
+
+<BaseLayout title="Jason · 个人主页" description="Jason's personal portfolio — 个人项目展示与作品集">
+
+  <Header />
+  <main>
+    <Hero
+      name="Jason"
+      tagline="Developer & Creator"
+      bio={[
+        "热爱编程，专注于 AI全栈开发 与个人项目探索。",
+        "持续学习，乐于分享，用代码构建有趣的东西。",
+      ]}
+      socialLinks={[
+        { label: "GitHub", url: "https://github.com/Lenceas" },
+        { label: "Email", url: "mailto:2923280915@qq.com" },
+      ]}
+    />
+
+    <ProjectGrid projects={projects} />
+  </main>
+  <Footer />
+
+</BaseLayout>

@@ -1,0 +1,158 @@
+/* ============================================
+   Jason Portfolio — 全局样式
+   极简清爽 · 蓝白配色
+   ============================================ */
+
+/* ---- CSS Custom Properties ---- */
+:root {
+  --color-primary: #3B82F6;
+  --color-primary-light: #60A5FA;
+  --color-primary-lighter: #DBEAFE;
+  --color-primary-dark: #2563EB;
+  --color-bg: #FFFFFF;
+  --color-bg-alt: #F8FAFC;
+  --color-text: #1E293B;
+  --color-text-secondary: #64748B;
+  --color-text-muted: #94A3B8;
+  --color-border: #E2E8F0;
+  --color-card-bg: #FFFFFF;
+  --color-card-hover: #F8FAFC;
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  --max-width: 1024px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+
+  --transition: 0.25s ease;
+
+  /* 响应式字体 */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+  --text-3xl: 2.5rem;
+}
+
+/* ---- Reset & Base ---- */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ---- Container (Mobile First) ---- */
+.container {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+/* 平板 ≥640px */
+@media (min-width: 640px) {
+  .container {
+    padding: 0 2rem;
+  }
+}
+
+/* 桌面 ≥1024px */
+@media (min-width: 1024px) {
+  .container {
+    padding: 0 2.5rem;
+  }
+}
+
+/* ---- Section ---- */
+.section {
+  padding: 3rem 0;
+}
+
+@media (min-width: 640px) {
+  .section {
+    padding: 4rem 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section {
+    padding: 5rem 0;
+  }
+}
+
+/* ---- Section Title ---- */
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  position: relative;
+  display: inline-block;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 36px;
+  height: 3px;
+  background: var(--color-primary);
+  border-radius: 2px;
+}
+
+@media (min-width: 640px) {
+  .section-title {
+    font-size: 1.75rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .section-title::after {
+    width: 40px;
+  }
+}
+
+/* ---- Screen Reader Only ---- */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

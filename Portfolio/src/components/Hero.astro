@@ -1,0 +1,193 @@
+---
+
+export interface Props {
+  name: string;
+  tagline: string;
+  bio: string[];
+  socialLinks: { label: string; url: string }[];
+}
+
+const { name, tagline, bio, socialLinks } = Astro.props;
+---
+
+<section class="hero">
+  <div class="container">
+    <div class="hero__content">
+      <!-- 头像 -->
+      <div class="hero__avatar-wrapper">
+        <img src="/images/avatar.svg" alt={name} class="hero__avatar" width="120" height="120" />
+        <span class="hero__status" aria-label="在线" />
+      </div>
+
+      <!-- 文字介绍 -->
+      <h1 class="hero__name">{name}</h1>
+      <p class="hero__tagline">{tagline}</p>
+
+      <div class="hero__bio">
+        {bio.map((line) => (
+          <p>{line}</p>
+        ))}
+      </div>
+
+      <!-- 社交链接 -->
+      <div class="hero__socials">
+        {socialLinks.map((link) => (
+          <a
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hero__social-link"
+          >
+            {link.label}
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding: 3rem 0 2.5rem;
+    text-align: center;
+  }
+
+  .hero__content {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .hero__avatar-wrapper {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1.25rem;
+  }
+
+  .hero__avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--color-primary-lighter);
+  }
+
+  .hero__status {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 14px;
+    height: 14px;
+    background: #22C55E;
+    border: 3px solid var(--color-bg);
+    border-radius: 50%;
+  }
+
+  .hero__name {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.4rem;
+    color: var(--color-text);
+  }
+
+  .hero__tagline {
+    font-size: 1rem;
+    color: var(--color-primary);
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+
+  .hero__bio {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    padding: 0 0.5rem;
+  }
+
+  .hero__bio p + p {
+    margin-top: 0.25rem;
+  }
+
+  .hero__socials {
+    display: flex;
+    justify-content: center;
+    gap: 0.625rem;
+    flex-wrap: wrap;
+  }
+
+  .hero__social-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.45rem 1.1rem;
+    font-size: 0.825rem;
+    font-weight: 500;
+    color: var(--color-primary);
+    background: var(--color-primary-lighter);
+    border-radius: 999px;
+    transition: background var(--transition), color var(--transition);
+  }
+
+  .hero__social-link:hover {
+    background: var(--color-primary);
+    color: #FFFFFF;
+  }
+
+  /* 平板 ≥640px */
+  @media (min-width: 640px) {
+    .hero {
+      padding: 4rem 0 3rem;
+    }
+
+    .hero__avatar {
+      width: 110px;
+      height: 110px;
+    }
+
+    .hero__name {
+      font-size: 2rem;
+    }
+
+    .hero__tagline {
+      font-size: 1.1rem;
+    }
+
+    .hero__bio {
+      font-size: 0.95rem;
+    }
+
+    .hero__social-link {
+      padding: 0.5rem 1.25rem;
+      font-size: 0.875rem;
+    }
+  }
+
+  /* 桌面 ≥1024px */
+  @media (min-width: 1024px) {
+    .hero {
+      padding: 5rem 0 3.5rem;
+    }
+
+    .hero__avatar-wrapper {
+      margin-bottom: 1.5rem;
+    }
+
+    .hero__avatar {
+      width: 120px;
+      height: 120px;
+    }
+
+    .hero__name {
+      font-size: 2.25rem;
+    }
+
+    .hero__tagline {
+      font-size: 1.125rem;
+    }
+
+    .hero__bio {
+      font-size: 1rem;
+      padding: 0;
+    }
+  }
+</style>

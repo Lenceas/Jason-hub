@@ -1,0 +1,53 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="container footer__inner">
+    <p class="footer__text">
+      &copy; {year} Jason. All rights reserved.
+    </p>
+    <p class="footer__text footer__text--muted">
+      Built with Astro &middot; 极简 · 清爽
+    </p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    padding: 2rem 0;
+    border-top: 1px solid var(--color-border);
+    text-align: center;
+  }
+
+  .footer__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .footer__text {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+  }
+
+  .footer__text--muted {
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+  }
+
+  @media (min-width: 640px) {
+    .footer {
+      padding: 2.5rem 0;
+    }
+
+    .footer__text {
+      font-size: 0.85rem;
+    }
+
+    .footer__text--muted {
+      font-size: 0.8rem;
+    }
+  }
+</style>

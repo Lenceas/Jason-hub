@@ -1,0 +1,65 @@
+---
+import type { Props as CardProps } from './ProjectCard.astro';
+import ProjectCard from './ProjectCard.astro';
+
+export interface Props {
+  projects: CardProps[];
+}
+
+const { projects } = Astro.props;
+---
+
+<section class="projects section" id="projects">
+  <div class="container">
+    <h2 class="section-title">项目</h2>
+    <div class="projects__grid">
+      {projects.length > 0 ? (
+        projects.map((project) => (
+          <ProjectCard {...project} />
+        ))
+      ) : (
+        <p class="projects__empty">暂无项目，敬请期待</p>
+      )}
+    </div>
+  </div>
+</section>
+
+<style>
+  .projects {
+    background: var(--color-bg-alt);
+  }
+
+  .projects__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .projects__empty {
+    text-align: center;
+    padding: 3rem 0;
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+
+  /* 平板 ≥640px */
+  @media (min-width: 640px) {
+    .projects__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+
+    .projects__empty {
+      padding: 4rem 0;
+      font-size: 1rem;
+    }
+  }
+
+  /* 桌面 ≥1024px（三列，但内容少时让卡片保持合理宽度） */
+  @media (min-width: 1024px) {
+    .projects__grid {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+  }
+</style>
