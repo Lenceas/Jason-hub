@@ -3,14 +3,36 @@
 export interface Props {
   name: string;
   tagline: string;
+  slogan: string;
   bio: string[];
   socialLinks: { label: string; url: string }[];
 }
 
-const { name, tagline, bio, socialLinks } = Astro.props;
+const { name, tagline, slogan, bio, socialLinks } = Astro.props;
+
+const brandColors: Record<string, string> = {
+  GitHub: '#24292F',
+  Gitee: '#C71D23',
+  博客园: '#1A8C6D',
+  Email: '#EA4335',
+};
+
+const svgIcons: Record<string, string> = {
+  GitHub: '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>',
+  Gitee: '<svg width="18" height="18" viewBox="0 0 90 90" fill="none"><circle cx="45" cy="45" r="45" fill="#C71D23"/><path d="M67.6 39.9H42.1c-1.2 0-2.2-1-2.2-2.2V42c0 1.2 1 2.2 2.2 2.2h15.5c1.2 0 2.2 1 2.2 2.2v.6h.1v.5c0 3.7-3 6.7-6.7 6.7H32.1c-1.2 0-2.2-1-2.2-2.2V36.5c0-3.7 3-6.7 6.7-6.7h31c1.2 0 2.2-1 2.2-2.2v-5.5c0-1.2-1-2.2-2.2-2.2H36.5C27.4 20 20 27.4 20 36.5v31c0 1.2 1 2.2 2.2 2.2h32.6c8.3 0 15-6.7 15-15V42c0-1.2-1-2.2-2.2-2.2z" fill="#FFFFFF"/></svg>',
+  博客园: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>',
+  Email: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4l-10 8L2 4"/></svg>',
+};
 ---
 
 <section class="hero">
+  <!-- 鼠标光晕 -->
+  <div id="glow" class="hero__glow" aria-hidden="true"></div>
+
+  <!-- 装饰圆 -->
+  <div class="hero__deco hero__deco--1" aria-hidden="true" />
+  <div class="hero__deco hero__deco--2" aria-hidden="true" />
+
   <div class="container">
     <div class="hero__content">
       <!-- 头像 -->
@@ -18,6 +40,9 @@ const { name, tagline, bio, socialLinks } = Astro.props;
         <img src="/images/avatar.svg" alt={name} class="hero__avatar" width="120" height="120" />
         <span class="hero__status" aria-label="在线" />
       </div>
+
+      <!-- 标语 -->
+      <p class="hero__slogan">{slogan}</p>
 
       <!-- 文字介绍 -->
       <h1 class="hero__name">{name}</h1>
@@ -31,16 +56,21 @@ const { name, tagline, bio, socialLinks } = Astro.props;
 
       <!-- 社交链接 -->
       <div class="hero__socials">
-        {socialLinks.map((link) => (
-          <a
-            href={link.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="hero__social-link"
-          >
-            {link.label}
-          </a>
-        ))}
+        {socialLinks.map((link) => {
+          const brandColor = brandColors[link.label] || 'var(--color-primary)';
+          return (
+            <a
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hero__social-link"
+              style={{ '--brand': brandColor }}
+            >
+              <span class="hero__social-icon" set:html={svgIcons[link.label] || ''} />
+              <span class="hero__social-label">{link.label}</span>
+            </a>
+          );
+        })}
       </div>
     </div>
   </div>
@@ -48,11 +78,57 @@ const { name, tagline, bio, socialLinks } = Astro.props;
 
 <style>
   .hero {
+    position: relative;
+    overflow: hidden;
     padding: 3rem 0 2.5rem;
     text-align: center;
   }
 
+  /* ---- 鼠标光晕 ---- */
+  .hero__glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    background: radial-gradient(
+      400px circle at var(--gx, 50%) var(--gy, 50%),
+      rgba(59, 130, 246, 0.06),
+      transparent 60%
+    );
+    z-index: 0;
+  }
+
+  /* ---- 装饰圆 ---- */
+  .hero__deco {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .hero__deco--1 {
+    width: 500px;
+    height: 500px;
+    top: -120px;
+    right: -180px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.08), transparent 70%);
+  }
+
+  .hero__deco--2 {
+    width: 300px;
+    height: 300px;
+    bottom: -60px;
+    left: -100px;
+    background: radial-gradient(circle, rgba(96, 165, 250, 0.06), transparent 70%);
+  }
+
   .hero__content {
+    position: relative;
+    z-index: 1;
     max-width: 600px;
     margin: 0 auto;
   }
@@ -60,7 +136,7 @@ const { name, tagline, bio, socialLinks } = Astro.props;
   .hero__avatar-wrapper {
     position: relative;
     display: inline-block;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1rem;
   }
 
   .hero__avatar {
@@ -69,6 +145,13 @@ const { name, tagline, bio, socialLinks } = Astro.props;
     border-radius: 50%;
     object-fit: cover;
     border: 3px solid var(--color-primary-lighter);
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.06);
+    transition: box-shadow var(--transition), transform var(--transition);
+  }
+
+  .hero__avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0.1);
   }
 
   .hero__status {
@@ -80,6 +163,16 @@ const { name, tagline, bio, socialLinks } = Astro.props;
     background: #22C55E;
     border: 3px solid var(--color-bg);
     border-radius: 50%;
+  }
+
+  /* ---- 标语 ---- */
+  .hero__slogan {
+    font-size: 0.85rem;
+    color: var(--color-primary-light);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+    opacity: 0.8;
   }
 
   .hero__name {
@@ -95,6 +188,23 @@ const { name, tagline, bio, socialLinks } = Astro.props;
     color: var(--color-primary);
     font-weight: 500;
     margin-bottom: 1rem;
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 2px solid var(--color-primary);
+    animation: typing 2.5s steps(25, end), blink-caret 0.75s step-end infinite;
+    max-width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  @keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+  }
+
+  @keyframes blink-caret {
+    from, to { border-color: transparent; }
+    50% { border-color: var(--color-primary); }
   }
 
   .hero__bio {
@@ -119,18 +229,37 @@ const { name, tagline, bio, socialLinks } = Astro.props;
   .hero__social-link {
     display: inline-flex;
     align-items: center;
-    padding: 0.45rem 1.1rem;
-    font-size: 0.825rem;
-    font-weight: 500;
-    color: var(--color-primary);
-    background: var(--color-primary-lighter);
+    gap: 0.45rem;
+    padding: 0.55rem 1.35rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--brand, var(--color-primary));
+    background: color-mix(in srgb, var(--brand, var(--color-primary)) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--brand, var(--color-primary)) 15%, transparent);
     border-radius: 999px;
-    transition: background var(--transition), color var(--transition);
+    transition: background var(--transition), color var(--transition), transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+  }
+
+  .hero__social-icon {
+    display: inline-flex;
+    align-items: center;
+    line-height: 0;
+  }
+
+  .hero__social-icon svg {
+    display: block;
+  }
+
+  .hero__social-label {
+    line-height: 1;
   }
 
   .hero__social-link:hover {
-    background: var(--color-primary);
     color: #FFFFFF;
+    background: var(--brand, var(--color-primary));
+    border-color: var(--brand, var(--color-primary));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--brand, var(--color-primary)) 30%, transparent);
   }
 
   /* 平板 ≥640px */
@@ -142,6 +271,10 @@ const { name, tagline, bio, socialLinks } = Astro.props;
     .hero__avatar {
       width: 110px;
       height: 110px;
+    }
+
+    .hero__slogan {
+      font-size: 0.9rem;
     }
 
     .hero__name {
@@ -157,8 +290,8 @@ const { name, tagline, bio, socialLinks } = Astro.props;
     }
 
     .hero__social-link {
-      padding: 0.5rem 1.25rem;
-      font-size: 0.875rem;
+      padding: 0.6rem 1.5rem;
+      font-size: 0.95rem;
     }
   }
 
@@ -169,7 +302,7 @@ const { name, tagline, bio, socialLinks } = Astro.props;
     }
 
     .hero__avatar-wrapper {
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
     }
 
     .hero__avatar {

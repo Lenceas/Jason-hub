@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "id": "example-project",
+    "title": "示例项目",
+    "tagline": "第一个子项目 · 开发中",
+    "description": "这里将展示 Jason-hub 旗下的第一个子项目，通过项目卡片跳转到独立站点。",
+    "status": "planning",
+    "featured": true,
+    "url": "https://github.com/Lenceas/Jason-hub",
+    "thumbnail": "/images/placeholder-project.svg",
+    "tags": ["Vue 3", "TypeScript", "待启动"],
+    "year": 2026
+  }
+]

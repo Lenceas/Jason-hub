@@ -1,0 +1,68 @@
+---
+
+const groups = [
+  ['富强', '民主', '文明', '和谐'],
+  ['自由', '平等', '公正', '法治'],
+  ['爱国', '敬业', '诚信', '友善'],
+];
+---
+
+<section class="v-section" style="padding:2rem 0;text-align:center;background:#fff;">
+  <div style="max-width:1024px;margin:0 auto;padding:0 1.25rem;">
+    <!-- 上装饰线 -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;max-width:300px;margin:0 auto;opacity:0.3;">
+      <span style="display:block;height:1px;flex:1;background:linear-gradient(to right,transparent,#60A5FA 20%,#60A5FA 80%,transparent);"></span>
+      <span style="display:block;width:4px;height:4px;border-radius:50%;background:#3B82F6;opacity:0.2;flex-shrink:0;"></span>
+      <span style="display:block;height:1px;flex:1;background:linear-gradient(to right,transparent,#60A5FA 20%,#60A5FA 80%,transparent);"></span>
+    </div>
+
+    <!-- 十二词 -->
+    <div class="v-body" style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 0;">
+      {groups.map((row) => (
+        <div class="v-row" style="display:flex;align-items:center;justify-content:center;gap:20px;position:relative;">
+          {row.map((word, i) => (
+            i === row.length - 1
+              ? <span class="v-word" style="font-size:16px;color:#94A3B8;letter-spacing:3px;opacity:0.6;cursor:default;transition:color 0.25s,opacity 0.25s;" onmouseover="this.style.color='#3B82F6';this.style.opacity='1'" onmouseout="this.style.color='#94A3B8';this.style.opacity='0.6'">{word}</span>
+              : <span class="v-word-wrap" style="display:inline-flex;align-items:center;gap:20px;"><span class="v-word" style="font-size:16px;color:#94A3B8;letter-spacing:3px;opacity:0.6;cursor:default;transition:color 0.25s,opacity 0.25s;" onmouseover="this.style.color='#3B82F6';this.style.opacity='1'" onmouseout="this.style.color='#94A3B8';this.style.opacity='0.6'">{word}</span><span style="display:block;width:1px;height:14px;background:#DBEAFE;opacity:0.4;flex-shrink:0;"></span></span>
+          ))}
+        </div>
+      ))}
+    </div>
+
+    <!-- 下装饰线 -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;max-width:300px;margin:0 auto;opacity:0.3;">
+      <span style="display:block;height:1px;flex:1;background:linear-gradient(to right,transparent,#60A5FA 20%,#60A5FA 80%,transparent);"></span>
+      <span style="display:block;width:4px;height:4px;border-radius:50%;background:#3B82F6;opacity:0.2;flex-shrink:0;"></span>
+      <span style="display:block;height:1px;flex:1;background:linear-gradient(to right,transparent,#60A5FA 20%,#60A5FA 80%,transparent);"></span>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  @media (min-width: 640px) {
+    .v-body {
+      flex-direction: row !important;
+      justify-content: center !important;
+      gap: 0 !important;
+      padding: 24px 0 !important;
+    }
+    .v-row {
+      padding: 0 24px !important;
+      gap: 20px !important;
+    }
+    .v-row + .v-row::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 1px;
+      height: 24px;
+      background: #DBEAFE;
+      opacity: 0.3;
+    }
+    .v-word, .v-word-wrap {
+      font-size: 17px !important;
+    }
+  }
+</style>

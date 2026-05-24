@@ -11,7 +11,7 @@ const { projects } = Astro.props;
 
 <section class="projects section" id="projects">
   <div class="container">
-    <h2 class="section-title">项目</h2>
+    <h2 class="section-title" data-aos>项目</h2>
     <div class="projects__grid">
       {projects.length > 0 ? (
         projects.map((project) => (
@@ -55,7 +55,7 @@ const { projects } = Astro.props;
     }
   }
 
-  /* 桌面 ≥1024px（三列，但内容少时让卡片保持合理宽度） */
+  /* 桌面 ≥1024px */
   @media (min-width: 1024px) {
     .projects__grid {
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));

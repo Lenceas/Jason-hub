@@ -2,10 +2,25 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Hero from '../components/Hero.astro';
+import Skills from '../components/Skills.astro';
+import Values from '../components/Values.astro';
 import ProjectGrid from '../components/ProjectGrid.astro';
 import Footer from '../components/Footer.astro';
 
 import projects from '../data/projects.json';
+
+const levelOrder = { expert: 0, advanced: 1, intermediate: 2, beginner: 3 };
+
+const skills = [
+  { name: "C# .NET", level: "expert" as const },
+  { name: "Vue", level: "advanced" as const },
+  { name: "TypeScript", level: "advanced" as const },
+  { name: "小程序", level: "advanced" as const },
+  { name: "Docker", level: "intermediate" as const },
+  { name: "MySQL", level: "intermediate" as const },
+  { name: "Redis", level: "intermediate" as const },
+  { name: "MQTT", level: "intermediate" as const },
+].sort((a, b) => levelOrder[a.level] - levelOrder[b.level]);
 ---
 
 <BaseLayout title="Jason · 个人主页" description="Jason's personal portfolio — 个人项目展示与作品集">
@@ -14,7 +29,8 @@ import projects from '../data/projects.json';
   <main>
     <Hero
       name="Jason"
-      tagline="Developer & Creator"
+      tagline="用代码构建有趣的东西"
+      slogan="✧ AI 全栈开发者 · 持续学习中 ✧"
       bio={[
         "热爱编程，专注于 AI全栈开发 与个人项目探索。",
         "持续学习，乐于分享，用代码构建有趣的东西。",
@@ -26,6 +42,10 @@ import projects from '../data/projects.json';
         { label: "Email", url: "mailto:2923280915@qq.com" },
       ]}
     />
+
+    <Skills {skills} />
+
+    <Values />
 
     <ProjectGrid projects={projects} />
   </main>

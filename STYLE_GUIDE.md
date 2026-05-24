@@ -22,13 +22,14 @@
   - `≥ 1024px` — 桌面
 - 避免 `!important`
 - 颜色值统一引用 CSS 变量，不写死
+- 部分组件（Skills、Values）使用**内联样式**，因 Astro 的 scoped CSS 在动态渲染中存在兼容问题
 
 ## 组件规范
 
 - **Astro 组件**：模板 + `<style>` 写在同一个 `.astro` 文件中
 - 组件通过 `export interface Props` 声明属性类型
 - 每个组件职责单一，不做太多事
-- 组件样式作用域自动隔离（Astro 原生），无需手动加 scoped
+- 部分组件使用内联样式 + `is:global` 处理响应式（避免 scoped CSS 不生效的问题）
 
 ## 项目数据规范
 

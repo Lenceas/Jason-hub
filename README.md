@@ -8,7 +8,7 @@
 
 个人项目 Monorepo · 主站聚合 · 子项目统一入口
 
-通过 [Portfolio](./Portfolio) 主站聚合展示个人介绍与项目卡片，跳转到各个独立子项目。
+通过 [Portfolio](./Portfolio) 主站聚合展示个人介绍、技能标签、社会主义核心价值观展示及项目卡片，作为 Jason-hub 所有子项目的统一入口。
 
 ### 结构
 
@@ -53,7 +53,7 @@ npm run build
 
 Personal Monorepo — Central hub & sub-project entry point
 
-A personal project aggregation site built with [Astro 6](./Portfolio). The main page showcases a personal profile and project cards that link to independent sub-projects.
+A personal project aggregation site built with [Astro 6](./Portfolio). The main page showcases a personal profile, skills, values, and project cards that link to independent sub-projects.
 
 ### Structure
 

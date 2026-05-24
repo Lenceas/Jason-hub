@@ -24,7 +24,7 @@ Jason-hub/
 │   ├── src/
 │   │   ├── pages/          ← 页面路由（单页：index.astro）
 │   │   ├── layouts/        ← 布局模板（BaseLayout）
-│   │   ├── components/     ← 组件（Header/Hero/ProjectCard/Grid/Footer）
+│   │   ├── components/     ← 组件（Header / Hero / Skills / Values / ProjectCard / ProjectGrid / Footer）
 │   │   ├── data/           ← 项目数据（JSON）
 │   │   └── styles/         ← 全局样式（CSS 变量 + Reset + 响应式）
 │   ├── astro.config.mjs

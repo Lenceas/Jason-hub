@@ -22,9 +22,18 @@ Jason-hub 主站 · 个人主页
 ### 页面组成
 
 - **Header** — Logo、导航
-- **Hero** — 头像、名称、简介、社交链接
-- **ProjectGrid** — 项目卡片网格（数据驱动）
+- **Hero** — 头像、名称、标语、简介、社交链接（品牌色图标按钮）
+- **Skills** — 彩色技能标签云（按熟练度分色）
+- **Values** — 水墨风格社会主义核心价值观展示
+- **ProjectGrid** — 项目卡片网格（数据驱动，毛玻璃效果）
 - **Footer** — 版权信息
+
+### 视觉特效
+
+- 鼠标跟随光晕、背景渐变装饰圆
+- 6 色碰撞弹球
+- 滚动淡入动画
+- 毛玻璃卡片 + 精选标识
 
 ### 数据源
 
@@ -43,6 +52,8 @@ Portfolio/
 │   ├── components/
 │   │   ├── Header.astro
 │   │   ├── Hero.astro
+│   │   ├── Skills.astro
+│   │   ├── Values.astro
 │   │   ├── ProjectCard.astro
 │   │   ├── ProjectGrid.astro
 │   │   └── Footer.astro
@@ -97,9 +108,18 @@ A minimal personal homepage built with **Astro 6**, aggregating personal profile
 ### Page Sections
 
 - **Header** — Logo, navigation
-- **Hero** — Avatar, name, tagline, bio, social links
-- **ProjectGrid** — Data-driven project card grid
+- **Hero** — Avatar, name, tagline, bio, social links (brand-colored icon buttons)
+- **Skills** — Color-coded skill tags (by proficiency level)
+- **Values** — Ink-wash style socialist core values display
+- **ProjectGrid** — Data-driven project card grid (glass morphism)
 - **Footer** — Copyright & credits
+
+### Visual Effects
+
+- Mouse-follow glow, gradient decorative circles
+- 6-color bouncing balls
+- Scroll fade-in animation
+- Glass morphism cards with featured badges
 
 ### Data Source
 
@@ -118,6 +138,8 @@ Portfolio/
 │   ├── components/
 │   │   ├── Header.astro
 │   │   ├── Hero.astro
+│   │   ├── Skills.astro
+│   │   ├── Values.astro
 │   │   ├── ProjectCard.astro
 │   │   ├── ProjectGrid.astro
 │   │   └── Footer.astro

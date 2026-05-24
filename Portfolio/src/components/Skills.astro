@@ -1,0 +1,57 @@
+---
+export interface Props {
+  skills: { name: string; level: 'beginner' | 'intermediate' | 'advanced' | 'expert' }[];
+}
+
+const { skills } = Astro.props;
+
+const levelStyle: Record<string, { color: string; bg: string; border: string }> = {
+  beginner: { color: '#94A3B8', bg: '#F1F5F9', border: '#E2E8F0' },
+  intermediate: { color: '#3B82F6', bg: '#DBEAFE', border: '#BFDBFE' },
+  advanced: { color: '#1D4ED8', bg: '#EFF6FF', border: '#93C5FD' },
+  expert: { color: '#FFFFFF', bg: '#2563EB', border: '#2563EB' },
+};
+
+const levelTooltip: Record<string, string> = {
+  beginner: '初学',
+  intermediate: '熟练',
+  advanced: '精通',
+  expert: '擅长',
+};
+---
+
+<section style="padding:3rem 0;background:#fff;text-align:center;">
+  <div style="max-width:1024px;margin:0 auto;padding:0 1.25rem;">
+    <h2 style="font-size:1.5rem;font-weight:600;margin-bottom:2rem;display:inline-block;position:relative;color:#1E293B;">
+      技能
+      <span style="content:'';position:absolute;bottom:-8px;left:0;width:36px;height:3px;background:#3B82F6;border-radius:2px;display:block;"></span>
+    </h2>
+    <div style="display:flex;flex-wrap:wrap;gap:0.75rem;justify-content:center;">
+      {skills.map((s) => {
+        const st = levelStyle[s.level];
+        return (
+          <span
+            title={levelTooltip[s.level]}
+            style={{
+              display: 'inline-block',
+              padding: '0.4rem 1rem',
+              fontSize: '0.85rem',
+              fontWeight: 500,
+              color: st.color,
+              background: st.bg,
+              border: '1px solid ' + st.border,
+              borderRadius: '999px',
+              cursor: 'default',
+              transition: 'transform 0.25s ease, box-shadow 0.25s ease',
+              lineHeight: 1.4,
+            }}
+            onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px rgba(59,130,246,0.15)'"
+            onmouseout="this.style.transform='';this.style.boxShadow=''"
+          >
+            {s.name}
+          </span>
+        );
+      })}
+    </div>
+  </div>
+</section>

@@ -22,5 +22,136 @@ const { title, description } = Astro.props;
   </head>
   <body>
     <slot />
+    <script is:inline>
+      // 滚动动画
+      document.addEventListener('DOMContentLoaded', function () {
+        var observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('aos-animate');
+              }
+            });
+          },
+          { threshold: 0.12 }
+        );
+        document.querySelectorAll('[data-aos]').forEach(function (el) {
+          observer.observe(el);
+        });
+      });
+
+      // 鼠标跟随光晕
+      document.addEventListener('DOMContentLoaded', function () {
+        var glow = document.getElementById('glow');
+        if (!glow) return;
+        var hero = document.querySelector('.hero');
+        if (!hero) return;
+        hero.addEventListener('mousemove', function (e) {
+          var rect = hero.getBoundingClientRect();
+          var x = e.clientX - rect.left;
+          var y = e.clientY - rect.top;
+          glow.style.setProperty('--gx', x + 'px');
+          glow.style.setProperty('--gy', y + 'px');
+          glow.style.opacity = '1';
+        });
+        hero.addEventListener('mouseleave', function () {
+          glow.style.opacity = '0';
+        });
+      });
+
+      // 碰撞弹球
+      document.addEventListener('DOMContentLoaded', function () {
+        var body = document.body;
+        var colors = [
+          'rgba(59,130,246,0.07)',  // 蓝
+          'rgba(245,158,11,0.07)',  // 橙
+          'rgba(34,197,94,0.07)',   // 绿
+          'rgba(239,68,68,0.07)',   // 红
+          'rgba(168,85,247,0.07)',  // 紫
+          'rgba(236,72,153,0.07)',  // 粉
+        ];
+        var borderColors = [
+          'rgba(59,130,246,0.18)',
+          'rgba(245,158,11,0.18)',
+          'rgba(34,197,94,0.18)',
+          'rgba(239,68,68,0.18)',
+          'rgba(168,85,247,0.18)',
+          'rgba(236,72,153,0.18)',
+        ];
+        var balls = [];
+        var count = 6;
+
+        for (var i = 0; i < count; i++) {
+          var el = document.createElement('div');
+          var size = 40 + Math.random() * 40;
+          el.style.cssText =
+            'position:fixed;width:' + size + 'px;height:' + size + 'px;border-radius:50%;' +
+            'border:1px solid ' + borderColors[i] + ';' +
+            'pointer-events:none;z-index:0;' +
+            'background:radial-gradient(circle at 35% 35%, ' + colors[i] + ', ' + colors[i] + ' 60%, transparent);';
+          body.appendChild(el);
+
+          balls.push({
+            el: el,
+            x: Math.random() * (window.innerWidth - size),
+            y: Math.random() * (window.innerHeight - size),
+            vx: (0.6 + Math.random() * 0.9) * (Math.random() > 0.5 ? 1 : -1),
+            vy: (0.6 + Math.random() * 0.9) * (Math.random() > 0.5 ? 1 : -1),
+            size: size,
+          });
+        }
+
+        function tick() {
+          var w = window.innerWidth;
+          var h = window.innerHeight;
+
+          for (var i = 0; i < balls.length; i++) {
+            var b = balls[i];
+            b.x += b.vx;
+            b.y += b.vy;
+
+            if (b.x + b.size > w) { b.x = w - b.size; b.vx = -b.vx; }
+            if (b.x < 0) { b.x = 0; b.vx = -b.vx; }
+            if (b.y + b.size > h) { b.y = h - b.size; b.vy = -b.vy; }
+            if (b.y < 0) { b.y = 0; b.vy = -b.vy; }
+
+            for (var j = i + 1; j < balls.length; j++) {
+              var c = balls[j];
+              var dx = (b.x + b.size / 2) - (c.x + c.size / 2);
+              var dy = (b.y + b.size / 2) - (c.y + c.size / 2);
+              var dist = Math.sqrt(dx * dx + dy * dy);
+              var minDist = (b.size + c.size) / 2;
+
+              if (dist < minDist && dist > 0) {
+                var overlap = (minDist - dist) / 2;
+                var nx = dx / dist;
+                var ny = dy / dist;
+
+                b.x += nx * overlap;
+                b.y += ny * overlap;
+                c.x -= nx * overlap;
+                c.y -= ny * overlap;
+
+                var dvx = b.vx - c.vx;
+                var dvy = b.vy - c.vy;
+                var dot = dvx * nx + dvy * ny;
+                if (dot > 0) {
+                  b.vx -= dot * nx;
+                  b.vy -= dot * ny;
+                  c.vx += dot * nx;
+                  c.vy += dot * ny;
+                }
+              }
+            }
+
+            b.el.style.left = b.x + 'px';
+            b.el.style.top = b.y + 'px';
+          }
+
+          requestAnimationFrame(tick);
+        }
+        tick();
+      });
+    </script>
   </body>
 </html>
