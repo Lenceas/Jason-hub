@@ -9,13 +9,22 @@ import Footer from '../components/Footer.astro';
 
 import projects from '../data/projects.json';
 
+const statusOrder: Record<string, number> = { completed: 0, active: 1, planning: 2, archived: 3 };
+const sortedProjects = [...projects].sort((a, b) => {
+  const fa = a.featured ? 0 : 1;
+  const fb = b.featured ? 0 : 1;
+  if (fa !== fb) return fa - fb;
+  return (statusOrder[a.status] ?? 2) - (statusOrder[b.status] ?? 2);
+});
+
 const levelOrder = { expert: 0, advanced: 1, intermediate: 2, beginner: 3 };
 
 const skills = [
+  { name: "Vibe Coding", level: "expert" as const },
   { name: "C# .NET", level: "expert" as const },
   { name: "Vue", level: "advanced" as const },
   { name: "TypeScript", level: "advanced" as const },
-  { name: "小程序", level: "advanced" as const },
+  { name: "小程序", level: "advanced" as const },  
   { name: "Docker", level: "intermediate" as const },
   { name: "MySQL", level: "intermediate" as const },
   { name: "Redis", level: "intermediate" as const },
@@ -43,11 +52,11 @@ const skills = [
       ]}
     />
 
-    <Skills {skills} />
-
     <Values />
 
-    <ProjectGrid projects={projects} />
+    <Skills {skills} />
+
+    <ProjectGrid projects={sortedProjects} />
   </main>
   <Footer />
 

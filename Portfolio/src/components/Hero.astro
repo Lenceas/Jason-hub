@@ -37,7 +37,7 @@ const svgIcons: Record<string, string> = {
     <div class="hero__content">
       <!-- 头像 -->
       <div class="hero__avatar-wrapper">
-        <img src="/images/avatar.svg" alt={name} class="hero__avatar" width="120" height="120" />
+        <img src="/images/avatar.svg" alt={name} class="hero__avatar" width="120" height="120" draggable="false" />
         <span class="hero__status" aria-label="在线" />
       </div>
 
@@ -147,6 +147,9 @@ const svgIcons: Record<string, string> = {
     border: 3px solid var(--color-primary-lighter);
     box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.06);
     transition: box-shadow var(--transition), transform var(--transition);
+    user-select: none;
+    -webkit-user-drag: none;
+    user-drag: none;
   }
 
   .hero__avatar:hover {

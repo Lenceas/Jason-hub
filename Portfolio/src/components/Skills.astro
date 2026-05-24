@@ -5,50 +5,81 @@ export interface Props {
 
 const { skills } = Astro.props;
 
-const levelStyle: Record<string, { color: string; bg: string; border: string }> = {
-  beginner: { color: '#94A3B8', bg: '#F1F5F9', border: '#E2E8F0' },
-  intermediate: { color: '#3B82F6', bg: '#DBEAFE', border: '#BFDBFE' },
-  advanced: { color: '#1D4ED8', bg: '#EFF6FF', border: '#93C5FD' },
-  expert: { color: '#FFFFFF', bg: '#2563EB', border: '#2563EB' },
+const icons: Record<string, string> = {
+  'Vibe Coding': '✨',
+  'C# .NET': '🔷',
+  'Vue': '💚',
+  'TypeScript': '📘',
+  '小程序': '📱',  
+  'Docker': '🐳',
+  'MySQL': '🗄️',
+  'Redis': '⚡',
+  'MQTT': '📡',
 };
 
-const levelTooltip: Record<string, string> = {
+const levelStyle: Record<string, { color: string; bg: string; border: string; size: string }> = {
+  beginner: { color: '#94A3B8', bg: '#F8FAFC', border: '#E2E8F0', size: '0.8rem' },
+  intermediate: { color: '#065F46', bg: '#ECFDF5', border: '#A7F3D0', size: '0.85rem' },
+  advanced: { color: '#4F46E5', bg: '#EEF2FF', border: '#A5B4FC', size: '0.9rem' },
+  expert: { color: '#FFFFFF', bg: '#2563EB', border: '#2563EB', size: '0.95rem' },
+};
+
+const levelLabel: Record<string, string> = {
   beginner: '初学',
   intermediate: '熟练',
   advanced: '精通',
   expert: '擅长',
 };
+
+const skillOverrides: Record<string, { color: string; bg: string; border: string }> = {
+  'Vibe Coding': { color: '#1D4ED8', bg: '#DBEAFE', border: '#93C5FD' },
+  'C# .NET': { color: '#1D4ED8', bg: '#DBEAFE', border: '#93C5FD' },
+};
 ---
 
 <section style="padding:3rem 0;background:#fff;text-align:center;">
   <div style="max-width:1024px;margin:0 auto;padding:0 1.25rem;">
-    <h2 style="font-size:1.5rem;font-weight:600;margin-bottom:2rem;display:inline-block;position:relative;color:#1E293B;">
+    <h2 style="font-size:1.5rem;font-weight:600;margin-bottom:2rem;display:inline-flex;align-items:center;gap:8px;position:relative;color:#1E293B;">
+      <span style="color:#93C5FD;font-weight:300;opacity:0.5;font-size:1.2rem;">&lt;</span>
       技能
-      <span style="content:'';position:absolute;bottom:-8px;left:0;width:36px;height:3px;background:#3B82F6;border-radius:2px;display:block;"></span>
+      <span style="color:#93C5FD;font-weight:300;opacity:0.5;font-size:1.2rem;">/&gt;</span>
+      <span style="display:block;position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:36px;height:3px;background:#3B82F6;border-radius:2px;"></span>
     </h2>
-    <div style="display:flex;flex-wrap:wrap;gap:0.75rem;justify-content:center;">
+    <div style="display:flex;flex-wrap:wrap;gap:0.75rem;justify-content:center;max-width:640px;margin:0 auto;">
       {skills.map((s) => {
-        const st = levelStyle[s.level];
+        const base = levelStyle[s.level];
+        const override = skillOverrides[s.name];
+        const st = override || base;
+        const icon = icons[s.name] || '○';
+        const tip = levelLabel[s.level];
         return (
           <span
-            title={levelTooltip[s.level]}
             style={{
-              display: 'inline-block',
-              padding: '0.4rem 1rem',
-              fontSize: '0.85rem',
+              position: 'relative',
+              display: 'inline-flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '0.5rem 1rem 0.35rem',
+              fontSize: st.size,
               fontWeight: 500,
               color: st.color,
               background: st.bg,
               border: '1px solid ' + st.border,
-              borderRadius: '999px',
+              borderRadius: '10px',
               cursor: 'default',
               transition: 'transform 0.25s ease, box-shadow 0.25s ease',
               lineHeight: 1.4,
+              minWidth: '80px',
             }}
-            onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px rgba(59,130,246,0.15)'"
+            onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 6px 16px rgba(59,130,246,0.18)'"
             onmouseout="this.style.transform='';this.style.boxShadow=''"
           >
-            {s.name}
+            <span style={{ position: 'absolute', top: '-7px', right: '-7px', background: st.bg, border: '1px solid ' + st.border, color: st.color, fontSize: '0.6rem', padding: '0 5px', borderRadius: '6px', lineHeight: '1.5', fontWeight: 500, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>{tip}</span>
+            <span style="display:inline-flex;align-items:center;gap:4px;">
+              <span style="font-size:1em;line-height:1;">{icon}</span>
+              {s.name}
+            </span>
           </span>
         );
       })}

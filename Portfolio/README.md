@@ -23,9 +23,9 @@ Jason-hub 主站 · 个人主页
 
 - **Header** — Logo、导航
 - **Hero** — 头像、名称、标语、简介、社交链接（品牌色图标按钮）
-- **Skills** — 彩色技能标签云（按熟练度分色）
-- **Values** — 水墨风格社会主义核心价值观展示
-- **ProjectGrid** — 项目卡片网格（数据驱动，毛玻璃效果）
+- **Skills** — 彩色技能标签云（按熟练度分色 + 固定熟练度气泡）
+- **Values** — 水墨风格社会主义核心价值观展示（自动轮播高亮）
+- **ProjectGrid** — 项目卡片网格（数据驱动，毛玻璃效果，精选星标）
 - **Footer** — 版权信息
 
 ### 视觉特效
@@ -33,7 +33,8 @@ Jason-hub 主站 · 个人主页
 - 鼠标跟随光晕、背景渐变装饰圆
 - 6 色碰撞弹球
 - 滚动淡入动画
-- 毛玻璃卡片 + 精选标识
+- 毛玻璃卡片 + 精选星标
+- 价值观自动轮播高亮（1s 间隔）
 
 ### 数据源
 
@@ -109,9 +110,9 @@ A minimal personal homepage built with **Astro 6**, aggregating personal profile
 
 - **Header** — Logo, navigation
 - **Hero** — Avatar, name, tagline, bio, social links (brand-colored icon buttons)
-- **Skills** — Color-coded skill tags (by proficiency level)
-- **Values** — Ink-wash style socialist core values display
-- **ProjectGrid** — Data-driven project card grid (glass morphism)
+- **Skills** — Color-coded skill tags (proficiency level + fixed tooltip badges)
+- **Values** — Ink-wash style socialist core values display (auto-cycling highlight)
+- **ProjectGrid** — Data-driven project card grid (glass morphism, featured star icon)
 - **Footer** — Copyright & credits
 
 ### Visual Effects
@@ -119,7 +120,8 @@ A minimal personal homepage built with **Astro 6**, aggregating personal profile
 - Mouse-follow glow, gradient decorative circles
 - 6-color bouncing balls
 - Scroll fade-in animation
-- Glass morphism cards with featured badges
+- Glass morphism cards with featured star badges
+- Values auto-cycling highlight (1s interval)
 
 ### Data Source
 

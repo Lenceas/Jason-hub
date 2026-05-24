@@ -1,14 +1,50 @@
 [
   {
-    "id": "example-project",
-    "title": "示例项目",
-    "tagline": "第一个子项目 · 开发中",
-    "description": "这里将展示 Jason-hub 旗下的第一个子项目，通过项目卡片跳转到独立站点。",
-    "status": "planning",
+    "id": "todo-app",
+    "title": "Todo App",
+    "tagline": "Vue 3 + TypeScript · 任务管理",
+    "description": "一个简洁的任务管理应用，支持分类、标签、拖拽排序，后端基于 .NET 8 + PostgreSQL 构建，前后端分离部署。",
+    "status": "completed",
     "featured": true,
     "url": "https://github.com/Lenceas/Jason-hub",
     "thumbnail": "/images/placeholder-project.svg",
-    "tags": ["Vue 3", "TypeScript", "待启动"],
+    "tags": ["Vue 3", "TypeScript", ".NET", "PostgreSQL"],
     "year": 2026
+  },
+  {
+    "id": "blog-platform",
+    "title": "个人博客",
+    "tagline": "静态博客 · Markdown 驱动",
+    "description": "基于 Astro 构建的个人博客，支持 Markdown/MDX 编写，自动生成目录、标签聚合、RSS 订阅。",
+    "status": "active",
+    "featured": false,
+    "url": "https://github.com/Lenceas/Jason-hub",
+    "thumbnail": "/images/placeholder-project.svg",
+    "tags": ["Astro", "Markdown", "MDX"],
+    "year": 2026
+  },
+  {
+    "id": "iot-dashboard",
+    "title": "IoT Dashboard",
+    "tagline": "MQTT + Redis · 实时数据看板",
+    "description": "物联网设备数据监控面板，通过 MQTT 采集数据，Redis 缓存实时状态，Vue 3 前端可视化展示。",
+    "status": "planning",
+    "featured": false,
+    "url": "https://github.com/Lenceas/Jason-hub",
+    "thumbnail": "/images/placeholder-project.svg",
+    "tags": ["Vue 3", "MQTT", "Redis", "仪表盘"],
+    "year": 2026
+  },
+  {
+    "id": "old-site",
+    "title": "旧版主页",
+    "tagline": "个人网站 · 初代版本",
+    "description": "Jason-hub 的前身，基于纯 HTML/CSS/JS 构建的早期个人页面，已停止维护。",
+    "status": "archived",
+    "featured": false,
+    "url": "https://github.com/Lenceas/Jason-hub",
+    "thumbnail": "/images/placeholder-project.svg",
+    "tags": ["HTML", "CSS", "JavaScript"],
+    "year": 2024
   }
 ]

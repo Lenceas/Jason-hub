@@ -4,7 +4,7 @@ export interface Props {
   title: string;
   tagline: string;
   description: string;
-  status: 'active' | 'planning' | 'archived';
+  status: 'active' | 'planning' | 'archived' | 'completed';
   url: string;
   thumbnail: string;
   tags: string[];
@@ -15,7 +15,8 @@ export interface Props {
 const { id, title, tagline, description, status, url, thumbnail, tags, year, featured } = Astro.props;
 
 const statusLabel: Record<string, { text: string; color: string }> = {
-  active: { text: '进行中', color: '#22C55E' },
+  completed: { text: '已完成', color: '#10B981' },
+  active: { text: '进行中', color: '#3B82F6' },
   planning: { text: '规划中', color: '#F59E0B' },
   archived: { text: '已归档', color: '#94A3B8' },
 };
@@ -24,7 +25,7 @@ const statusLabel: Record<string, { text: string; color: string }> = {
 <article class="card glass" data-aos>
   <a href={url} target="_blank" rel="noopener noreferrer" class="card__link">
     <!-- 精选标识 -->
-    {featured && <span class="card__featured">精选</span>}
+    {featured && <span style="position:absolute;top:12px;left:12px;z-index:2;display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.92);backdrop-filter:blur(4px);border:1px solid rgba(245,158,11,0.3);box-shadow:0 2px 8px rgba(245,158,11,0.15);"><svg width="14" height="14" viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B" stroke-width="1"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>}
 
     <!-- 缩略图 -->
     <div class="card__thumb">
@@ -85,21 +86,8 @@ const statusLabel: Record<string, { text: string; color: string }> = {
     color: inherit;
   }
 
-  /* ---- 精选标识 ---- */
   .card__featured {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    z-index: 2;
-    padding: 3px 10px;
-    border-radius: 999px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: #F59E0B;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(4px);
-    border: 1px solid rgba(245, 158, 11, 0.3);
-    letter-spacing: 0.03em;
+    display: none;
   }
 
   .card__thumb {
