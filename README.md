@@ -24,6 +24,14 @@ Jason-hub/
 
 Portfolio 主站使用 **8000** 端口。
 
+## 分支与版本
+
+- **main** — 主分支，始终可部署
+- **project/\<name\>** — 子项目开发分支
+- 版本号：`v1.0.0` → `v1.1.0` → `v1.1.1` ...
+
+详见 [STYLE_GUIDE.md](./STYLE_GUIDE.md#git-分支与版本规范) Git 章节。
+
 ## 快速开始
 
 ```bash

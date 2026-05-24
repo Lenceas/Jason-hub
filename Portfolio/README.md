@@ -56,3 +56,17 @@ npm install
 npm run dev    # → http://localhost:8000
 npm run build  # 构建静态文件到 dist/
 ```
+
+## Git 分支
+
+Portfolio 作为主站，在 `main` 分支上直接开发。如需较大改动，可切 `feat/` 分支：
+
+```bash
+git checkout -b feat/xxx
+# 开发完成后
+git checkout main
+git merge feat/xxx
+git branch -d feat/xxx
+```
+
+版本号跟随根仓库语义化版本，详见 [STYLE_GUIDE.md](../STYLE_GUIDE.md#git-分支与版本规范)。

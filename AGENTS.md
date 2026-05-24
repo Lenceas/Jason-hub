@@ -43,6 +43,24 @@ Jason-hub/
 - **添加新子项目**时，同步更新 `Portfolio/src/data/projects.json` 添加对应项目卡片
 - **项目卡片字段**：`id`、`title`、`tagline`、`description`、`status`（active/planning/archived）、`url`、`thumbnail`、`tags`、`year`
 
+## Git 分支规范
+
+采用简化版 GitHub Flow（单人适用）。
+
+| 分支 | 用途 | 说明 |
+|------|------|------|
+| `main` | 主分支 | 始终可部署，合并即发布 |
+| `project/<name>` | 子项目开发 | 如 `project/todo-app`，开发完合并到 main 后删除 |
+| `feat/<描述>` | 功能开发 | 可选，小功能独立分支 |
+| `fix/<描述>` | 修复 | Bug 修复 |
+
+**版本号**（语义化版本）：
+- `v1.0.0` — 首个可发布版本
+- `v1.1.0` — 新增子项目 / 新功能
+- `v1.1.1` — Bug 修复
+
+更多细节见 [STYLE_GUIDE.md](./STYLE_GUIDE.md) Git 章节。
+
 ## 端口规则（开发环境）
 
 用于本地开发和反向代理配置。

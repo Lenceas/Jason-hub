@@ -67,6 +67,25 @@ src/data/projects.json  ──→  Astro 构建时读取  ──→  静态 HTML
 
 详见 [AGENTS.md](./AGENTS.md) 的端口分配表。
 
+## 分支策略
+
+```
+main ───●────────●────────●────────  ← 始终可部署
+         \      /        /
+project/   ●──●──●      /
+todo-app        \      /
+                 ●────●
+
+Tag: v1.0.0    v1.1.0    v1.1.1
+```
+
+- **main** — 主分支，始终可部署
+- **project/\<name\>** — 子项目开发分支，开发完合并回 main 后删除
+- **feat/\<描述\>** / **fix/\<描述\>** — 小功能 / 修复
+- 语义化版本：`v主版本.次版本.修订`
+
+详见 [STYLE_GUIDE.md](./STYLE_GUIDE.md) 的 Git 章节。
+
 ## 技术选型
 
 | 模块 | 方案 | 理由 |
