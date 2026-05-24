@@ -1,10 +1,16 @@
 # Portfolio
 
-> Jason-hub 主站 · 个人主页
+> [中文](#zh) · [English](#en)
+
+---
+
+<h2 id="zh">中文</h2>
+
+Jason-hub 主站 · 个人主页
 
 基于 **Astro 6** 构建的极简个人主页，聚合展示个人介绍与项目卡片，作为 Jason-hub 所有子项目的统一入口。
 
-## 技术栈
+### 技术栈
 
 |  |  |
 |------|------|
@@ -13,18 +19,18 @@
 | 设计 | 极简清爽 · 蓝白配色 |
 | 响应式 | Mobile First（三端适配） |
 
-## 页面组成
+### 页面组成
 
 - **Header** — Logo、导航
 - **Hero** — 头像、名称、简介、社交链接
 - **ProjectGrid** — 项目卡片网格（数据驱动）
 - **Footer** — 版权信息
 
-## 数据源
+### 数据源
 
 项目卡片数据存储在 `src/data/projects.json`，添加新子项目时在此文件中追加记录即可。
 
-## 目录结构
+### 目录结构
 
 ```
 Portfolio/
@@ -49,7 +55,7 @@ Portfolio/
 └── package.json
 ```
 
-## 本地开发
+### 本地开发
 
 ```bash
 npm install
@@ -57,7 +63,7 @@ npm run dev    # → http://localhost:8000
 npm run build  # 构建静态文件到 dist/
 ```
 
-## Git 分支
+### Git 分支
 
 Portfolio 作为主站，在 `main` 分支上直接开发。如需较大改动，可切 `feat/` 分支：
 
@@ -70,3 +76,78 @@ git branch -d feat/xxx
 ```
 
 版本号跟随根仓库语义化版本，详见 [STYLE_GUIDE.md](../STYLE_GUIDE.md#git-分支与版本规范)。
+
+---
+
+<h2 id="en">English</h2>
+
+Jason-hub Main Site · Personal Homepage
+
+A minimal personal homepage built with **Astro 6**, aggregating personal profile and project cards as the unified entry point for all Jason-hub sub-projects.
+
+### Tech Stack
+
+|  |  |
+|------|------|
+| Framework | Astro 6 |
+| Styling | Vanilla CSS + CSS Custom Properties |
+| Design | Minimal & clean · Blue-white palette |
+| Responsive | Mobile-first (3 breakpoints) |
+
+### Page Sections
+
+- **Header** — Logo, navigation
+- **Hero** — Avatar, name, tagline, bio, social links
+- **ProjectGrid** — Data-driven project card grid
+- **Footer** — Copyright & credits
+
+### Data Source
+
+Project card data lives in `src/data/projects.json`. Add a new entry whenever a new sub-project is created.
+
+### Directory Structure
+
+```
+Portfolio/
+├── public/images/          ← Static assets (avatar, logo, thumbnails)
+├── src/
+│   ├── pages/
+│   │   └── index.astro     ← Single page entry
+│   ├── layouts/
+│   │   └── BaseLayout.astro
+│   ├── components/
+│   │   ├── Header.astro
+│   │   ├── Hero.astro
+│   │   ├── ProjectCard.astro
+│   │   ├── ProjectGrid.astro
+│   │   └── Footer.astro
+│   ├── data/
+│   │   └── projects.json
+│   └── styles/
+│       └── global.css
+├── astro.config.mjs
+├── tsconfig.json
+└── package.json
+```
+
+### Local Development
+
+```bash
+npm install
+npm run dev    # → http://localhost:8000
+npm run build  # Build static output to dist/
+```
+
+### Git Branching
+
+Portfolio is the main site and is developed directly on `main`. For larger changes, use a `feat/` branch:
+
+```bash
+git checkout -b feat/xxx
+# After development
+git checkout main
+git merge feat/xxx
+git branch -d feat/xxx
+```
+
+Versioning follows the root repo's semantic versioning. See [STYLE_GUIDE.md](../STYLE_GUIDE.md#git-分支与版本规范) for details.
