@@ -1,0 +1,246 @@
+<div class="back-to-top" id="back-to-top" role="button" tabindex="0" aria-label="回到顶部">
+  <!-- 滚动进度环 + 毛玻璃底色 -->
+  <svg class="back-to-top__ring" viewBox="0 0 48 48" aria-hidden="true">
+    <!-- 毛玻璃底圆 -->
+    <defs>
+      <filter id="b2t-blur">
+        <feGaussianBlur stdDeviation="0" />
+      </filter>
+    </defs>
+    <circle cx="24" cy="24" r="22" fill="rgba(255,255,255,0.75)" />
+    <!-- 进度环底部轨道 -->
+    <circle class="back-to-top__ring-track" cx="24" cy="24" r="20" fill="none" />
+    <!-- 进度条 -->
+    <circle class="back-to-top__ring-progress" id="ring-progress" cx="24" cy="24" r="20" fill="none" />
+  </svg>
+
+  <!-- 箭头图标 -->
+  <svg class="back-to-top__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M18 15l-6-6-6 6" />
+  </svg>
+
+  <!-- 悬停提示标签 -->
+  <span class="back-to-top__label">TOP</span>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var btn = document.getElementById('back-to-top');
+    if (!btn) return;
+
+    var ring = document.getElementById('ring-progress');
+    var circumference = 2 * Math.PI * 20; // r=20
+
+    if (ring) {
+      ring.style.strokeDasharray = circumference + '';
+      ring.style.strokeDashoffset = circumference + '';
+    }
+
+    var scrollHandler = function () {
+      var scrollTop = window.scrollY;
+      var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+
+      if (scrollTop > 200) {
+        btn.classList.add('back-to-top--visible');
+      } else {
+        btn.classList.remove('back-to-top--visible');
+      }
+
+      if (ring && docHeight > 0) {
+        var progress = Math.min(scrollTop / docHeight, 1);
+        var offset = circumference - progress * circumference;
+        ring.style.strokeDashoffset = offset + '';
+      }
+    };
+
+    document.addEventListener('scroll', scrollHandler, { passive: true });
+
+    btn.addEventListener('click', function () {
+      btn.classList.add('back-to-top--clicked');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(function () {
+        btn.classList.remove('back-to-top--clicked');
+      }, 600);
+    });
+
+    btn.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        btn.click();
+      }
+    });
+  });
+</script>
+
+<style>
+  .back-to-top {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 100;
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(16px);
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    user-select: none;
+    outline: none;
+  }
+
+  .back-to-top--visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* ---- 毛玻璃外框 ---- */
+  .back-to-top::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--color-card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .back-to-top:hover::before {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2), var(--shadow-md);
+  }
+
+  .back-to-top:focus-visible {
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px var(--color-primary-lighter);
+  }
+
+  /* ---- 点击波纹 ---- */
+  .back-to-top--clicked::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--color-primary-light);
+    opacity: 0.3;
+    z-index: -1;
+    animation: b2t-ripple 0.6s ease-out forwards;
+  }
+
+  @keyframes b2t-ripple {
+    0%   { transform: scale(1); opacity: 0.4; }
+    100% { transform: scale(2.5); opacity: 0; }
+  }
+
+  /* ---- 进度环（覆盖整个按钮） ---- */
+  .back-to-top__ring {
+    position: absolute;
+    inset: -2px;
+    width: calc(100% + 4px);
+    height: calc(100% + 4px);
+    z-index: 2;
+    pointer-events: none;
+    transform: rotate(-90deg);
+  }
+
+  .back-to-top__ring-track {
+    stroke: var(--color-border);
+    stroke-width: 2;
+  }
+
+  .back-to-top__ring-progress {
+    stroke: var(--color-primary);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-dashoffset: 125.66; /* circumference 2 * PI * 20 */
+    transition: stroke-dashoffset 0.15s ease;
+  }
+
+  /* ---- 箭头图标 ---- */
+  .back-to-top__icon {
+    position: absolute;
+    z-index: 3;
+    width: 20px;
+    height: 20px;
+    color: var(--color-text-secondary);
+    transition: color var(--transition);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: b2t-float 2s ease-in-out infinite;
+  }
+
+  .back-to-top:hover .back-to-top__icon {
+    color: var(--color-primary);
+    animation: b2t-bounce 0.6s ease-in-out infinite;
+  }
+
+  @keyframes b2t-float {
+    0%, 100% { transform: translate(-50%, -50%); }
+    50%      { transform: translate(-50%, calc(-50% - 2px)); }
+  }
+
+  @keyframes b2t-bounce {
+    0%, 100% { transform: translate(-50%, -50%); }
+    50%      { transform: translate(-50%, calc(-50% - 5px)); }
+  }
+
+  /* ---- 悬停标签 ---- */
+  .back-to-top__label {
+    position: absolute;
+    right: calc(100% + 8px);
+    top: 50%;
+    transform: translateY(-50%) translateX(8px);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--color-primary);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    pointer-events: none;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    background: var(--color-card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: var(--shadow-sm);
+    line-height: 1;
+  }
+
+  .back-to-top:hover .back-to-top__label {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+
+  /* ---- 响应式 ---- */
+  @media (min-width: 640px) {
+    .back-to-top {
+      bottom: 2rem;
+      right: 2rem;
+      width: 52px;
+      height: 52px;
+    }
+
+    .back-to-top__icon {
+      width: 22px;
+      height: 22px;
+    }
+
+    .back-to-top__label {
+      font-size: 0.75rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .back-to-top {
+      bottom: 2.5rem;
+      right: 2.5rem;
+    }
+  }
+</style>

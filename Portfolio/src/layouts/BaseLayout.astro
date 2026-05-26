@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import BackToTop from '../components/BackToTop.astro';
 export interface Props {
   title: string;
   description?: string;
@@ -22,6 +23,7 @@ const { title, description } = Astro.props;
   </head>
   <body>
     <slot />
+    <BackToTop />
     <script is:inline>
       // 滚动动画
       document.addEventListener('DOMContentLoaded', function () {
