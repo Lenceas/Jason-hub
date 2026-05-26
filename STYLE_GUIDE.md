@@ -12,6 +12,7 @@
 | CSS 自定义属性 | `--color-*`, `--radius-*`, `--shadow-*` | `--color-primary`, `--radius-md` |
 | JSON 字段 | camelCase | `projectId`, `tagline`, `socialLinks` |
 | 文件夹 | PascalCase（组件目录） / kebab-case | `components/`, `styles/` |
+| 更新日志 | `UPDATE.md`（根目录） / `{项目名}-Update.md`（子项目） | `Portfolio-Update.md` |
 
 ## CSS 规范
 
