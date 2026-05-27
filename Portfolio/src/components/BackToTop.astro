@@ -40,7 +40,7 @@
       var scrollTop = window.scrollY;
       var docHeight = document.documentElement.scrollHeight - window.innerHeight;
 
-      if (scrollTop > 200) {
+      if (scrollTop > 0) {
         btn.classList.add('back-to-top--visible');
       } else {
         btn.classList.remove('back-to-top--visible');
@@ -174,7 +174,7 @@
     animation: b2t-float 2s ease-in-out infinite;
   }
 
-  .back-to-top:hover .back-to-top__icon {
+  .back-to-top--visible .back-to-top__icon {
     color: var(--color-primary);
     animation: b2t-bounce 0.6s ease-in-out infinite;
   }
@@ -192,9 +192,9 @@
   /* ---- 悬停标签 ---- */
   .back-to-top__label {
     position: absolute;
-    right: calc(100% + 8px);
-    top: 50%;
-    transform: translateY(-50%) translateX(8px);
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translate(-50%, 8px);
     font-size: 0.7rem;
     font-weight: 600;
     letter-spacing: 0.08em;
@@ -213,9 +213,9 @@
     line-height: 1;
   }
 
-  .back-to-top:hover .back-to-top__label {
+  .back-to-top--visible .back-to-top__label {
     opacity: 1;
-    transform: translateY(-50%) translateX(0);
+    transform: translate(-50%, 0);
   }
 
   /* ---- 响应式 ---- */

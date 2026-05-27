@@ -46,7 +46,9 @@ const svgIcons: Record<string, string> = {
 
       <!-- 文字介绍 -->
       <h1 class="hero__name">{name}</h1>
-      <p class="hero__tagline">{tagline}</p>
+      <p class="hero__tagline">
+        <span id="typing-text"></span><span id="typing-cursor" class="typing-cursor">|</span>
+      </p>
 
       <div class="hero__bio">
         {bio.map((line) => (
@@ -191,23 +193,19 @@ const svgIcons: Record<string, string> = {
     color: var(--color-primary);
     font-weight: 500;
     margin-bottom: 1rem;
-    overflow: hidden;
-    white-space: nowrap;
-    border-right: 2px solid var(--color-primary);
-    animation: typing 2.5s steps(25, end), blink-caret 0.75s step-end infinite;
     max-width: fit-content;
     margin-left: auto;
     margin-right: auto;
   }
 
-  @keyframes typing {
-    from { width: 0; }
-    to { width: 100%; }
+  .typing-cursor {
+    color: var(--color-primary);
+    animation: blink 0.75s step-end infinite;
   }
 
-  @keyframes blink-caret {
-    from, to { border-color: transparent; }
-    50% { border-color: var(--color-primary); }
+  @keyframes blink {
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
   }
 
   .hero__bio {
@@ -327,3 +325,32 @@ const svgIcons: Record<string, string> = {
     }
   }
 </style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const text = "用代码构建有趣的东西...";
+    const el = document.getElementById('typing-text');
+    const cursor = document.getElementById('typing-cursor');
+    if (!el || !cursor) return;
+
+    let charIndex = 0;
+    const typeSpeed = 120;
+    const holdDelay = 5000;
+
+    function typeLoop() {
+      if (charIndex < text.length) {
+        charIndex++;
+        el.textContent = text.slice(0, charIndex);
+        setTimeout(typeLoop, typeSpeed);
+      } else {
+        setTimeout(() => {
+          charIndex = 0;
+          el.textContent = '';
+          setTimeout(typeLoop, 300);
+        }, holdDelay);
+      }
+    }
+
+    typeLoop();
+  });
+</script>
