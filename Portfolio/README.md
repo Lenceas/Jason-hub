@@ -26,6 +26,7 @@ Jason-hub 主站 · 个人主页
 - **Skills** — 彩色技能标签云（按熟练度分色 + 固定熟练度气泡）
 - **Values** — 水墨风格社会主义核心价值观展示（自动轮播高亮）
 - **ProjectGrid** — 项目卡片网格（数据驱动，毛玻璃效果，精选星标）
+- **BackToTop** — 回到顶部按钮（滚动进度环 + 弹跳箭头动画）
 - **Footer** — 版权信息
 
 ### 视觉特效
@@ -34,6 +35,7 @@ Jason-hub 主站 · 个人主页
 - 6 色碰撞弹球
 - 滚动淡入动画
 - 毛玻璃卡片 + 精选星标
+- 回到顶部动画（滚动进度环 + 弹跳箭头）
 - 价值观自动轮播高亮（1s 间隔）
 
 ### 数据源
@@ -57,6 +59,7 @@ Portfolio/
 │   │   ├── Values.astro
 │   │   ├── ProjectCard.astro
 │   │   ├── ProjectGrid.astro
+│   │   ├── BackToTop.astro
 │   │   └── Footer.astro
 │   ├── data/
 │   │   └── projects.json
@@ -113,6 +116,7 @@ A minimal personal homepage built with **Astro 6**, aggregating personal profile
 - **Skills** — Color-coded skill tags (proficiency level + fixed tooltip badges)
 - **Values** — Ink-wash style socialist core values display (auto-cycling highlight)
 - **ProjectGrid** — Data-driven project card grid (glass morphism, featured star icon)
+- **BackToTop** — Scroll-to-top button (progress ring + bouncing arrow)
 - **Footer** — Copyright & credits
 
 ### Visual Effects
@@ -121,6 +125,7 @@ A minimal personal homepage built with **Astro 6**, aggregating personal profile
 - 6-color bouncing balls
 - Scroll fade-in animation
 - Glass morphism cards with featured star badges
+- Scroll-to-top animation (progress ring + bouncing arrow)
 - Values auto-cycling highlight (1s interval)
 
 ### Data Source
@@ -144,6 +149,7 @@ Portfolio/
 │   │   ├── Values.astro
 │   │   ├── ProjectCard.astro
 │   │   ├── ProjectGrid.astro
+│   │   ├── BackToTop.astro
 │   │   └── Footer.astro
 │   ├── data/
 │   │   └── projects.json

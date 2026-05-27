@@ -2,6 +2,14 @@
 
 ---
 
+## v1.0.6 (2026-05-27 23:26 ~ 23:27)
+
+- **RELEASE.md**：重构发布工作流 — 新增预检（强制构建验证）/ 变更分类 / 新增子项目补充检查表
+- **README.md**：根目录结构图补全 CHANGELOG / DEPLOY / RELEASE 文档
+- **Portfolio/README.md**：同步 BackToTop 组件到页面组成 / 目录结构 / 视觉特效（中英文）
+
+---
+
 ## v1.0.5 (2026-05-27 23:03 ~ 23:12)
 
 - **STYLE_GUIDE.md**：命名规范重构 — 五种风格（UPPER_CASE / PascalCase / kebab-case / camelCase / SCREAMING_SNAKE）按场景分类

@@ -14,11 +14,15 @@
 
 ```
 Jason-hub/
-├── Portfolio/     ← Astro 6 个人主页（主站）
-├── ...            ← 后续子项目 (Vue 3 + TS)
-├── AGENTS.md      ← AI 协作说明
-├── ARCHITECTURE.md ← 架构设计
-└── STYLE_GUIDE.md ← 编码规范
+├── Portfolio/        ← Astro 6 个人主页（主站）
+├── ...               ← 后续子项目 (Vue 3 + TS)
+├── AGENTS.md         ← AI 协作说明
+├── ARCHITECTURE.md   ← 架构设计
+├── CHANGELOG.md      ← 项目更新日志
+├── DEPLOY.md         ← 部署规范
+├── RELEASE.md        ← 发布工作流
+├── STYLE_GUIDE.md    ← 编码规范
+└── README.md         ← 项目总览（本文件）
 ```
 
 ### 端口规则
