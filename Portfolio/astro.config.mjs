@@ -1,7 +1,10 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://jason.dev',
+  site: 'https://lujiesheng.cn',
+  devToolbar: {
+    enabled: false,
+  },
   server: {
     host: true,
     port: 8000,
