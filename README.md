@@ -63,11 +63,15 @@ A personal project aggregation site built with [Astro 6](./Portfolio). The main 
 
 ```
 Jason-hub/
-├── Portfolio/     ← Astro 6 personal homepage (main site)
-├── ...            ← Upcoming sub-projects (Vue 3 + TS)
-├── AGENTS.md      ← AI agent instructions
-├── ARCHITECTURE.md ← Architecture design
-└── STYLE_GUIDE.md ← Coding standards
+├── Portfolio/        ← Astro 6 personal homepage (main site)
+├── ...               ← Upcoming sub-projects (Vue 3 + TS)
+├── AGENTS.md         ← AI agent instructions
+├── ARCHITECTURE.md   ← Architecture design
+├── CHANGELOG.md      ← Project changelog
+├── DEPLOY.md         ← Deployment guide
+├── RELEASE.md        ← Release workflow
+├── STYLE_GUIDE.md    ← Coding standards
+└── README.md         ← Project overview (this file)
 ```
 
 ### Port Convention
