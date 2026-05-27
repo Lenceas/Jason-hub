@@ -1,4 +1,11 @@
-# UPDATE.md — Portfolio 更新日志
+# CHANGELOG.md — Portfolio 更新日志
+
+---
+
+## v1.0.5 (2026-05-27 23:03 ~ 23:12)
+
+- **STYLE_GUIDE.md**：命名规范重构，按场景分为五种风格
+- **日志文件更名**：`Portfolio-Update.md` → `Portfolio-Changelog.md`
 
 ---
 
@@ -33,8 +40,8 @@
 - **Values**：社会主义核心价值观替换为程序员风格文字（简洁/可靠/高效/优雅 · 开源/协作/迭代/极致 · 专注/好奇/创造/分享）
 - **Hero**：头像替换为个人微信头像
 - **tsconfig**：添加 `ignoreDeprecations: "6.0"` 消除 TS baseUrl 弃用警告
-- **STYLE_GUIDE.md**：新增 UPDATE.md 命名规范
-- 创建本日志文件 `Portfolio-Update.md`
+- **STYLE_GUIDE.md**：新增命名规范
+- 创建本日志文件 `Portfolio-Changelog.md`
 
 ---
 

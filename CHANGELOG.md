@@ -1,4 +1,13 @@
-# UPDATE.md — Jason-hub 更新日志
+# CHANGELOG.md — Jason-hub 更新日志
+
+---
+
+## v1.0.5 (2026-05-27 23:03 ~ 23:12)
+
+- **STYLE_GUIDE.md**：命名规范重构 — 五种风格（UPPER_CASE / PascalCase / kebab-case / camelCase / SCREAMING_SNAKE）按场景分类
+- **UPDATE.md → CHANGELOG.md**：统一更名为 CHANGELOG，匹配行业惯例
+- **Portfolio-Update.md → Portfolio-Changelog.md**：子项目日志同步更名
+- 全量更新所有文档引用（STYLE_GUIDE / RELEASE / 历史记录）
 
 ---
 
@@ -28,9 +37,9 @@
 - 价值观模块：将社会主义核心价值观替换为程序员风格文字（简洁/可靠/高效/优雅 · 开源/协作/迭代/极致 · 专注/好奇/创造/分享）
 - 头像：替换为个人微信头像
 - tsconfig：添加 `ignoreDeprecations: "6.0"` 消除 baseUrl 弃用警告
-- STYLE_GUIDE.md：新增 UPDATE.md 命名规范（`UPDATE.md` 根目录 / `{项目名}-Update.md` 子项目）
-- 创建根目录 `UPDATE.md` 更新日志
-- 创建 `Portfolio/Portfolio-Update.md` 子项目更新日志
+- STYLE_GUIDE.md：新增命名规范（`CHANGELOG.md` 根目录 / `{项目名}-Changelog.md` 子项目）
+- 创建根目录 `CHANGELOG.md` 更新日志
+- 创建 `Portfolio/Portfolio-Changelog.md` 子项目更新日志
 
 ---
 

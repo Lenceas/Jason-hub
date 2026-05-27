@@ -4,15 +4,15 @@
 
 ## 命名规范
 
-| 类型 | 规范 | 示例 |
-|------|------|------|
-| 组件文件 | PascalCase | `ProjectCard.astro`, `Hero.astro` |
-| 普通文件 | kebab-case | `global.css`, `astro.config.mjs` |
-| CSS 类名 | BEM（block\_\_element--modifier） | `hero__social-link`, `card__desc` |
-| CSS 自定义属性 | `--color-*`, `--radius-*`, `--shadow-*` | `--color-primary`, `--radius-md` |
-| JSON 字段 | camelCase | `projectId`, `tagline`, `socialLinks` |
-| 文件夹 | PascalCase（组件目录） / kebab-case | `components/`, `styles/` |
-| 更新日志 | `UPDATE.md`（根目录） / `{项目名}-Update.md`（子项目） | `Portfolio-Update.md` |
+| 风格 | 规范 | 适用场景 | 示例 |
+|------|------|----------|------|
+| **UPPER_CASE** | 全大写 + 扩展名 | 根目录项目文档（约定俗成，按字母序排前） | `README.md`, `CHANGELOG.md`, `LICENSE`, `DEPLOY.md` |
+| **PascalCase** | 首字母大写 | Vue/Astro 组件文件 | `ProjectCard.astro`, `Hero.astro` |
+| **kebab-case** | 小写连字符 | 普通文件、配置文件 | `global.css`, `astro.config.mjs`, `docker-compose.yml` |
+| **camelCase** | 小写驼峰 | JSON 字段、JS/TS 变量 | `projectId`, `tagline`, `socialLinks` |
+| **SCREAMING_SNAKE** | 大写下划线 | 环境变量、常量 | `TODO_DB_CONNECTION`, `MYSQL_ROOT_PW` |
+
+> 例外：子项目级更新日志使用 `{项目名}-Changelog.md`（如 `Portfolio-Changelog.md`）。
 
 ## CSS 规范
 

@@ -43,8 +43,8 @@
 
 | 文档 | 更新时机 | 说明 |
 |------|---------|------|
-| `UPDATE.md`（根目录） | **每次必更** | Monorepo 级别更新日志 |
-| `Portfolio/Portfolio-Update.md` | Portfolio 相关改动必更 | 子项目级更新日志 |
+| `CHANGELOG.md`（根目录） | **每次必更** | Monorepo 级别更新日志 |
+| `Portfolio/Portfolio-Changelog.md` | Portfolio 相关改动必更 | 子项目级更新日志 |
 | `DEPLOY.md` | 部署架构/端口/域名有变动时 | 部署规范 |
 | `README.md` | 项目结构/快速开始有变动时 | 项目总览 |
 | `ARCHITECTURE.md` | 架构设计有变动时 | 架构文档 |
