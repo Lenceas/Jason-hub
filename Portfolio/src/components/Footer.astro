@@ -10,6 +10,9 @@ const year = new Date().getFullYear();
     <p class="footer__text footer__text--muted">
       Built with Astro &middot; 极简 · 清爽
     </p>
+    <p class="footer__text footer__text--icp">
+      <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">湘ICP备2021003806号-1</a>
+    </p>
   </div>
 </footer>
 
@@ -35,6 +38,16 @@ const year = new Date().getFullYear();
   .footer__text--muted {
     color: var(--color-text-muted);
     font-size: 0.75rem;
+  }
+
+  .footer__text--icp a {
+    color: var(--color-text-muted);
+    font-size: 0.7rem;
+    text-decoration: none;
+  }
+
+  .footer__text--icp a:hover {
+    text-decoration: underline;
   }
 
   @media (min-width: 640px) {

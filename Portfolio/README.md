@@ -27,7 +27,7 @@ Jason-hub 主站 · 个人主页
 - **Values** — 水墨风格社会主义核心价值观展示（自动轮播高亮）
 - **ProjectGrid** — 项目卡片网格（数据驱动，毛玻璃效果，精选星标）
 - **BackToTop** — 回到顶部按钮（滚动进度环 + 弹跳箭头动画）
-- **Footer** — 版权信息
+- **Footer** — 版权信息 & 备案号
 
 ### 视觉特效
 
@@ -117,7 +117,7 @@ A minimal personal homepage built with **Astro 6**, aggregating personal profile
 - **Values** — Ink-wash style socialist core values display (auto-cycling highlight)
 - **ProjectGrid** — Data-driven project card grid (glass morphism, featured star icon)
 - **BackToTop** — Scroll-to-top button (progress ring + bouncing arrow)
-- **Footer** — Copyright & credits
+- **Footer** — Copyright & ICP filing
 
 ### Visual Effects
 
