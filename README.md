@@ -8,39 +8,35 @@
 
 个人项目 Monorepo · 主站聚合 · 子项目统一入口
 
-通过 [Portfolio](./Portfolio) 主站聚合展示个人介绍、技能标签、社会主义核心价值观展示及项目卡片，作为 Jason-hub 所有子项目的统一入口。
+通过 [Portfolio](./Portfolio) 主站聚合展示个人介绍、技能标签、项目卡片，作为所有子项目的统一入口。
+
+### 在线地址
+
+**https://lujiesheng.cn**
+
+### 子项目
+
+| 项目 | 前端 | API | 技术栈 | 状态 |
+|------|------|----|--------|------|
+| Portfolio 主站 | `lujiesheng.cn` | — | Astro 6 | active |
+| 后续项目 | `<name>.lujiesheng.cn` | `api-<name>.lujiesheng.cn` | Vue 3 / .NET 10 | planning |
 
 ### 结构
 
 ```
 Jason-hub/
-├── Portfolio/        ← Astro 6 个人主页（主站）
-├── ...               ← 后续子项目 (Vue 3 + TS)
-├── AGENTS.md         ← AI 协作说明
-├── ARCHITECTURE.md   ← 架构设计
-├── CHANGELOG.md      ← 项目更新日志
-├── DEPLOY.md         ← 部署规范
-├── RELEASE.md        ← 发布工作流
-├── STYLE_GUIDE.md    ← 编码规范
-└── README.md         ← 项目总览（本文件）
+├── Portfolio/           ← Astro 6 个人主页（主站）
+├── project-<name>/      ← 后续子项目 (Vue 3 + .NET 10)
+├── .github/workflows/   ← GitHub Actions CI/CD
+├── docker-compose.yml   ← Docker 容器编排
+├── AGENTS.md            ← AI 协作说明
+├── ARCHITECTURE.md      ← 架构设计
+├── CHANGELOG.md         ← Monorepo 更新日志
+├── DEPLOY.md            ← 部署规范（Nginx / SSL / CI-CD）
+├── RELEASE.md           ← 发布工作流
+├── STYLE_GUIDE.md       ← 编码与 Git 规范
+└── README.md            ← 项目总览（本文件）
 ```
-
-### 端口规则
-
-| 类型 | 范围 |
-|------|------|
-| 前端开发 | 8000–8049 |
-| 后端 API | 8050–8099 |
-
-Portfolio 主站使用 **8000** 端口。
-
-### 分支与版本
-
-- **main** — 主分支，始终可部署
-- **project/\<name\>** — 子项目开发分支
-- 版本号：`v1.0.0` → `v1.1.0` → `v1.1.1` ...
-
-详见 [STYLE_GUIDE.md](./STYLE_GUIDE.md#git-分支与版本规范) Git 章节。
 
 ### 快速开始
 
@@ -57,39 +53,35 @@ npm run build
 
 Personal Monorepo — Central hub & sub-project entry point
 
-A personal project aggregation site built with [Astro 6](./Portfolio). The main page showcases a personal profile, skills, values, and project cards that link to independent sub-projects.
+A personal project aggregation site built with [Astro 6](./Portfolio). The main page showcases a personal profile, skills, and project cards that link to independent sub-projects.
+
+### Live Site
+
+**https://lujiesheng.cn**
+
+### Sub-Projects
+
+| Project | Frontend | API | Stack | Status |
+|---------|----------|-----|-------|--------|
+| Portfolio | `lujiesheng.cn` | — | Astro 6 | active |
+| Upcoming | `<name>.lujiesheng.cn` | `api-<name>.lujiesheng.cn` | Vue 3 / .NET 10 | planning |
 
 ### Structure
 
 ```
 Jason-hub/
-├── Portfolio/        ← Astro 6 personal homepage (main site)
-├── ...               ← Upcoming sub-projects (Vue 3 + TS)
-├── AGENTS.md         ← AI agent instructions
-├── ARCHITECTURE.md   ← Architecture design
-├── CHANGELOG.md      ← Project changelog
-├── DEPLOY.md         ← Deployment guide
-├── RELEASE.md        ← Release workflow
-├── STYLE_GUIDE.md    ← Coding standards
-└── README.md         ← Project overview (this file)
+├── Portfolio/           ← Astro 6 homepage (main site)
+├── project-<name>/      ← Upcoming sub-projects (Vue 3 + .NET 10)
+├── .github/workflows/   ← GitHub Actions CI/CD
+├── docker-compose.yml   ← Docker container orchestration
+├── AGENTS.md            ← AI agent instructions
+├── ARCHITECTURE.md      ← Architecture design
+├── CHANGELOG.md         ← Monorepo changelog
+├── DEPLOY.md            ← Deployment guide (Nginx / SSL / CI-CD)
+├── RELEASE.md           ← Release workflow
+├── STYLE_GUIDE.md       ← Coding & Git standards
+└── README.md            ← Project overview (this file)
 ```
-
-### Port Convention
-
-| Type | Range |
-|------|-------|
-| Frontend | 8000–8049 |
-| Backend API | 8050–8099 |
-
-Portfolio runs on port **8000**.
-
-### Branching & Versioning
-
-- **main** — production-ready at all times
-- **project/\<name\>** — sub-project development branches
-- Versioning: `v1.0.0` → `v1.1.0` → `v1.1.1` ...
-
-See [STYLE_GUIDE.md](./STYLE_GUIDE.md#git-分支与版本规范) for details.
 
 ### Quick Start
 
@@ -102,7 +94,9 @@ npm run build
 
 ---
 
-参见：[AGENTS.md](./AGENTS.md) · [ARCHITECTURE.md](./ARCHITECTURE.md) · [STYLE_GUIDE.md](./STYLE_GUIDE.md)
+参见：[AGENTS.md](./AGENTS.md) · [ARCHITECTURE.md](./ARCHITECTURE.md) · [DEPLOY.md](./DEPLOY.md) · [STYLE_GUIDE.md](./STYLE_GUIDE.md)
+
+---
 
 ## 许可证
 

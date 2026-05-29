@@ -2,6 +2,24 @@
 
 ---
 
+## v1.0.10 (2026-05-29 11:25)
+
+- **文档**：DEPLOY.md / AGENTS.md / ARCHITECTURE.md / RELEASE.md 全面更新
+  - SSL 自动化流程（acme.sh + Let's Encrypt + 腾讯云 DNS API）
+  - 域名命名规范（`<name>.lujiesheng.cn` / `api-<name>.lujiesheng.cn`）
+  - Nginx 反向代理配置同步实际部署
+  - 新增子项目部署检查清单（DNS / SSL / Nginx / CI-CD）
+  - 后端框架统一 .NET 10
+  - 端口绑定改为 `127.0.0.1` 仅本地回环
+
+---
+
+## v1.0.9 (2026-05-29 09:56)
+
+- **文档**：CHANGELOG.md / DEPLOY.md / Portfolio-Changelog.md 同步实际 CI/CD 实现 + 部署记录
+
+---
+
 ## v1.0.8 (2026-05-28 ~ 2026-05-29 09:44)
 
 - **Footer**：新增底部备案号 `湘ICP备2021003806号-1`，链接工信部备案查询

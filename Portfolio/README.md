@@ -67,7 +67,9 @@ Portfolio/
 │       └── global.css
 ├── astro.config.mjs
 ├── tsconfig.json
-└── package.json
+├── package.json
+├── Dockerfile
+└── nginx.conf
 ```
 
 ### 本地开发
@@ -78,9 +80,11 @@ npm run dev    # → http://localhost:8000
 npm run build  # 构建静态文件到 dist/
 ```
 
-### Git 分支
+### 线上部署
 
-Portfolio 作为主站，在 `main` 分支上直接开发。如需较大改动，可切 `feat/` 分支：
+主站通过 Nginx 反代 + Docker 容器化部署，SSL 证书由 acme.sh 自动管理。详见 [DEPLOY.md](../DEPLOY.md)。
+
+### Git 分支
 
 ```bash
 git checkout -b feat/xxx
@@ -157,7 +161,9 @@ Portfolio/
 │       └── global.css
 ├── astro.config.mjs
 ├── tsconfig.json
-└── package.json
+├── package.json
+├── Dockerfile
+└── nginx.conf
 ```
 
 ### Local Development
@@ -168,9 +174,11 @@ npm run dev    # → http://localhost:8000
 npm run build  # Build static output to dist/
 ```
 
-### Git Branching
+### Deployment
 
-Portfolio is the main site and is developed directly on `main`. For larger changes, use a `feat/` branch:
+Deployed via Nginx reverse proxy + Docker containers. SSL managed by acme.sh. See [DEPLOY.md](../DEPLOY.md).
+
+### Git Branching
 
 ```bash
 git checkout -b feat/xxx
