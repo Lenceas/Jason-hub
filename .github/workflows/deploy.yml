@@ -12,29 +12,21 @@ jobs:
           fetch-depth: 1
 
       - name: 打包代码
-        run: tar czf deploy.tar.gz --ignore-failed-read $(git ls-files)
+        run: tar czf deploy.tar.gz $(git ls-files)
 
-      - name: 上传并部署
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          source: "deploy.tar.gz"
-          target: "/tmp"
-          strip_components: 0
-          rm: true
+      - name: 配置 SSH 并部署
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
 
-      - name: 解压并重建容器
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
+          scp -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key deploy.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/tmp/deploy.tar.gz
+
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
             rm -rf /opt/lujiesheng/Portfolio
             tar xzf /tmp/deploy.tar.gz -C /opt/lujiesheng
             rm /tmp/deploy.tar.gz
             cd /opt/lujiesheng
             docker compose up --build -d portfolio
             docker image prune -f
+          '
