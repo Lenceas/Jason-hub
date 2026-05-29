@@ -106,28 +106,32 @@ Tag: v1.0.0    v1.1.0    v1.1.1
 ┌──────────────────────────────────────┐
 │  Nginx (主机)                         │
 │  • SSL termination (acme.sh 自动续期)  │
-│  • 反向代理分发到各容器                 │
-│  • 域名路由: lujiesheng.cn / api-<name>.lujiesheng.cn / <name>.lujiesheng.cn     │
+│  • 域名路由: lujiesheng.cn / <name>.lujiesheng.cn / api-<name>.lujiesheng.cn │
 └────┬────────┬──────────┬─────────────┘
      │        │          │
      ▼        ▼          ▼
 ┌─────────┐ ┌─────────┐ ┌─────────┐
-│ Portfolio│ │ Note    │ │ Note    │
+│ Portfolio│ │ Monitor │ │ Monitor │
 │ :8000   │ │ :8001   │ │ :8051   │  ← 仅 127.0.0.1 绑定
 │ Docker  │ │ Docker  │ │ Docker  │
-└─────────┘ └─────────┘ └────┬────┘
-                             │
-                        ┌────┴────┐
-                        │  MySQL   │
-                        │ :3306   │
-                        └─────────┘
+└─────────┘ └────┬─────┘ └────┬─────┘
+                 │            │
+                 ▼            ▼
+          ┌─────────────────────────┐
+          │  基础设施层 (全局共享)      │
+          │  MySQL :3306             │
+          │  Redis :6379             │
+          │  MongoDB :27017          │
+          │  (仅 Docker 内网互联)      │
+          └─────────────────────────┘
 ```
 
 | 层级 | 说明 |
 |------|------|
 | Nginx | 主机 80/443，SSL termination，按域名反代到容器 |
-| Docker 容器 | 仅绑定 `127.0.0.1`，不对外暴露端口 |
-| SSL | acme.sh + Let's Encrypt + 腾讯云 DNS API，自动续期 |
+| 应用容器 | 仅绑定 `127.0.0.1`，不对外暴露端口 |
+| 基础设施 | MySQL / Redis / MongoDB，所有子项目共用，仅 Docker 内网互联 |
+| SSL | acme.sh + Let's Encrypt + 腾讯云 DNS API，一个域名一张免费证书 |
 | CI/CD | GitHub Actions 推送到 main → SCP → docker compose up --build |
 
 详见 [DEPLOY.md](./DEPLOY.md)

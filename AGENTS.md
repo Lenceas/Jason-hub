@@ -61,39 +61,44 @@ Jason-hub/
 
 更多细节见 [STYLE_GUIDE.md](./STYLE_GUIDE.md) Git 章节。
 
-## 端口规则（开发环境）
+## 端口规则
 
-用于本地开发和反向代理配置。
+所有端口仅绑定 `127.0.0.1`，外网通过 Nginx 访问。
 
 | 类型 | 端口范围 | 说明 |
 |------|----------|------|
 | 前端页面 | 8000–8049 | Astro 主站 / Vue 子项目 |
 | 后端 API | 8050–8099 | 子项目对应的 API 服务 |
+| 数据库 | 标准端口 | MySQL 3306 / Redis 6379 / MongoDB 27017 |
 
 ### 端口分配表
 
-| 项目 | 类型 | 端口 | 反向代理目标 |
-|------|------|------|-------------|
-| **Portfolio 主站** | Astro 前端 | **8000** | `portfolio.域名` |
-| 子项目 1 | Vue 3 前端 | 8001 | `项目1.域名` |
-| 子项目 2 | Vue 3 前端 | 8002 | `项目2.域名` |
-| ... | ... | 依次递增 | ... |
-| 子项目 1 API | 后端服务 | 8050 | `api-项目1.域名` |
-| 子项目 2 API | 后端服务 | 8051 | `api-项目2.域名` |
+| 项目 | 类型 | 端口 | 域名 |
+|------|------|------|------|
+| **Portfolio** | Astro 前端 | 8000 | `lujiesheng.cn` |
+| **Monitor** | Vue 3 前端 | 8001 | `monitor.lujiesheng.cn` |
+| Monitor API | .NET 10 后端 | 8051 | `api-monitor.lujiesheng.cn` |
+| 子项目 N | Vue 3 前端 | 8002+ | `<name>.lujiesheng.cn` |
+| 子项目 N API | .NET 10 后端 | 8052+ | `api-<name>.lujiesheng.cn` |
 
 > 新增子项目时按此规则分配端口，并更新本表。
+
+## 基础设施
+
+MySQL 8.4 / Redis 8 / MongoDB 8 三数据库作为全局基础设施，所有子项目共用。容器内默认端口：`3306` / `6379` / `27017`。
 
 ## 部署与域名
 
 | 项目 | 域名 | 说明 |
 |------|------|------|
-| Portfolio 主站 | `lujiesheng.cn` `www.lujiesheng.cn` | 主入口 |
-| 子项目前端 | `<name>.lujiesheng.cn` | 如 `note.lujiesheng.cn` |
-| 子项目 API | `api-<name>.lujiesheng.cn` | 如 `api-note.lujiesheng.cn` |
+| Portfolio | `lujiesheng.cn` `www.lujiesheng.cn` | 主入口 |
+| Monitor | `monitor.lujiesheng.cn` | 第一个子项目 |
+| 子项目前端 | `<name>.lujiesheng.cn` | 后续子项目 |
+| 子项目 API | `api-<name>.lujiesheng.cn` | 子项目后端 |
 
-- SSL 证书：acme.sh + Let's Encrypt + 腾讯云 DNS API 自动续期
+- SSL 证书：acme.sh + Let's Encrypt + 腾讯云 DNS API，一个域名一张免费证书
 - 部署：GitHub Actions → SCP 上传代码 → `docker compose up --build -d`
-- Nginx：主机 80/443 → 反代到 Docker `127.0.0.1:<port>`，容器端口不对外暴露
+- Nginx：主机 80/443 → 反代到 `127.0.0.1:<port>`
 - 详情见 [DEPLOY.md](./DEPLOY.md)
 
 ## 子项目列表

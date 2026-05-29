@@ -19,6 +19,7 @@
 | 项目 | 前端 | API | 技术栈 | 状态 |
 |------|------|----|--------|------|
 | Portfolio 主站 | `lujiesheng.cn` | — | Astro 6 | active |
+| Monitor 监控面板 | `monitor.lujiesheng.cn` | `api-monitor.lujiesheng.cn` | Vue 3 / .NET 10 | planning |
 | 后续项目 | `<name>.lujiesheng.cn` | `api-<name>.lujiesheng.cn` | Vue 3 / .NET 10 | planning |
 
 ### 结构
@@ -74,6 +75,7 @@ A personal project aggregation site built with [Astro 6](./Portfolio). The main 
 | Project | Frontend | API | Stack | Status |
 |---------|----------|-----|-------|--------|
 | Portfolio | `lujiesheng.cn` | — | Astro 6 | active |
+| Monitor | `monitor.lujiesheng.cn` | `api-monitor.lujiesheng.cn` | Vue 3 / .NET 10 | planning |
 | Upcoming | `<name>.lujiesheng.cn` | `api-<name>.lujiesheng.cn` | Vue 3 / .NET 10 | planning |
 
 ### Structure

@@ -1,6 +1,79 @@
+# ============================================================
+# 基础设施层 — 全局共享，所有子项目共用
+# ============================================================
 services:
+  mysql:
+    image: mysql:8.4
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PW}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:8-alpine
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:8
+    ports:
+      - "127.0.0.1:27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PW}
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+# ============================================================
+# 应用层 — 按子项目分组
+# ============================================================
   portfolio:
     build: ./Portfolio
     ports:
       - "127.0.0.1:8000:80"
     restart: unless-stopped
+
+  # monitor-web:       ← 后续
+  #   build: ./Monitor/web
+  #   ports:
+  #     - "127.0.0.1:8001:80"
+  #   restart: unless-stopped
+  #
+  # monitor-api:
+  #   build: ./Monitor/api
+  #   ports:
+  #     - "127.0.0.1:8051:8080"
+  #   environment:
+  #     - ConnectionStrings__Default=${MONITOR_DB_CONNECTION}
+  #     - Redis__ConnectionString=${MONITOR_REDIS_CONNECTION}
+  #   depends_on:
+  #     mysql:    { condition: service_healthy }
+  #     redis:    { condition: service_healthy }
+  #   restart: unless-stopped
+
+volumes:
+  mysql-data:
+  redis-data:
+  mongo-data:

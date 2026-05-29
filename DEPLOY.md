@@ -223,54 +223,86 @@ ENTRYPOINT ["dotnet", "NoteApi.dll"]
 
 ## Docker Compose
 
-所有服务端口仅绑定 `127.0.0.1`，外网通过 Nginx 访问。
+分为**基础设施层**（全局共享）和**应用层**（按子项目分组）。所有端口仅绑定 `127.0.0.1`。
+
+### 基础设施层
+
+MySQL / Redis / MongoDB 三数据库，所有子项目共用，一次启动。
 
 ```yaml
-# docker-compose.yml
 services:
-  portfolio:
-    build: ./Portfolio
-    ports:
-      - "127.0.0.1:8000:80"
-    restart: unless-stopped
-
-  note-web:
-    build: ./project-note/web
-    ports:
-      - "127.0.0.1:8001:80"
-    restart: unless-stopped
-
-  api-note:
-    build: ./project-note/api
-    ports:
-      - "127.0.0.1:8051:8050"
-    environment:
-      - ConnectionStrings__Default=${NOTE_DB_CONNECTION}
-    depends_on:
-      note-db:
-        condition: service_healthy
-    restart: unless-stopped
-
-  note-db:
-    image: mysql:8
-    volumes:
-      - note-data:/var/lib/mysql
+  mysql:
+    image: mysql:8.4
+    ports: ["127.0.0.1:3306:3306"]
+    volumes: [mysql-data:/var/lib/mysql]
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PW}
-      MYSQL_DATABASE: note
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+    restart: unless-stopped
+
+  redis:
+    image: redis:8-alpine
+    ports: ["127.0.0.1:6379:6379"]
+    volumes: [redis-data:/data]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:8
+    ports: ["127.0.0.1:27017:27017"]
+    volumes: [mongo-data:/data/db]
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PW}
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+    restart: unless-stopped
+```
+
+### 应用层
+
+每个子项目按需依赖基础设施。
+
+```yaml
+  # ---- Portfolio 主站 ----
+  portfolio:
+    build: ./Portfolio
+    ports: ["127.0.0.1:8000:80"]
+    restart: unless-stopped
+
+  # ---- Monitor 监控面板 ----
+  monitor-web:
+    build: ./Monitor/web
+    ports: ["127.0.0.1:8001:80"]
+    restart: unless-stopped
+
+  monitor-api:
+    build: ./Monitor/api
+    ports: ["127.0.0.1:8051:8080"]
+    environment:
+      - ConnectionStrings__Default=${MONITOR_DB_CONNECTION}
+      - Redis__ConnectionString=${MONITOR_REDIS_CONNECTION}
+    depends_on:
+      mysql: { condition: service_healthy }
+      redis: { condition: service_healthy }
     restart: unless-stopped
 
 volumes:
-  note-data:
+  mysql-data:
+  redis-data:
+  mongo-data:
 ```
 
 **.env 文件**（不提交到 git）：
 
 ```
 MYSQL_ROOT_PW=your_secure_password
-NOTE_DB_CONNECTION=Server=note-db;Port=3306;Database=note;User=root;Password=your_secure_password;
+MONGO_ROOT_USER=admin
+MONGO_ROOT_PW=your_secure_password
+MONITOR_DB_CONNECTION=Server=127.0.0.1;Port=3306;Database=monitor;User=root;Password=<pw>;
+MONITOR_REDIS_CONNECTION=127.0.0.1:6379
 ```
 
 ---

@@ -2,6 +2,13 @@
 
 ---
 
+## v1.0.14 (2026-05-29)
+
+- **基础设施**：Docker Compose 新增全局基础设施层 — MySQL 8 + Redis 7 + MongoDB 7，所有子项目共用
+- **文档**：AGENTS / ARCHITECTURE / DEPLOY 端口表与部署图更新，加入数据库层和 Monitor 子项目
+
+---
+
 ## v1.0.13 (2026-05-29)
 
 - **Hero**：优化个人简介文案，去重并精简首行
