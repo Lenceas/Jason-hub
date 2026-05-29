@@ -223,18 +223,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: SSH 部署到云服务器
-        uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
+          fetch-depth: 1
+
+      - name: 打包代码
+        run: tar czf deploy.tar.gz $(git ls-files)
+
+      - name: 部署到服务器
+        run: |
+          sudo apt-get install -qq -y sshpass
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -o StrictHostKeyChecking=no deploy.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/tmp/deploy.tar.gz
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
+            rm -rf /opt/lujiesheng/Portfolio
+            tar xzf /tmp/deploy.tar.gz -C /opt/lujiesheng
+            rm /tmp/deploy.tar.gz
             cd /opt/lujiesheng
-            git pull
-            docker-compose up --build -d
+            docker compose up --build -d portfolio
             docker image prune -f
+          '
 ```
 
 GitHub Secrets 配置：
@@ -243,7 +249,9 @@ GitHub Secrets 配置：
 |--------|------|
 | `SERVER_HOST` | 服务器 IP 或域名 |
 | `SERVER_USER` | SSH 用户名 |
-| `SERVER_SSH_KEY` | SSH 私钥 |
+| `SERVER_PASSWORD` | SSH 密码 |
+
+> **注意**：服务器在国内无法直连 GitHub，故采用 Actions runner 打包代码 → SCP 上传 → Docker 重建的方案，不使用服务器 `git pull`。
 
 ### 服务器目录结构
 
@@ -268,11 +276,11 @@ GitHub Secrets 配置：
 
 ```
 git push → GitHub Actions 触发
-         → SSH 登录云服务器
-         → cd /opt/lujiesheng && git pull
-         → docker-compose up --build -d （构建+启动新容器）
+         → tar 打包代码（仅 git 追踪文件）
+         → scp 上传到服务器 /tmp
+         → SSH 解压覆盖 /opt/lujiesheng
+         → docker compose up --build -d （构建+启动新容器）
          → docker image prune -f （清理旧镜像）
-         → 主机 Nginx 自动路由到新容器
 ```
 
 ---

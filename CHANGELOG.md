@@ -2,9 +2,12 @@
 
 ---
 
-## v1.0.8 (2026-05-28)
+## v1.0.8 (2026-05-28 ~ 2026-05-29 09:44)
 
 - **Footer**：新增底部备案号 `湘ICP备2021003806号-1`，链接工信部备案查询
+- **Docker**：新增 `Dockerfile` + `nginx.conf` + `docker-compose.yml`，多阶段构建容器化部署
+- **CI/CD**：新增 GitHub Actions 自动部署工作流（`sshpass` + `scp` 直传 → `docker compose up --build -d`）
+- **Server**：腾讯云 2C4G 服务器部署上线，`81.71.136.3:8000`
 
 ---
 
