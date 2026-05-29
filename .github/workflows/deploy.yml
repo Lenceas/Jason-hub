@@ -14,15 +14,11 @@ jobs:
       - name: 打包代码
         run: tar czf deploy.tar.gz $(git ls-files)
 
-      - name: 配置 SSH 并部署
+      - name: 部署到服务器
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-
-          scp -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key deploy.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/tmp/deploy.tar.gz
-
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
+          sudo apt-get install -qq -y sshpass
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -o StrictHostKeyChecking=no deploy.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/tmp/deploy.tar.gz
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
             rm -rf /opt/lujiesheng/Portfolio
             tar xzf /tmp/deploy.tar.gz -C /opt/lujiesheng
             rm /tmp/deploy.tar.gz
