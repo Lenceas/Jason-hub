@@ -11,14 +11,8 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: 打包代码（排除无用文件）
-        run: |
-          tar czf deploy.tar.gz \
-            --exclude=.git \
-            --exclude=node_modules \
-            --exclude=dist \
-            --exclude=.github \
-            .
+      - name: 打包代码
+        run: tar czf deploy.tar.gz --ignore-failed-read $(git ls-files)
 
       - name: 上传并部署
         uses: appleboy/scp-action@v0.1.7
