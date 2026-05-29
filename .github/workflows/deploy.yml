@@ -8,24 +8,39 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: 上传代码到服务器
+        with:
+          fetch-depth: 1
+
+      - name: 打包代码（排除无用文件）
+        run: |
+          tar czf deploy.tar.gz \
+            --exclude=.git \
+            --exclude=node_modules \
+            --exclude=dist \
+            --exclude=.github \
+            .
+
+      - name: 上传并部署
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          source: .
-          target: /opt/lujiesheng
+          source: "deploy.tar.gz"
+          target: "/tmp"
           strip_components: 0
           rm: true
 
-      - name: SSH 部署到云服务器
+      - name: 解压并重建容器
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
+            rm -rf /opt/lujiesheng/Portfolio
+            tar xzf /tmp/deploy.tar.gz -C /opt/lujiesheng
+            rm /tmp/deploy.tar.gz
             cd /opt/lujiesheng
-            docker compose up --build -d
+            docker compose up --build -d portfolio
             docker image prune -f

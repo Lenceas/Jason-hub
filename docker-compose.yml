@@ -1,0 +1,6 @@
+services:
+  portfolio:
+    build: ./Portfolio
+    ports:
+      - "8000:80"
+    restart: unless-stopped
