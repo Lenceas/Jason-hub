@@ -47,6 +47,16 @@ npm run dev    # → http://localhost:8000
 npm run build
 ```
 
+### 许可证
+
+本项目采用 **MIT** 协议开源，仅覆盖代码部分。
+
+**以下内容不在此协议范围内，保留所有权利：**
+- 个人介绍、头像、照片
+- 博客文章、笔记等内容
+
+详见 [LICENSE](./LICENSE)。
+
 ---
 
 <h2 id="en">English</h2>
@@ -92,23 +102,7 @@ npm run dev    # → http://localhost:8000
 npm run build
 ```
 
----
-
-参见：[AGENTS.md](./AGENTS.md) · [ARCHITECTURE.md](./ARCHITECTURE.md) · [DEPLOY.md](./DEPLOY.md) · [STYLE_GUIDE.md](./STYLE_GUIDE.md)
-
----
-
-## 许可证
-
-本项目采用 **MIT** 协议开源，仅覆盖代码部分。
-
-**以下内容不在此协议范围内，保留所有权利：**
-- 个人介绍、头像、照片
-- 博客文章、笔记等内容
-
-详见 [LICENSE](./LICENSE)。
-
-## License
+### License
 
 This project is open-sourced under the **MIT** license, covering only the source code.
 
@@ -116,4 +110,8 @@ This project is open-sourced under the **MIT** license, covering only the source
 - Personal bio, avatar, photographs
 - Blog posts, notes, and written content
 
-See [LICENSE](./LICENSE) for details.
+See [LICENSE](./LICENSE).
+
+---
+
+参见：[AGENTS.md](./AGENTS.md) · [ARCHITECTURE.md](./ARCHITECTURE.md) · [DEPLOY.md](./DEPLOY.md) · [STYLE_GUIDE.md](./STYLE_GUIDE.md)

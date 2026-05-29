@@ -2,6 +2,20 @@
 
 ---
 
+## v1.0.12 (2026-05-29)
+
+- **SEO**：title/description/keywords 优化，加入中文姓名 + 技能关键词
+- **Meta**：新增 Open Graph / canonical / Twitter Card 元标签
+- **favicon**：新增圆形头像 favicon（64×64，`/images/favicon.png`）
+
+---
+
+## v1.0.11 (2026-05-29)
+
+- 无 Portfolio 直接变更，版本跟随根仓库文档更新
+
+---
+
 ## v1.0.10 (2026-05-29 11:25)
 
 - 无 Portfolio 直接变更，版本跟随根仓库文档更新

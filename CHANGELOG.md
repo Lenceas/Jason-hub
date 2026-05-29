@@ -2,6 +2,23 @@
 
 ---
 
+## v1.0.12 (2026-05-29)
+
+- **SEO**：网页 TDK 优化 — title/description/keywords 加入中文姓名 + 技能关键词
+- **OG 标签**：新增 Open Graph + Twitter Card 元标签，优化社交媒体分享展示
+- **favicon**：新增圆形头像 favicon，替换默认 logo.svg
+- **README**：许可证归入各语言段，中/英文内容各自独立
+
+---
+
+## v1.0.11 (2026-05-29)
+
+- **README**：根 README 重构为项目概览（去端口/分支/版本），与子项目 README 风格统一
+- **RELEASE**：发布工作流重构 — 强制 7 步流程 + 文档更新复核 + 禁止事项
+- **CHANGELOG**：补齐 v1.0.9 / v1.0.10 遗漏记录
+
+---
+
 ## v1.0.10 (2026-05-29 11:25)
 
 - **文档**：DEPLOY.md / AGENTS.md / ARCHITECTURE.md / RELEASE.md 全面更新

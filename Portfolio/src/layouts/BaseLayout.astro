@@ -14,12 +14,25 @@ const { title, description } = Astro.props;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
     <meta name="description" content={description || "Jason's personal portfolio"} />
-    <link rel="icon" type="image/svg+xml" href="/images/logo.svg" />
+    <meta name="keywords" content="卢杰晟,Jason,AI全栈开发者,个人主页,.NET,C#,Vue,TypeScript,VibeCoding" />
+    <meta name="author" content="卢杰晟" />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description || "Jason's personal portfolio"} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://lujiesheng.cn" />
+    <meta property="og:image" content="https://lujiesheng.cn/images/wechat_avatar.jpg" />
+    <meta property="og:site_name" content="卢杰晟 · 个人主页" />
+
+    <meta name="twitter:card" content="summary" />
+
+    <link rel="canonical" href="https://lujiesheng.cn" />
+    <link rel="icon" type="image/png" href="/images/favicon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <title>{title}</title>
   </head>
   <body>
     <slot />
