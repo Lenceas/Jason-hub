@@ -245,8 +245,9 @@ services:
     image: redis:8-alpine
     ports: ["127.0.0.1:6379:6379"]
     volumes: [redis-data:/data]
+    command: redis-server --requirepass ${REDIS_PW}
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PW}", "ping"]
     restart: unless-stopped
 
   mongo:
