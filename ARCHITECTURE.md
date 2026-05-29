@@ -97,6 +97,41 @@ Tag: v1.0.0    v1.1.0    v1.1.1
 
 详见 [STYLE_GUIDE.md](./STYLE_GUIDE.md) 的 Git 章节。
 
+## 部署架构
+
+```
+公网（HTTPS）
+  │
+  ▼
+┌──────────────────────────────────────┐
+│  Nginx (主机)                         │
+│  • SSL termination (acme.sh 自动续期)  │
+│  • 反向代理分发到各容器                 │
+│  • 域名路由: lujiesheng.cn / api-<name>.lujiesheng.cn / <name>.lujiesheng.cn     │
+└────┬────────┬──────────┬─────────────┘
+     │        │          │
+     ▼        ▼          ▼
+┌─────────┐ ┌─────────┐ ┌─────────┐
+│ Portfolio│ │ Note    │ │ Note    │
+│ :8000   │ │ :8001   │ │ :8051   │  ← 仅 127.0.0.1 绑定
+│ Docker  │ │ Docker  │ │ Docker  │
+└─────────┘ └─────────┘ └────┬────┘
+                             │
+                        ┌────┴────┐
+                        │  MySQL   │
+                        │ :3306   │
+                        └─────────┘
+```
+
+| 层级 | 说明 |
+|------|------|
+| Nginx | 主机 80/443，SSL termination，按域名反代到容器 |
+| Docker 容器 | 仅绑定 `127.0.0.1`，不对外暴露端口 |
+| SSL | acme.sh + Let's Encrypt + 腾讯云 DNS API，自动续期 |
+| CI/CD | GitHub Actions 推送到 main → SCP → docker compose up --build |
+
+详见 [DEPLOY.md](./DEPLOY.md)
+
 ## 技术选型
 
 | 模块 | 方案 | 理由 |

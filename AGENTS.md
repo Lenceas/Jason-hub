@@ -83,6 +83,19 @@ Jason-hub/
 
 > 新增子项目时按此规则分配端口，并更新本表。
 
+## 部署与域名
+
+| 项目 | 域名 | 说明 |
+|------|------|------|
+| Portfolio 主站 | `lujiesheng.cn` `www.lujiesheng.cn` | 主入口 |
+| 子项目前端 | `<name>.lujiesheng.cn` | 如 `note.lujiesheng.cn` |
+| 子项目 API | `api-<name>.lujiesheng.cn` | 如 `api-note.lujiesheng.cn` |
+
+- SSL 证书：acme.sh + Let's Encrypt + 腾讯云 DNS API 自动续期
+- 部署：GitHub Actions → SCP 上传代码 → `docker compose up --build -d`
+- Nginx：主机 80/443 → 反代到 Docker `127.0.0.1:<port>`，容器端口不对外暴露
+- 详情见 [DEPLOY.md](./DEPLOY.md)
+
 ## 子项目列表
 
 | 子项目 | 技术栈 | 状态 | 说明 |

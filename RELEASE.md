@@ -134,9 +134,12 @@ git push && git push --tags
 |--------|------|------|
 | 添加项目卡片 | `Portfolio/src/data/projects.json` | 新增一条记录 |
 | 更新端口表 | `AGENTS.md` | 分配前端端口 + API 端口 |
-| 更新架构图 | `ARCHITECTURE.md` | 子项目体系章节 |
-| 添加 docker-compose service | `DEPLOY.md` | 容器编排 + Dockerfile |
-| 添加 Nginx 配置 | `DEPLOY.md` | 域名 + 反代规则 |
+| 更新架构图 | `ARCHITECTURE.md` | 子项目体系 + 部署架构章节 |
+| 添加 docker-compose service | `DEPLOY.md` | 容器编排 + Dockerfile（端口绑 `127.0.0.1`） |
+| 添加 DNS 解析 | 腾讯云 DNS | `<name>.lujiesheng.cn` A 记录 → `81.71.136.3` |
+| SSL 证书 | 服务器 | acme.sh 申请独立子域名证书（一个域名一张） |
+| 添加 Nginx 配置 | `DEPLOY.md` | 子域名 `server` 块 + 反代 → `127.0.0.1:<port>` |
+| 更新 CI/CD deploy.yml | `.github/workflows/deploy.yml` | 追加新 service 构建命令 |
 | 更新根 README 结构 | `README.md` | 目录结构图 |
 | 建子项目 README | `{子项目}/README.md` | 子项目技术栈/结构/开发说明 |
 

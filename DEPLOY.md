@@ -1,6 +1,6 @@
 # DEPLOY.md — 部署规范
 
-> Jason-hub 部署架构、CI/CD 流程、域名与反向代理规范。
+> Jason-hub 部署架构、CI/CD 流程、域名、SSL 与反向代理规范。
 
 ---
 
@@ -16,7 +16,7 @@
                      │
          ┌───────────┼───────────┐
          │           │           │
-    portfolio:8000  frontend:8001  api:8050 ...
+    portfolio:8000  note:8001  api-note:8051 ...
          │           │           │
    ┌─────┴┐    ┌────┴────┐  ┌───┴────┐
    │ Astro │    │ Vue 3  │  │ .NET   │  ← Docker 容器
@@ -28,78 +28,144 @@
                            └─────────┘
 ```
 
+> 所有 Docker 容器端口仅绑定 `127.0.0.1`，不对外暴露。外网流量由主机 Nginx 统一处理 SSL + 反代。
+
 ---
 
 ## 域名映射
 
 | 类型 | 域名 | 代理目标 | 说明 |
 |------|------|----------|------|
-| 主站 | `lujiesheng.cn` | `127.0.0.1:8000` | Portfolio 主站 |
-| 子项目前端 | `todo.lujiesheng.cn` | `127.0.0.1:8001` | 子项目 SPA 页面 |
-| 子项目 API | `api-todo.lujiesheng.cn` | `127.0.0.1:8050` | 子项目后端 API |
+| 主站 | `lujiesheng.cn` `www.lujiesheng.cn` | `127.0.0.1:8000` | Portfolio 主站 |
+| 子项目前端 | `<name>.lujiesheng.cn` | `127.0.0.1:<80xx>` | 子项目 SPA 页面 |
+| 子项目 API | `api-<name>.lujiesheng.cn` | `127.0.0.1:<80xx+50>` | 子项目后端 API |
 
-SSL 证书使用 Let's Encrypt（certbot）或腾讯云免费证书，建议申请**通配符证书** `*.lujiesheng.cn` 一次覆盖所有二级域名。
+**DNS 解析**：所有域名 A 记录指向 `81.71.136.3`。
+
+---
+
+## SSL 证书（acme.sh + Let's Encrypt）
+
+使用 **acme.sh** + 腾讯云 DNS API 自动申请和续期，走 DNS-01 验证（不需要开放额外端口）。
+
+**策略**：一个域名一张免费证书，每个子项目独立管理。
+
+### 当前证书
+
+| 域名 | 证书文件 | 类型 |
+|------|---------|------|
+| `lujiesheng.cn` + `www.lujiesheng.cn` | `lujiesheng.cn.pem` / `.key` | 双域名 ECC |
+
+### 主站申请流程
+
+```bash
+~/.acme.sh/acme.sh --issue --dns dns_tencent -d lujiesheng.cn -d www.lujiesheng.cn
+~/.acme.sh/acme.sh --install-cert -d lujiesheng.cn \
+  --key-file       ~/.acme.sh/ssl/lujiesheng.cn.key \
+  --fullchain-file ~/.acme.sh/ssl/lujiesheng.cn.pem \
+  --reloadcmd      "sudo cp ~/.acme.sh/ssl/lujiesheng.cn.key /etc/nginx/ssl/lujiesheng.cn.key && sudo cp ~/.acme.sh/ssl/lujiesheng.cn.pem /etc/nginx/ssl/lujiesheng.cn.pem && sudo chmod 600 /etc/nginx/ssl/lujiesheng.cn.key && sudo chmod 644 /etc/nginx/ssl/lujiesheng.cn.pem && sudo systemctl reload nginx"
+```
+
+### 新增子项目 SSL 流程
+
+子项目命名规则：`<name>.lujiesheng.cn` → 证书前缀 `<name>`
+
+```bash
+# 以 Note 子项目为例
+~/.acme.sh/acme.sh --issue --dns dns_tencent -d note.lujiesheng.cn
+~/.acme.sh/acme.sh --install-cert -d note.lujiesheng.cn \
+  --key-file       ~/.acme.sh/ssl/note.lujiesheng.cn.key \
+  --fullchain-file ~/.acme.sh/ssl/note.lujiesheng.cn.pem \
+  --reloadcmd      "sudo cp ~/.acme.sh/ssl/note.lujiesheng.cn.key /etc/nginx/ssl/note.lujiesheng.cn.key && sudo cp ~/.acme.sh/ssl/note.lujiesheng.cn.pem /etc/nginx/ssl/note.lujiesheng.cn.pem && sudo chmod 600 /etc/nginx/ssl/note.lujiesheng.cn.key && sudo chmod 644 /etc/nginx/ssl/note.lujiesheng.cn.pem && sudo systemctl reload nginx"
+```
+
+### 自动续期
+
+- acme.sh 每天凌晨 3 点通过 cron 检查证书有效期
+- 剩余 ≤ 7 天时自动续期（`Le_RenewalDays=7`）
+- 续期后自动拷贝到 `/etc/nginx/ssl/` 并 `systemctl reload nginx`
+- 腾讯云 DNS API 凭证保存在 `~/.acme.sh/account.conf`（仅服务器本地）
+
+### 前置依赖
+
+服务器需预先安装：
+
+```bash
+curl -sL https://gitee.com/neilpang/acme.sh/raw/master/acme.sh -o ~/.acme.sh/acme.sh
+chmod +x ~/.acme.sh/acme.sh
+
+# 腾讯云 DNS API hook
+mkdir -p ~/.acme.sh/dnsapi
+curl -sL https://gitee.com/neilpang/acme.sh/raw/master/dnsapi/dns_tencent.sh -o ~/.acme.sh/dnsapi/dns_tencent.sh
+
+# 配置 API 密钥（子用户，仅 DNSPod 权限）
+cat >> ~/.acme.sh/account.conf << "EOF"
+export Tencent_SecretId="<SecretId>"
+export Tencent_SecretKey="<SecretKey>"
+Le_RenewalDays=7
+EOF
+```
 
 ---
 
 ## Nginx 反向代理（主机级）
 
 主机 Nginx 负责 SSL termination 和路由分发，不运行在 Docker 内。
+每个域名使用各自独立的 SSL 证书文件。
 
 ```nginx
-# /etc/nginx/conf.d/lujiesheng.cn.conf
-server {
-    listen 443 ssl http2;
-    server_name lujiesheng.cn;
+# /etc/nginx/sites-available/lujiesheng.cn
 
-    ssl_certificate     /etc/ssl/certs/lujiesheng.cn/fullchain.pem;
-    ssl_certificate_key /etc/ssl/certs/lujiesheng.cn/privkey.pem;
+# HTTP → HTTPS 强制跳转
+server {
+    listen 80;
+    server_name lujiesheng.cn www.lujiesheng.cn;
+    return 301 https://$host$request_uri;
+}
+
+# 主站
+server {
+    listen 443 ssl;
+    server_name lujiesheng.cn www.lujiesheng.cn;
+
+    ssl_certificate     /etc/nginx/ssl/lujiesheng.cn.pem;
+    ssl_certificate_key /etc/nginx/ssl/lujiesheng.cn.key;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
 
     location / {
         proxy_pass http://127.0.0.1:8000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
 
+# HTTP 跳转（子域名）
 server {
-    listen 443 ssl http2;
-    server_name todo.lujiesheng.cn;
+    listen 80;
+    server_name note.lujiesheng.cn api-note.lujiesheng.cn;
+    return 301 https://$host$request_uri;
+}
 
-    ssl_certificate     /etc/ssl/certs/lujiesheng.cn/fullchain.pem;
-    ssl_certificate_key /etc/ssl/certs/lujiesheng.cn/privkey.pem;
+# 子项目示例：Note 前端
+server {
+    listen 443 ssl;
+    server_name note.lujiesheng.cn;
+
+    ssl_certificate     /etc/nginx/ssl/note.lujiesheng.cn.pem;
+    ssl_certificate_key /etc/nginx/ssl/note.lujiesheng.cn.key;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
 
     location / {
         proxy_pass http://127.0.0.1:8001;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
-    }
-}
-
-server {
-    listen 443 ssl http2;
-    server_name api-todo.lujiesheng.cn;
-
-    ssl_certificate     /etc/ssl/certs/lujiesheng.cn/fullchain.pem;
-    ssl_certificate_key /etc/ssl/certs/lujiesheng.cn/privkey.pem;
-
-    location / {
-        proxy_pass http://127.0.0.1:8050;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
-}
-```
-
-HTTP 强制跳转 HTTPS：
-
-```nginx
-server {
-    listen 80;
-    server_name lujiesheng.cn todo.lujiesheng.cn api-todo.lujiesheng.cn;
-    return 301 https://$host$request_uri;
 }
 ```
 
@@ -109,7 +175,7 @@ server {
 
 ### Astro / Vue 等前端项目
 
-使用**多阶段构建**，最终产物扔进 `nginx:alpine`。
+使用**多阶段构建**，最终产物由 `nginx:alpine` 提供服务。
 
 ```dockerfile
 # Portfolio/Dockerfile
@@ -124,7 +190,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 ```
 
-附带的 `nginx.conf` 仅做静态文件服务，不需反代逻辑：
+容器内 nginx.conf — 仅做静态文件服务：
 
 ```nginx
 server {
@@ -137,25 +203,27 @@ server {
 
 ### 后端 API 项目
 
-直接编译运行，镜像中不包含 Nginx：
+直接编译运行，不包含 Nginx：
 
 ```dockerfile
-# project-todo/api/Dockerfile
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+# project-note/api/Dockerfile
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 COPY . .
 RUN dotnet publish -c Release -o /app
 
-FROM mcr.microsoft.com/dotnet/aspnet:9.0
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
 COPY --from=build /app .
 EXPOSE 8050
-ENTRYPOINT ["dotnet", "TodoApi.dll"]
+ENTRYPOINT ["dotnet", "NoteApi.dll"]
 ```
 
 ---
 
 ## Docker Compose
+
+所有服务端口仅绑定 `127.0.0.1`，外网通过 Nginx 访问。
 
 ```yaml
 # docker-compose.yml
@@ -163,46 +231,46 @@ services:
   portfolio:
     build: ./Portfolio
     ports:
-      - "8000:80"
+      - "127.0.0.1:8000:80"
     restart: unless-stopped
 
-  todo-web:
-    build: ./project-todo/web
+  note-web:
+    build: ./project-note/web
     ports:
-      - "8001:80"
+      - "127.0.0.1:8001:80"
     restart: unless-stopped
 
-  todo-api:
-    build: ./project-todo/api
+  api-note:
+    build: ./project-note/api
     ports:
-      - "8050:8050"
+      - "127.0.0.1:8051:8050"
     environment:
-      - ConnectionStrings__Default=${TODO_DB_CONNECTION}
+      - ConnectionStrings__Default=${NOTE_DB_CONNECTION}
     depends_on:
-      todo-db:
+      note-db:
         condition: service_healthy
     restart: unless-stopped
 
-  todo-db:
+  note-db:
     image: mysql:8
     volumes:
-      - todo-data:/var/lib/mysql
+      - note-data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PW}
-      MYSQL_DATABASE: todo
+      MYSQL_DATABASE: note
     healthcheck:
       test: ["CMD", "mysqladmin", "ping"]
     restart: unless-stopped
 
 volumes:
-  todo-data:
+  note-data:
 ```
 
 **.env 文件**（不提交到 git）：
 
 ```
 MYSQL_ROOT_PW=your_secure_password
-TODO_DB_CONNECTION=Server=todo-db;Port=3306;Database=todo;User=root;Password=your_secure_password;
+NOTE_DB_CONNECTION=Server=note-db;Port=3306;Database=note;User=root;Password=your_secure_password;
 ```
 
 ---
@@ -247,32 +315,49 @@ GitHub Secrets 配置：
 
 | Secret | 说明 |
 |--------|------|
-| `SERVER_HOST` | 服务器 IP 或域名 |
+| `SERVER_HOST` | 服务器 IP |
 | `SERVER_USER` | SSH 用户名 |
 | `SERVER_PASSWORD` | SSH 密码 |
 
-> **注意**：服务器在国内无法直连 GitHub，故采用 Actions runner 打包代码 → SCP 上传 → Docker 重建的方案，不使用服务器 `git pull`。
+> 新增子项目时，deploy.yml 中 `docker compose up` 需追加新 service 名称。
 
-### 服务器目录结构
+---
+
+## 服务器实际信息
+
+| 项目 | 值 |
+|------|----|
+| IP | `81.71.136.3` |
+| 系统 | Ubuntu 24.04 LTS |
+| 配置 | 2C4G / 70GB SSD / 6Mbps |
+| 项目路径 | `/opt/lujiesheng/` |
+| Docker Engine | 29.5.2 |
+| Docker Compose | v5.1.4 |
+| SSL | acme.sh + Let's Encrypt (自动续期) |
+
+### 目录结构
 
 ```
 /opt/lujiesheng/
 ├── docker-compose.yml
-├── .env                    # 环境变量（不纳入 git）
+├── .env                         # 环境变量（不纳入 git）
 ├── Portfolio/
 │   ├── Dockerfile
 │   ├── nginx.conf
 │   └── src/...
-└── project-todo/
-    ├── web/
-    │   ├── Dockerfile
-    │   └── ...
-    └── api/
-        ├── Dockerfile
-        └── ...
+├── project-note/                ← 子项目示例
+│   ├── web/
+│   │   ├── Dockerfile
+│   │   └── ...
+│   └── api/
+│       ├── Dockerfile
+│       └── ...
+└── ...
 ```
 
-### 部署流程
+---
+
+## 部署流程
 
 ```
 git push → GitHub Actions 触发
@@ -285,42 +370,53 @@ git push → GitHub Actions 触发
 
 ---
 
-## 端口规则
+## 防火墙
 
-参考 [AGENTS.md](./AGENTS.md) 端口分配表，新增子项目时：
+腾讯云轻量服务器防火墙需放行以下端口：
 
-| 类型 | 范围 | 分配规则 |
-|------|------|----------|
-| 前端容器 | 8000–8049 | 按项目依次递增，与宿主机端口一一映射 |
-| 后端容器 | 8050–8099 | 与前端对应，API 端口 = 前端端口 + 50 |
-| 数据库 | 3306+ | 仅容器内互联，不暴露到宿主机 |
+| 端口 | 用途 |
+|------|------|
+| 22 | SSH |
+| 80 | HTTP（Nginx） |
+| 443 | HTTPS（Nginx SSL） |
 
-示例：
-
-| 项目 | 前端端口 | API 端口 | 数据库 |
-|------|---------|----------|--------|
-| Portfolio | 8000 | — | — |
-| Todo App | 8001 | 8050 | 容器内 3306 |
-| 项目 2 | 8002 | 8051 | 容器内 3307 |
+> Docker 容器端口（8000-8099）无需对外开放。
 
 ---
 
-## SSL 证书续期
+## 端口规则
 
-Let's Encrypt 自动续期（certbot）：
+参考 [AGENTS.md](./AGENTS.md) 端口分配表：
 
-```bash
-# 安装 certbot
-apt install certbot python3-certbot-nginx
+| 类型 | 范围 | 分配规则 |
+|------|------|----------|
+| 前端容器 | 8000–8049 | 按项目依次递增，Docker 仅绑定 `127.0.0.1` |
+| 后端容器 | 8050–8099 | API 端口 = 前端端口 + 50 |
+| 数据库 | 3306+ | 仅容器内互联，不暴露 |
 
-# 申请通配符证书
-certbot certonly --manual -d lujiesheng.cn -d *.lujiesheng.cn
+示例：
 
-# 自动续期（cron）
-echo "0 3 * * * certbot renew --quiet && systemctl reload nginx" | crontab -
-```
+| 项目 | 前端容器端口 | API 容器端口 | 域名 | 数据库 |
+|------|-------------|-------------|------|--------|
+| Portfolio | 8000 | — | `lujiesheng.cn` | — |
+| Note | 8001 | 8051 | `note.lujiesheng.cn` + `api-note.lujiesheng.cn` | 容器内 3306 |
+| 项目 2 | 8002 | 8052 | `<name>.lujiesheng.cn` + `api-<name>.lujiesheng.cn` | 容器内 3307 |
 
-腾讯云免费证书需在控制台手动下载上传，或用腾讯云 API 自动续期。
+---
+
+## 新增子项目部署检查清单
+
+按以下顺序完成：
+
+- [ ] 创建子项目（Vue 3 / .NET 等）
+- [ ] 编写 `Dockerfile` + 容器内 `nginx.conf`（前端项目）
+- [ ] `docker-compose.yml` 追加 service（端口只绑 `127.0.0.1`）
+- [ ] GitHub Actions `deploy.yml` 增加新 service 构建命令
+- [ ] DNS 添加 A 记录（`<name>.lujiesheng.cn` / `api-<name>.lujiesheng.cn` → `81.71.136.3`）
+- [ ] **SSL**：使用 acme.sh 申请子域名证书（`<name>.lujiesheng.cn`），见上方 "新增子项目 SSL 流程"
+- [ ] Nginx 添加子域名 `server` 块 → `nginx -t` → `systemctl reload nginx`
+- [ ] Portfolio `projects.json` 添加项目卡片
+- [ ] 更新各 MD 文档（CHANGELOG / README / AGENTS 端口表 / 本清单）
 
 ---
 
@@ -328,23 +424,33 @@ echo "0 3 * * * certbot renew --quiet && systemctl reload nginx" | crontab -
 
 ```bash
 # 1. 服务器环境准备
-apt install docker docker-compose nginx
+apt install nginx
+# Docker 从官方源安装（非 apt 自带）
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker.gpg
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu noble stable" > /etc/apt/sources.list.d/docker.list
+apt update && apt install docker-ce docker-compose-plugin
 
 # 2. 拉取项目
 git clone https://github.com/Lenceas/Jason-hub.git /opt/lujiesheng
 
-# 3. 配置环境变量
-cp .env.example .env
-vim .env
+# 3. 配置 SSL（acme.sh + 腾讯云 DNS API）
+# 见上方 "SSL 证书" 章节
 
-# 4. 启动所有服务
-docker-compose up -d
+# 4. 配置 Nginx 反代 + SSL
+vim /etc/nginx/sites-available/lujiesheng.cn
+ln -s /etc/nginx/sites-available/lujiesheng.cn /etc/nginx/sites-enabled/
+rm /etc/nginx/sites-enabled/default
+nginx -t && systemctl reload nginx
 
-# 5. 配置 Nginx 反向代理 + SSL
-vim /etc/nginx/conf.d/lujiesheng.cn.conf
-systemctl reload nginx
+# 5. 启动所有服务
+cd /opt/lujiesheng
+docker compose up -d
 
-# 6. GitHub Actions 自动部署后续更新
+# 6. 配置 .env
+cp .env.example .env && vim .env
+
+# 7. GitHub Actions 自动部署后续更新
+# 在 GitHub Secrets 中配置 SERVER_HOST / SERVER_USER / SERVER_PASSWORD
 ```
 
 ---
@@ -355,5 +461,3 @@ systemctl reload nginx
 |------|-----------|
 | `main` | 自动触发部署 |
 | `project/*` / `feat/*` / `fix/*` | 仅提交，不触发自动部署 |
-
-新增子项目时，在 `docker-compose.yml` 追加 service 即可，不影响已有服务。
