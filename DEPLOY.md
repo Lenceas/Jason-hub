@@ -55,6 +55,8 @@
 | 域名 | 证书文件 | 类型 |
 |------|---------|------|
 | `lujiesheng.cn` + `www.lujiesheng.cn` | `lujiesheng.cn.pem` / `.key` | 双域名 ECC |
+| `api-auth.lujiesheng.cn` | `api-auth.lujiesheng.cn.pem` / `.key` | ECC |
+| `api-notification.lujiesheng.cn` | `api-notification.lujiesheng.cn.pem` / `.key` | ECC |
 
 ### 主站申请流程
 
@@ -167,6 +169,30 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
+
+# 基础设施服务示例：Auth 鉴权
+server {
+    listen 443 ssl;
+    server_name api-auth.lujiesheng.cn;
+
+    ssl_certificate     /etc/nginx/ssl/api-auth.lujiesheng.cn.pem;
+    ssl_certificate_key /etc/nginx/ssl/api-auth.lujiesheng.cn.key;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
+
+    # /healthz 仅限内网，公网拦截
+    location = /healthz {
+        return 404;
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:8100;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
 ```
 
 ---
@@ -271,6 +297,16 @@ services:
   portfolio:
     build: ./Portfolio
     ports: ["127.0.0.1:8000:80"]
+    restart: unless-stopped
+
+  # ---- Auth 鉴权服务（基础设施） ----
+  auth:
+    build: ./Auth/api
+    ports: ["127.0.0.1:8100:8080"]
+    environment:
+      - ConnectionStrings__Default=${AUTH_DB_CONNECTION}
+    depends_on:
+      mysql: { condition: service_healthy }
     restart: unless-stopped
 
   # ---- Monitor 监控面板（待开发，当前 docker-compose.yml 中注释状态） ----
@@ -426,7 +462,8 @@ git push → GitHub Actions 触发
 | 类型 | 范围 | 分配规则 |
 |------|------|----------|
 | 前端容器 | 8000–8049 | 按项目依次递增，Docker 仅绑定 `127.0.0.1` |
-| 后端容器 | 8050–8099 | API 端口 = 前端端口 + 50 |
+| 子项目 API | 8050–8099 | API 端口 = 前端端口 + 50 |
+| 基础设施服务 | 8100–8149 | Auth 鉴权 / 通知 / 任务调度 / 消息队列，依次递增 |
 | 数据库 | 3306+ | 仅容器内互联，不暴露 |
 
 示例：
@@ -435,6 +472,8 @@ git push → GitHub Actions 触发
 |------|-------------|-------------|------|--------|
 | Portfolio | 8000 | — | `lujiesheng.cn` | — |
 | Monitor | 8001 | 8051 | `monitor.lujiesheng.cn` + `api-monitor.lujiesheng.cn` | 容器内 3306 |
+| Auth | — | 8100 | `api-auth.lujiesheng.cn` | 容器内 3306 |
+| Notification | — | 8110 | `api-notification.lujiesheng.cn` | 容器内 3306 |
 | 项目 2 | 8002 | 8052 | `<name>.lujiesheng.cn` + `api-<name>.lujiesheng.cn` | 容器内 3307 |
 
 ---

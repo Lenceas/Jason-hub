@@ -49,6 +49,18 @@ Jason-hub 第一个子项目，统一监控平台。对服务器、Docker 容器
 | SSL 证书到期 | 自动检查剩余天数，提前预警 |
 | 可用率报表 | 日/周/月 SLA 百分比 |
 
+##### 站点监控列表（规划）
+
+| 站点 | 域名 | 检查方式 | 鉴权 |
+|------|------|---------|------|
+| Portfolio 主站 | `lujiesheng.cn` | HTTP GET `/` | ❌ 公开 |
+| Monitor 前端 | `monitor.lujiesheng.cn` | HTTP GET `/` | ❌ 公开 |
+| Monitor API | `api-monitor.lujiesheng.cn` | HTTP GET `/healthz` | ❌ 公开 |
+| Auth 服务 | `api-auth.lujiesheng.cn` | HTTP GET `/login`（登录页） | ❌ 无 `/healthz` |
+| Notification 通知 | `api-notification.lujiesheng.cn` | HTTP GET `/healthz` | ❌ 公开 |
+
+> 站点监控检查的是"公网可达性"和"SSL 证书"，不使用 JWT 鉴权。Auth 服务的 `/healthz` 仅限内网（Nginx 公网拦截），站点监控改为 TLS 握手检测。其余 API 服务提供公开的 `/healthz` 端点。
+
 #### 扩展：Nginx 反向代理监控
 
 | 指标 | 说明 | 数据来源 |
@@ -63,10 +75,20 @@ Jason-hub 第一个子项目，统一监控平台。对服务器、Docker 容器
 
 | 功能 | 说明 |
 |------|------|
-| API 健康探针 | 定时调用各服务 `/health` 端点 |
+| API 健康探针 | 定时调用各服务 `/api/v1/health` 端点（需 JWT 验证） |
 | 依赖服务状态 | MySQL / Redis / MongoDB 连通性 + 深度指标（见下表） |
 | 延迟监控 | 各服务响应时间统计 |
 | 服务心跳 | 每个子项目的心跳检测 |
+
+##### 应用健康检查列表（规划）
+
+| 服务 | 内网端点 | 认证方式 | 检查内容 |
+|------|---------|---------|---------|
+| Auth 鉴权 | `http://auth:8100/api/v1/auth/health` | Bearer \<service-token\> | 服务存活、数据库连接 |
+| Monitor API | `http://monitor-api:8051/api/v1/health` | Bearer \<service-token\> | 服务存活、MySQL/Redis 连接 |
+| Notification | `http://notification:8110/api/v1/health` | Bearer \<service-token\> | 服务存活、数据库连接 |
+
+> 应用健康检查在内网进行，使用 Monitor 服务的 Client Credentials JWT 调用。与站点监控的公开 `/healthz` 不同，这里是带权限的深度检测。|
 
 #### 依赖服务深度指标
 
@@ -120,6 +142,7 @@ GITHUB_REPO=Lenceas/Jason-hub
 | 后端框架 | **.NET 10 + Minimal API** | 轻量高性能 |
 | API 文档 | **Scalar** | 集成至 `/api/v1/docs`，蓝白主题适配 |
 | ORM | **SqlSugar** | 支持多数据库、多租户、国产数据库、MongoDB |
+| 数据库 | **MySQL 8.4** | 使用独立 `monitor` 数据库，与 `auth` 用户中心隔离 |
 | 缓存 | **Redis** | 实时数据和 Pub/Sub |
 | 采集代理 | **.NET 10 Background Worker** | 服务器端定时采集 |
 | Docker 通信 | **Docker SDK for .NET** | 容器状态获取 |
@@ -246,6 +269,8 @@ GET    /api/v1/docs                     ← Scalar API 文档
 ---
 
 ## 七、数据库设计
+
+Monitor 使用独立 `monitor` 数据库，与全局 `auth` 用户中心隔离。告警事件中的用户信息通过 `user_id` 引用 `auth.auth_users`。
 
 ### 表结构
 

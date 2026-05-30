@@ -87,7 +87,8 @@ Jason-hub/
 | 类型 | 端口范围 | 说明 |
 |------|----------|------|
 | 前端页面 | 8000–8049 | Astro 主站 / Vue 子项目 |
-| 后端 API | 8050–8099 | 子项目对应的 API 服务 |
+| 子项目 API | 8050–8099 | 子项目对应的 API 服务 |
+| 基础设施服务 | 8100–8149 | Auth 鉴权 / 通知 / 任务调度 / 消息队列等 |
 | 数据库 | 标准端口 | MySQL 3306 / Redis 6379 / MongoDB 27017 |
 
 ### 端口分配表
@@ -97,6 +98,10 @@ Jason-hub/
 | **Portfolio** | Astro 前端 | 8000 | `lujiesheng.cn` |
 | **Monitor** | Vue 3 前端 | 8001 | `monitor.lujiesheng.cn` |
 | Monitor API | .NET 10 后端（含 Agent 采集器） | 8051 | `api-monitor.lujiesheng.cn` |
+| **Auth 服务** | .NET 10 鉴权中心（JWT） | 8100 | `api-auth.lujiesheng.cn` |
+| **Notification** | .NET 10 通知服务 | 8110 | `api-notification.lujiesheng.cn` |
+| **任务调度** | .NET 10 任务调度服务 | 8120 | —（内网） |
+| 消息队列 | 基础设施服务 | 8130 | —（内网） |
 | 子项目 N | Vue 3 前端 | 8002+ | `<name>.lujiesheng.cn` |
 | 子项目 N API | .NET 10 后端 | 8052+ | `api-<name>.lujiesheng.cn` |
 

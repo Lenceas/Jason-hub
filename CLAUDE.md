@@ -22,8 +22,11 @@
 
 > `[进行中]` 表示正在做的，`[待办]` 表示计划内的，`[完成]` 表示已交付的。
 
-### 本期焦点：Monitor 监控面板
+### 本期焦点：基础设施服务 + Monitor 监控面板
 
+- [进行中] 基础设施服务方案确定 — Auth 鉴权 / Notification 通知 / 任务调度 / 消息队列
+  - Auth 鉴权中心（JWT + RS256 本地验证）：方案已定，端口 8100
+  - 端口段重定义：三段式（前端 8000-8049 / 子项目 API 8050-8099 / 基础设施服务 8100-8149）
 - [进行中] Monitor 子项目 — 方案确定，待开发
   - 前端：Vue 3 + TypeScript / UnoCSS / ECharts / Pinia（端口 8001）
   - 后端：.NET 10 / SqlSugar / Scalar / Minimal API（端口 8051）
@@ -58,10 +61,18 @@
 
 ### 端口分配
 
-| 项目 | 前端端口 | API 端口 | 前端域名 | API 域名 |
-|------|---------|---------|---------|---------|
-| Portfolio | 8000 | — | `lujiesheng.cn` | — |
-| Monitor | 8001 | 8051 | `monitor.lujiesheng.cn` | `api-monitor.lujiesheng.cn` |
+| 项目 | 端口 | 域名 |
+|------|------|------|
+| **前端页面 (8000-8049)** | | |
+| Portfolio | 8000 | `lujiesheng.cn` |
+| Monitor 前端 | 8001 | `monitor.lujiesheng.cn` |
+| **子项目 API (8050-8099)** | | |
+| Monitor API | 8051 | `api-monitor.lujiesheng.cn` |
+| **基础设施服务 (8100-8149)** | | |
+| Auth 鉴权服务 | 8100 | `api-auth.lujiesheng.cn` |
+| Notification 通知 | 8110 | `api-notification.lujiesheng.cn` |
+| 任务调度 | 8120 | —（内网） |
+| 消息队列 | 8130 | —（内网） |
 
 ---
 
@@ -69,9 +80,12 @@
 
 | 日期 | 决策 | 参考文档 |
 |------|------|---------|
+| 2026-05-30 | 端口段重定义：三段式（前端 8000-8049 / 子项目 API 8050-8099 / 基础设施服务 8100-8149） | `ARCHITECTURE.md` |
+| 2026-05-30 | Auth 鉴权服务纳入基础设施层：JWT + RS256 本地验证（:8100） | `PLAN.md` |
+| 2026-05-30 | 通知服务从 Monitor 抽取为独立基础设施服务（Notification :8110） | `PLAN.md` |
+| 2026-05-30 | 定时服务与任务调度合并为统一任务调度服务（:8120） | `PLAN.md` |
 | 2026-05-30 | 文档体系重构：PLAN.md 规范 + 中英双语 + 根+子项目双层文档 | `STYLE_GUIDE.md` |
 | 2026-05-30 | 双轨发布流：子项目独立发布流 + 主仓库发布流 | `RELEASE.md` |
 | 2026-05-30 | 子项目独立版本管理：分支内自由发版，main +1 minor | `STYLE_GUIDE.md` |
-| 2026-05-30 | 全文档审计修复 18 项：DEPLOY.md Note→Monitor / .NET 10 补全 / .env.example | `DEPLOY.md` |
 | 2026-05-30 | Monitor 方案扩展为 6 大模块（+Nginx 监控 + 数据库深度指标 + CI/CD 流水线） | `Monitor/PLAN.md` |
 | 2026-05-30 | 采集代理纳入 Monitor 架构体系 | `ARCHITECTURE.md` |
