@@ -2,6 +2,25 @@
 
 ---
 
+## v1.2.0 (2026-05-30)
+
+- **feat**：新增 Auth 鉴权基础设施服务（.NET 10 + Minimal API，:8100）
+- **feat**：Auth JWT 签发 — RS256 非对称签名 + BCrypt 密码哈希 + HttpOnly Cookie 跨子域共享
+- **feat**：Auth 爆破防御 — IP 限流（5次/分钟）+ 账户锁定（10次/15分钟）
+- **feat**：Auth Scalar API 文档集成（BluePlanet 蓝白主题）
+- **feat**：AuthShared 共享中间件库 — JwtValidator / AuthHandler / RequireScope
+- **feat**：Auth 6 大 API 端点（login / token / refresh / healthz / health / public-key / docs）
+- **feat**：Auth 登录页 HTML 蓝白毛玻璃风格
+- **feat**：数据库命名规范 — 统一 `jason_` 前缀（jason_auth / jason_monitor / jason_blog / jason_forum）
+- **docs**：Monitor/PLAN.md 7 张表 + PLAN.md 3 张表全字段中文注释
+- **docs**：PLAN.md 新增数据库命名规范节
+- **docs**：Auth 子项目文档三件套（PLAN.md / CHANGELOG.md / README.md）
+- **fix**：AuthService 爆破防御并发安全 — 原子 SQL 递增失败计数
+- **fix**：Auth JwtService 线程安全 — RS256 签名加锁保护
+- **fix**：Auth 刷新令牌流程 — 登录时生成 refresh token + 数据库持久化
+- **fix**：Auth RefreshToken 使用 DI 单例 JwtValidator
+- **chore**：完善 .gitignore（.NET bin/obj / 开发密钥 / IDE 配置）
+
 ## v1.1.0 (2026-05-30)
 
 - **feat**：新增文档体系规范 — 根目录 + 子项目各含 `PLAN.md`（方案）+ `CHANGELOG.md`（日志）+ `README.md`（指南）

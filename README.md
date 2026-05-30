@@ -19,6 +19,7 @@
 | 项目 | 前端 | API | 技术栈 | 状态 |
 |------|------|----|--------|------|
 | Portfolio 主站 | `lujiesheng.cn` | — | Astro 6 | active |
+| Auth 鉴权服务 | — | `api-auth.lujiesheng.cn` | .NET 10 / Minimal API | dev |
 | Monitor 监控面板 | `monitor.lujiesheng.cn` | `api-monitor.lujiesheng.cn` | Vue 3 / .NET 10 | planning |
 | 后续项目 | `<name>.lujiesheng.cn` | `api-<name>.lujiesheng.cn` | Vue 3 / .NET 10 | planning |
 
@@ -27,6 +28,7 @@
 ```
 Jason-hub/
 ├── Portfolio/           ← Astro 6 个人主页（主站）
+├── Auth/                ← .NET 10 鉴权服务（基础设施）
 ├── Monitor/             ← Vue 3 + .NET 10 监控面板（planning）
 ├── .github/workflows/   ← GitHub Actions CI/CD
 ├── docker-compose.yml   ← Docker 容器编排
@@ -79,6 +81,7 @@ A personal project aggregation site built with [Astro 6](./Portfolio). The main 
 | Project | Frontend | API | Stack | Status |
 |---------|----------|-----|-------|--------|
 | Portfolio | `lujiesheng.cn` | — | Astro 6 | active |
+| Auth | — | `api-auth.lujiesheng.cn` | .NET 10 / Minimal API | dev |
 | Monitor | `monitor.lujiesheng.cn` | `api-monitor.lujiesheng.cn` | Vue 3 / .NET 10 | planning |
 | Upcoming | `<name>.lujiesheng.cn` | `api-<name>.lujiesheng.cn` | Vue 3 / .NET 10 | planning |
 
@@ -87,6 +90,7 @@ A personal project aggregation site built with [Astro 6](./Portfolio). The main 
 ```
 Jason-hub/
 ├── Portfolio/           ← Astro 6 homepage (main site)
+├── Auth/                ← .NET 10 auth service (infrastructure)
 ├── Monitor/             ← Vue 3 + .NET 10 monitoring dashboard (planning)
 ├── .github/workflows/   ← GitHub Actions CI/CD
 ├── docker-compose.yml   ← Docker container orchestration

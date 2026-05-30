@@ -308,37 +308,37 @@ GET  /api/v1/auth/public-key      ← 返回公钥（各服务启动时拉取并
 #### 数据库表
 
 ```sql
--- 用户（Monitor 面板管理员）
+-- 用户表（管理员登录，位于 jason_auth 库）
 CREATE TABLE auth_users (
-    id              INT PRIMARY KEY AUTO_INCREMENT,
-    username        VARCHAR(100) NOT NULL UNIQUE,
-    password_hash   VARCHAR(255) NOT NULL,
-    role            VARCHAR(50) DEFAULT 'admin',
-    failed_attempts INT DEFAULT 0,
-    locked_until    DATETIME,
-    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP
-);
+    id              INT PRIMARY KEY AUTO_INCREMENT  COMMENT '用户ID',
+    username        VARCHAR(100) NOT NULL UNIQUE    COMMENT '用户名',
+    password_hash   VARCHAR(255) NOT NULL           COMMENT '密码哈希（BCrypt）',
+    role            VARCHAR(50) DEFAULT 'admin'      COMMENT '角色：admin',
+    failed_attempts INT DEFAULT 0                   COMMENT '连续登录失败次数',
+    locked_until    DATETIME                        COMMENT '账户锁定截止时间',
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'
+) COMMENT='用户表 — 管理员登录';
 
 -- 服务间调用凭证
 CREATE TABLE auth_clients (
-    id                INT PRIMARY KEY AUTO_INCREMENT,
-    client_id         VARCHAR(100) NOT NULL UNIQUE,
-    client_secret_hash VARCHAR(255) NOT NULL,
-    name              VARCHAR(200) NOT NULL,
-    scopes            VARCHAR(500) NOT NULL,
-    is_active         TINYINT(1) DEFAULT 1,
-    created_at        DATETIME DEFAULT CURRENT_TIMESTAMP
-);
+    id                INT PRIMARY KEY AUTO_INCREMENT    COMMENT '凭证ID',
+    client_id         VARCHAR(100) NOT NULL UNIQUE      COMMENT '客户端ID',
+    client_secret_hash VARCHAR(255) NOT NULL            COMMENT '客户端密钥哈希',
+    name              VARCHAR(200) NOT NULL             COMMENT '服务名称',
+    scopes            VARCHAR(500) NOT NULL             COMMENT '权限范围（逗号分隔）',
+    is_active         TINYINT(1) DEFAULT 1              COMMENT '是否启用',
+    created_at        DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'
+) COMMENT='服务间调用凭证表';
 
 -- 刷新令牌
 CREATE TABLE auth_refresh_tokens (
-    id         BIGINT PRIMARY KEY AUTO_INCREMENT,
-    user_id    INT,
-    token_hash VARCHAR(255) NOT NULL,
-    expires_at DATETIME NOT NULL,
-    revoked    TINYINT(1) DEFAULT 0,
+    id         BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '令牌ID',
+    user_id    INT                                COMMENT '用户ID（关联auth_users）',
+    token_hash VARCHAR(255) NOT NULL              COMMENT '令牌哈希',
+    expires_at DATETIME NOT NULL                  COMMENT '过期时间',
+    revoked    TINYINT(1) DEFAULT 0               COMMENT '是否已吊销',
     FOREIGN KEY (user_id) REFERENCES auth_users(id)
-);
+) COMMENT='刷新令牌表';
 ```
 
 #### 爆破防御
@@ -428,11 +428,21 @@ app.MapPost("/api/v1/notify", () => { ... })
 
 > 所有子项目共用一个 MySQL 8.4 实例，按 Database 逻辑隔离。不分库分表、不做读写分离、不上多租户。
 
+### 命名规范
+
+所有数据库统一使用 `jason_<项目名>` 格式：
+
+| 数据库 | 用途 |
+|--------|------|
+| `jason_auth` | Auth 鉴权（全局用户中心） |
+| `jason_monitor` | Monitor 监控面板 |
+| `jason_blog` | 未来：个人博客 |
+| `jason_forum` | 未来：论坛 |
+
 ### 设计理念
 
 | 问题 | 为什么不做 | 什么时候需要 |
 |------|-----------|-------------|
-| 分库分表 | 个人项目数据量远未到单表瓶颈 | 单表 ≥ 1000 万行 |
 | 读写分离 | 一台服务器，读 QPS 很低 | 读 QPS ≥ 5000 |
 | 多租户 | 没有"租户"概念，只有不同类型的用户 | 需要 SaaS 化隔离数据 |
 | 独立数据库实例 | 一个 MySQL 容器跑所有库，零额外运维 | 单个库达到服务器资源瓶颈 |
@@ -441,12 +451,12 @@ app.MapPost("/api/v1/notify", () => { ... })
 
 ```
 MySQL 8.4 容器 (:3306)
-├── auth                    ← Auth 鉴权（全局用户中心）
+├── jason_auth              ← Auth 鉴权（全局用户中心）
 │   ├── auth_users          ← 所有用户（你 + 未来注册用户）
 │   ├── auth_clients        ← 服务间调用凭证
 │   └── auth_refresh_tokens ← 刷新令牌
 │
-├── monitor                 ← Monitor 监控面板
+├── jason_monitor           ← Monitor 监控面板
 │   ├── server_metrics
 │   ├── sites / uptime_records
 │   ├── container_snapshots
@@ -454,49 +464,49 @@ MySQL 8.4 容器 (:3306)
 │   ├── alert_rules / alert_events
 │   └── ci_deployments
 │
-├── blog                    ← 未来：个人博客
+├── jason_blog              ← 未来：个人博客
 │   ├── posts / categories / tags
 │   └── comments
 │
-├── forum                   ← 未来：论坛
+├── jason_forum             ← 未来：论坛
 │   ├── threads / posts
 │   └── categories
 │
-└── 更多子项目...
+└── 更多 jason_<项目名>...
 ```
 
 ### 用户中心全局共享
 
-`auth` 数据库是所有子项目共用的全局用户中心，其他子项目通过 `user_id` 外键引用：
+`jason_auth` 数据库是所有子项目共用的全局用户中心，其他子项目通过 `user_id` 外键引用：
 
 ```sql
--- 博客文章引用 auth 用户
-CREATE TABLE blog.posts (
+-- 博客文章引用 jason_auth 用户
+CREATE TABLE jason_blog.posts (
     id        INT PRIMARY KEY AUTO_INCREMENT,
     title     VARCHAR(200) NOT NULL,
-    author_id INT NOT NULL,           -- REFERENCES auth.auth_users(id)
+    author_id INT NOT NULL,           -- REFERENCES jason_auth.auth_users(id)
     -- ...
 );
 
--- 论坛帖子引用 auth 用户
-CREATE TABLE forum.threads (
+-- 论坛帖子引用 jason_auth 用户
+CREATE TABLE jason_forum.threads (
     id      INT PRIMARY KEY AUTO_INCREMENT,
     title   VARCHAR(200) NOT NULL,
-    user_id INT NOT NULL,            -- REFERENCES auth.auth_users(id)
+    user_id INT NOT NULL,            -- REFERENCES jason_auth.auth_users(id)
     -- ...
 );
 ```
 
-> 每个子项目不存用户数据，用户统一存在 `auth` 库中。一个账号登录所有子项目。
+> 每个子项目不存用户数据，用户统一存在 `jason_auth` 库中。一个账号登录所有子项目。
 
 ### 连接配置
 
 各服务通过环境变量配置各自数据库的连接串：
 
 ```env
-AUTH_DB_CONNECTION=Server=127.0.0.1;Port=3306;Database=auth;User=root;Password=<pw>;
-MONITOR_DB_CONNECTION=Server=127.0.0.1;Port=3306;Database=monitor;User=root;Password=<pw>;
-BLOG_DB_CONNECTION=Server=127.0.0.1;Port=3306;Database=blog;User=root;Password=<pw>;
+AUTH_DB_CONNECTION=Server=127.0.0.1;Port=3306;Database=jason_auth;User=root;Password=<pw>;
+MONITOR_DB_CONNECTION=Server=127.0.0.1;Port=3306;Database=jason_monitor;User=root;Password=<pw>;
+BLOG_DB_CONNECTION=Server=127.0.0.1;Port=3306;Database=jason_blog;User=root;Password=<pw>;
 ```
 
 SqlSugar 多数据库注册：

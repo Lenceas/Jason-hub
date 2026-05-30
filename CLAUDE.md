@@ -24,9 +24,13 @@
 
 ### 本期焦点：基础设施服务 + Monitor 监控面板
 
-- [进行中] 基础设施服务方案确定 — Auth 鉴权 / Notification 通知 / 任务调度 / 消息队列
-  - Auth 鉴权中心（JWT + RS256 本地验证）：方案已定，端口 8100
-  - 端口段重定义：三段式（前端 8000-8049 / 子项目 API 8050-8099 / 基础设施服务 8100-8149）
+- [完成] Auth 鉴权服务开发 — JWT + RS256 本地验证，端口 8100 ✅
+  - .NET 10 + Minimal API + SqlSugar + BCrypt
+  - 6 大 API 端点 + Scalar API 文档 + 登录页 HTML
+  - AuthShared 共享中间件库供各子项目引用
+  - 数据库 `jason_auth`（auth_users / auth_clients / auth_refresh_tokens）
+- [待办] Auth 鉴权服务部署 — DNS / SSL / Nginx / docker-compose
+- [进行中] Notification 通知服务 / 任务调度 / 消息队列 — 方案待定
 - [进行中] Monitor 子项目 — 方案确定，待开发
   - 前端：Vue 3 + TypeScript / UnoCSS / ECharts / Pinia（端口 8001）
   - 后端：.NET 10 / SqlSugar / Scalar / Minimal API（端口 8051）
@@ -35,8 +39,8 @@
 
 ### 最近完成
 
+- [完成] v1.2.0 — Auth 鉴权服务开发 + 数据库 `jason_` 命名规范 + 中文表注释
 - [完成] v1.1.0 — 文档体系全面重构（PLAN.md 规范/双轨发布流/中英双语/18 项审计修复）
-- [完成] v1.0.19 — 新增 CLAUDE.md 跨设备记忆同步机制 + 子项目立项流程
 
 ---
 
@@ -80,6 +84,8 @@
 
 | 日期 | 决策 | 参考文档 |
 |------|------|---------|
+| 2026-05-30 | Auth 鉴权服务 v1 开发完成（.NET 10 + RS256 + Scalar） | `Auth/PLAN.md` |
+| 2026-05-30 | 数据库命名规范统一为 `jason_<项目名>` 格式 | `PLAN.md` |
 | 2026-05-30 | 端口段重定义：三段式（前端 8000-8049 / 子项目 API 8050-8099 / 基础设施服务 8100-8149） | `ARCHITECTURE.md` |
 | 2026-05-30 | Auth 鉴权服务纳入基础设施层：JWT + RS256 本地验证（:8100） | `PLAN.md` |
 | 2026-05-30 | 通知服务从 Monitor 抽取为独立基础设施服务（Notification :8110） | `PLAN.md` |

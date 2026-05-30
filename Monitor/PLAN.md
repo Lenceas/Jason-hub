@@ -270,98 +270,98 @@ GET    /api/v1/docs                     ← Scalar API 文档
 
 ## 七、数据库设计
 
-Monitor 使用独立 `monitor` 数据库，与全局 `auth` 用户中心隔离。告警事件中的用户信息通过 `user_id` 引用 `auth.auth_users`。
+Monitor 使用独立 `jason_monitor` 数据库，与全局 `jason_auth` 用户中心隔离。告警事件中的用户信息通过 `user_id` 引用 `jason_auth.auth_users`。
 
 ### 表结构
 
 ```sql
--- 服务器指标（每分钟一条）
+-- 服务器指标表（每分钟一条记录）
 CREATE TABLE server_metrics (
-    id          BIGINT PRIMARY KEY AUTO_INCREMENT,
-    ts          DATETIME NOT NULL,
-    cpu_pct     DECIMAL(5,2),
-    mem_pct     DECIMAL(5,2),
-    mem_used    BIGINT,
-    mem_total   BIGINT,
-    disk_pct    DECIMAL(5,2),
-    net_in      BIGINT,
-    net_out     BIGINT,
-    load_1m     DECIMAL(4,2),
-    load_5m     DECIMAL(4,2),
-    load_15m    DECIMAL(4,2),
+    id          BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '记录ID',
+    ts          DATETIME NOT NULL                    COMMENT '采集时间戳',
+    cpu_pct     DECIMAL(5,2)                         COMMENT 'CPU使用率（%）',
+    mem_pct     DECIMAL(5,2)                         COMMENT '内存使用率（%）',
+    mem_used    BIGINT                                COMMENT '已用内存（字节）',
+    mem_total   BIGINT                                COMMENT '总内存（字节）',
+    disk_pct    DECIMAL(5,2)                         COMMENT '磁盘使用率（%）',
+    net_in      BIGINT                                COMMENT '入网流量（字节）',
+    net_out     BIGINT                                COMMENT '出网流量（字节）',
+    load_1m     DECIMAL(4,2)                         COMMENT '1分钟负载',
+    load_5m     DECIMAL(4,2)                         COMMENT '5分钟负载',
+    load_15m    DECIMAL(4,2)                         COMMENT '15分钟负载',
     INDEX idx_ts (ts)
-);
+) COMMENT='服务器指标表';
 
--- 站点配置
+-- 站点配置表
 CREATE TABLE sites (
-    id           INT PRIMARY KEY AUTO_INCREMENT,
-    name         VARCHAR(100) NOT NULL,
-    url          VARCHAR(500) NOT NULL,
-    interval_sec INT DEFAULT 60,
-    timeout_ms   INT DEFAULT 5000,
-    method       VARCHAR(10) DEFAULT 'GET',
-    is_active    TINYINT(1) DEFAULT 1,
-    created_at   DATETIME DEFAULT CURRENT_TIMESTAMP
-);
+    id           INT PRIMARY KEY AUTO_INCREMENT    COMMENT '站点ID',
+    name         VARCHAR(100) NOT NULL              COMMENT '站点名称',
+    url          VARCHAR(500) NOT NULL              COMMENT '站点URL',
+    interval_sec INT DEFAULT 60                    COMMENT '探测间隔（秒）',
+    timeout_ms   INT DEFAULT 5000                  COMMENT '超时时间（毫秒）',
+    method       VARCHAR(10) DEFAULT 'GET'          COMMENT 'HTTP方法',
+    is_active    TINYINT(1) DEFAULT 1              COMMENT '是否启用',
+    created_at   DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'
+) COMMENT='站点配置表';
 
--- 站点检查记录
+-- 站点检查记录表
 CREATE TABLE uptime_records (
-    id           BIGINT PRIMARY KEY AUTO_INCREMENT,
-    site_id      INT NOT NULL,
-    status_code  INT,
-    response_ms  INT,
-    checked_at   DATETIME NOT NULL,
-    is_ok        TINYINT(1) NOT NULL,
+    id           BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '记录ID',
+    site_id      INT NOT NULL                      COMMENT '站点ID（关联sites）',
+    status_code  INT                                COMMENT 'HTTP状态码',
+    response_ms  INT                                COMMENT '响应时间（毫秒）',
+    checked_at   DATETIME NOT NULL                 COMMENT '检查时间',
+    is_ok        TINYINT(1) NOT NULL               COMMENT '是否正常',
     FOREIGN KEY (site_id) REFERENCES sites(id),
     INDEX idx_site_checked (site_id, checked_at)
-);
+) COMMENT='站点检查记录表';
 
--- 容器快照
+-- 容器快照表
 CREATE TABLE container_snapshots (
-    id           BIGINT PRIMARY KEY AUTO_INCREMENT,
-    ts           DATETIME NOT NULL,
-    name         VARCHAR(200) NOT NULL,
-    status       VARCHAR(50),
-    cpu_pct      DECIMAL(10,2),
-    mem_usage    BIGINT,
-    mem_limit    BIGINT,
+    id           BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '记录ID',
+    ts           DATETIME NOT NULL                 COMMENT '采集时间戳',
+    name         VARCHAR(200) NOT NULL              COMMENT '容器名称',
+    status       VARCHAR(50)                        COMMENT '容器状态',
+    cpu_pct      DECIMAL(10,2)                     COMMENT 'CPU使用率',
+    mem_usage    BIGINT                             COMMENT '内存使用量（字节）',
+    mem_limit    BIGINT                             COMMENT '内存限制（字节）',
     INDEX idx_ts (ts)
-);
+) COMMENT='容器快照表';
 
--- 健康检查记录
+-- 健康检查记录表
 CREATE TABLE health_records (
-    id           BIGINT PRIMARY KEY AUTO_INCREMENT,
-    ts           DATETIME NOT NULL,
-    service      VARCHAR(100) NOT NULL,
-    endpoint     VARCHAR(500),
-    status       VARCHAR(20),
-    latency_ms   INT,
+    id           BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '记录ID',
+    ts           DATETIME NOT NULL                 COMMENT '检查时间',
+    service      VARCHAR(100) NOT NULL              COMMENT '服务名称',
+    endpoint     VARCHAR(500)                       COMMENT '检查端点',
+    status       VARCHAR(20)                        COMMENT '状态码/结果',
+    latency_ms   INT                                COMMENT '延迟（毫秒）',
     INDEX idx_service_ts (service, ts)
-);
+) COMMENT='健康检查记录表';
 
--- 告警规则
+-- 告警规则表
 CREATE TABLE alert_rules (
-    id           INT PRIMARY KEY AUTO_INCREMENT,
-    name         VARCHAR(200) NOT NULL,
-    metric       VARCHAR(100) NOT NULL,
-    operator     VARCHAR(10) NOT NULL,
-    threshold    DECIMAL(10,2) NOT NULL,
-    duration_sec INT DEFAULT 300,
-    enabled      TINYINT(1) DEFAULT 1,
-    created_at   DATETIME DEFAULT CURRENT_TIMESTAMP
-);
+    id           INT PRIMARY KEY AUTO_INCREMENT    COMMENT '规则ID',
+    name         VARCHAR(200) NOT NULL              COMMENT '规则名称',
+    metric       VARCHAR(100) NOT NULL              COMMENT '监控指标名',
+    operator     VARCHAR(10) NOT NULL               COMMENT '比较运算符（> / < / >= / <=）',
+    threshold    DECIMAL(10,2) NOT NULL             COMMENT '告警阈值',
+    duration_sec INT DEFAULT 300                   COMMENT '持续时长（秒）',
+    enabled      TINYINT(1) DEFAULT 1              COMMENT '是否启用',
+    created_at   DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'
+) COMMENT='告警规则表';
 
--- 告警事件
+-- 告警事件表
 CREATE TABLE alert_events (
-    id           BIGINT PRIMARY KEY AUTO_INCREMENT,
-    rule_id      INT NOT NULL,
-    triggered_at DATETIME NOT NULL,
-    resolved_at  DATETIME,
-    message      TEXT,
-    severity     VARCHAR(20) DEFAULT 'warning',
+    id           BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '事件ID',
+    rule_id      INT NOT NULL                      COMMENT '关联规则ID',
+    triggered_at DATETIME NOT NULL                 COMMENT '触发时间',
+    resolved_at  DATETIME                          COMMENT '恢复时间',
+    message      TEXT                               COMMENT '告警消息',
+    severity     VARCHAR(20) DEFAULT 'warning'     COMMENT '严重级别（warning/critical）',
     FOREIGN KEY (rule_id) REFERENCES alert_rules(id),
     INDEX idx_rule_triggered (rule_id, triggered_at)
-);
+) COMMENT='告警事件表';
 ```
 
 ---

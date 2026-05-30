@@ -340,7 +340,7 @@ volumes:
 MYSQL_ROOT_PW=your_secure_password
 MONGO_ROOT_USER=admin
 MONGO_ROOT_PW=your_secure_password
-MONITOR_DB_CONNECTION=Server=127.0.0.1;Port=3306;Database=monitor;User=root;Password=<pw>;
+MONITOR_DB_CONNECTION=Server=127.0.0.1;Port=3306;Database=jason_monitor;User=root;Password=<pw>;
 MONITOR_REDIS_CONNECTION=127.0.0.1:6379
 ```
 
