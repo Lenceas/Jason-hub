@@ -90,6 +90,8 @@
 | 新增子项目 | `feat` | `minor` |
 | 多种类型混合 | 取最高优先级前缀 | 取最高版本位 |
 
+> 步骤③确定的 **`{type}`** 和 **`{versionBump}`**（`patch` 或 `minor`）将直接传递到步骤⑥的摘要和步骤⑦的执行命令，后续不再手动选择。
+
 **3b. 列出本次影响范围：**
 
 分析 `git diff` 涉及的变更，向用户说明本次改动将影响哪些文档（参见步骤④的清单），确保心中有数后再进入下一步。
@@ -146,22 +148,26 @@ Commit 信息预览
   └── {type}: {简短描述} v{新版本}
 
 版本号变化
-  └── v旧版本 → v新版本
+  └── v旧版本 → v新版本（{versionBump}）
 ```
 
 等待用户回复"ok"或"确认"后继续。
 
+> 版本位 `{versionBump}` 来自步骤③的判定结果，用户确认即表示认可该版本位。
+
 ### ⑦ 自动执行
+
+版本位直接使用步骤③确定的 `{versionBump}`，不再手动选择。
 
 ```bash
 cd Portfolio
-npm version <patch|minor> --no-git-tag-version
+npm version {versionBump} --no-git-tag-version
 
 cd ..
 git add -A
-git commit -m "{type}: {描述} v{版本}"
+git commit -m "{type}: {描述} v{新版本}"
 
-git tag v{版本}
+git tag v{新版本}
 git push && git push --tags
 ```
 

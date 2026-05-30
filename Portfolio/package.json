@@ -1,7 +1,7 @@
 {
   "name": "portfolio",
   "type": "module",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "Jason's personal portfolio — Astro main site",
   "scripts": {
     "dev": "astro dev --host --port 8000 --open",
