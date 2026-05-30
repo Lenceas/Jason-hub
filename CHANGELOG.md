@@ -2,6 +2,13 @@
 
 ---
 
+## v1.0.15 (2026-05-29)
+
+- **Redis**：新增密码认证 — `--requirepass ${REDIS_PW}` 启动参数，healthcheck 同步适配带密码验证
+- **DEPLOY.md**：同步更新 Redis 配置示例
+
+---
+
 ## v1.0.14 (2026-05-29)
 
 - **基础设施**：Docker Compose 新增全局基础设施层 — MySQL 8 + Redis 7 + MongoDB 7，所有子项目共用

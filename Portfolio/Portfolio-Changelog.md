@@ -2,6 +2,12 @@
 
 ---
 
+## v1.0.15 (2026-05-29)
+
+- 无 Portfolio 直接变更，版本跟随根仓库 Redis 密码认证更新
+
+---
+
 ## v1.0.14 (2026-05-29)
 
 - **Docker Compose**：新增 MySQL / Redis / MongoDB 基础设施服务
