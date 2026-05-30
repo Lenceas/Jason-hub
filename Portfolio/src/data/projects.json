@@ -3,7 +3,7 @@
     "id": "todo-app",
     "title": "Todo App",
     "tagline": "Vue 3 + TypeScript · 任务管理",
-    "description": "一个简洁的任务管理应用，支持分类、标签、拖拽排序，后端基于 .NET 8 + PostgreSQL 构建，前后端分离部署。",
+    "description": "一个简洁的任务管理应用，支持分类、标签、拖拽排序，后端基于 .NET 10 + PostgreSQL 构建，前后端分离部署。",
     "status": "completed",
     "featured": true,
     "url": "https://github.com/Lenceas/Jason-hub",

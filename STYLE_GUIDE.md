@@ -6,15 +6,16 @@
 
 | 风格 | 规范 | 适用场景 | 示例 |
 |------|------|----------|------|
-| **UPPER_CASE** | 全大写 + 扩展名 | 根目录项目文档（约定俗成，按字母序排前） | `README.md`, `CHANGELOG.md`, `LICENSE`, `DEPLOY.md` |
+| **UPPER_CASE** | 全大写 + 扩展名 | 约定俗成的根目录项目文档（按字母序排前） | `README.md`, `CHANGELOG.md`, `PLAN.md`, `LICENSE`, `DEPLOY.md` |
+| **PascalCase** | 首字母大写 | 其余根目录文档与说明文件 | `AGENTS.md`, `ARCHITECTURE.md`, `CLAUDE.md`, `RELEASE.md`, `STYLE_GUIDE.md` |
 | **PascalCase** | 首字母大写 | Vue/Astro 组件文件、子项目目录 | `ProjectCard.astro`, `Hero.astro`, `Monitor/` |
 | **kebab-case** | 小写连字符 | 普通文件、配置文件 | `global.css`, `astro.config.mjs`, `docker-compose.yml` |
 | **camelCase** | 小写驼峰 | JSON 字段、JS/TS 变量 | `projectId`, `tagline`, `socialLinks` |
 | **SCREAMING_SNAKE** | 大写下划线 | 环境变量、常量 | `TODO_DB_CONNECTION`, `MYSQL_ROOT_PW` |
 
-> 例外：子项目级更新日志使用 `{项目名}-Changelog.md`（如 `Portfolio-Changelog.md`）。
->
-> 每个子项目根目录必须包含 `README.md`，作为该子项目的方案文档（动工前经确认）和技术说明（开发后持续更新）。
+> 根目录和每个子项目各自包含标准 MD 文档体系：
+> - **根目录**：`PLAN.md`（总体规划）+ `CHANGELOG.md`（变更日志）+ `README.md`（项目总览）
+> - **子项目**：`PLAN.md`（方案设计）+ `CHANGELOG.md`（变更日志）+ `README.md`（技术说明）
 
 ## CSS 规范
 
@@ -98,7 +99,33 @@ git push origin main --tags
 | 次版本 | 新增子项目、新功能 | `v1.1.0` → 加了 TodoApp |
 | 修订 | Bug 修复、小优化 | `v1.1.1` → 修了个 bug |
 
-> 版本号代表整个 Monorepo 的里程碑状态。若后续需要单独发布子项目，可拆分为独立仓库或使用子项目级 tag（如 `todoapp-v1.0.0`）。
+### 子项目版本管理
+
+每个子项目在独立分支上开发时，拥有自己的独立版本号体系：
+
+| 概念 | 规则 |
+|------|------|
+| 版本记录位置 | 各子项目目录内的 `CHANGELOG.md` |
+| 起始版本 | 从 `v0.1.0` 开始（骨架搭建） |
+| 开发期间 | 自由发版：`v0.1.0` → `v0.2.0` → ... → `v1.0.0` |
+| 合并回 main | main 版本号 +1 次版本（minor），表示"集成了某子项目" |
+| 后续更新 | 子项目版本独立演进，main 版本按实际变更范围决定 |
+| Portfolio 版本 | 在 `Portfolio/package.json` 中独立记录，不受子项目版本影响 |
+
+**示例**: Monitor 子项目开发到 v1.0.0 后合并 → main v1.0.19 → v1.1.0
+
+### 多项目同时变更时的提交策略
+
+同时涉及多个子项目的变更时，按以下规则处理：
+
+| 场景 | 做法 |
+|------|------|
+| `project/<name>` 分支内同时改本子项目 + Portfolio | **一个 commit**，属于同一逻辑变更（集成新子项目） |
+| main 上同时改 Portfolio + 某个子项目 | **分两个 commit**，各自走发布流程，便于追溯和回滚 |
+| 紧急修复跨两个子项目 | **分 commit 提交**，先修优先级高的先发版 |
+| 合并子项目分支到 main | **merge commit 本身就是一次提交**，无需拆分 |
+
+> **原则**：commit 按逻辑单元拆分，而非按文件拆分。同一逻辑变更（如"集成 Monitor"）只需一个 commit；不同逻辑变更（如"修 Portfolio 样式"和"修 Monitor 日志"）建议分开提交。
 
 ### 提交信息规范
 

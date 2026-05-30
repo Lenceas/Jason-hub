@@ -66,6 +66,8 @@ services:
   #   build: ./Monitor/api
   #   ports:
   #     - "127.0.0.1:8051:8080"
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock    # Agent 采集需要
   #   environment:
   #     - ConnectionStrings__Default=${MONITOR_DB_CONNECTION}
   #     - Redis__ConnectionString=${MONITOR_REDIS_CONNECTION}

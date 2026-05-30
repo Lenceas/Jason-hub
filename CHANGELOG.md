@@ -2,6 +2,23 @@
 
 ---
 
+## v1.1.0 (2026-05-30)
+
+- **feat**：新增文档体系规范 — 根目录 + 子项目各含 `PLAN.md`（方案）+ `CHANGELOG.md`（日志）+ `README.md`（指南）
+- **feat**：新增根 `PLAN.md` 总体规划 + `Portfolio/PLAN.md` 方案设计 + `Monitor/PLAN.md` 扩展为 6 大模块
+- **feat**：创建 `.env.example` 环境变量模板，补全缺失的部署前置文件
+- **feat**：采集代理（Monitor Agent）纳入架构体系（ARCHITECTURE.md 部署图 + docker-compose）
+- **docs**：`Portfolio/Portfolio-Changelog.md` → `Portfolio/CHANGELOG.md`，统一全大写命名
+- **docs**：RELEASE.md 新增「子项目发布流程」（8 步，含代码审查/文档复核/合并到 main）
+- **docs**：RELEASE.md 主发布流程增强（选择性暂存/子项目版本同步/多项目变更策略）
+- **docs**：DEPLOY.md 全篇示例 "Note" → "Monitor"，修复 3 年不一致的占位符问题
+- **docs**：AGENTS.md + ARCHITECTURE.md 技术栈表补全 .NET 10 + Scalar
+- **docs**：Monitor/README.md 中英双语 + 目录结构标注"规划中"
+- **docs**：AGENTS.md 目录结构图补全（从 5 项扩展到 15 项）
+- **docs**：CLAUDE.md 更新时机改为"每次开发阶段完成或发布版本时更新"
+- **docs**：全文档 18 项审计修复（补全缺失引用/修复不一致/对齐规范）
+- **fix**：`projects.json` Todo App 描述 .NET 8 → .NET 10 统一
+
 ## v1.0.19 (2026-05-30)
 
 - **新功能**：新增 `CLAUDE.md` 会话记忆同步机制 — 项目状态自动维护，换电脑后 `git pull` 即可续接进度
@@ -9,7 +26,7 @@
 - **文档**：ARCHITECTURE.md 子项目体系拆为方案设计 + 开发部署两阶段
 - **文档**：AGENTS.md 子项目表新增 Monitor（planning），引用方案文档
 - **文档**：STYLE_GUIDE.md 追加子项目 README.md 规范
-- **Monitor**：输出完整方案文档至 `Monitor/README.md`（五大模块/技术选型/API/DB/采集方案）
+- **Monitor**：输出完整方案文档至 `Monitor/PLAN.md`（五大模块/技术选型/API/DB/采集方案）
 
 ---
 
@@ -88,7 +105,7 @@
 
 ## v1.0.9 (2026-05-29 09:56)
 
-- **文档**：CHANGELOG.md / DEPLOY.md / Portfolio-Changelog.md 同步实际 CI/CD 实现 + 部署记录
+- **文档**：CHANGELOG.md / DEPLOY.md / Portfolio/CHANGELOG.md 同步实际 CI/CD 实现 + 部署记录
 
 ---
 
@@ -120,7 +137,7 @@
 
 - **STYLE_GUIDE.md**：命名规范重构 — 五种风格（UPPER_CASE / PascalCase / kebab-case / camelCase / SCREAMING_SNAKE）按场景分类
 - **UPDATE.md → CHANGELOG.md**：统一更名为 CHANGELOG，匹配行业惯例
-- **Portfolio-Update.md → Portfolio-Changelog.md**：子项目日志同步更名
+- **Portfolio-Update.md → CHANGELOG.md**：子项目日志同步更名
 - 全量更新所有文档引用（STYLE_GUIDE / RELEASE / 历史记录）
 
 ---
@@ -151,9 +168,9 @@
 - 价值观模块：将社会主义核心价值观替换为程序员风格文字（简洁/可靠/高效/优雅 · 开源/协作/迭代/极致 · 专注/好奇/创造/分享）
 - 头像：替换为个人微信头像
 - tsconfig：添加 `ignoreDeprecations: "6.0"` 消除 baseUrl 弃用警告
-- STYLE_GUIDE.md：新增命名规范（`CHANGELOG.md` 根目录 / `{项目名}-Changelog.md` 子项目）
+- STYLE_GUIDE.md：新增命名规范（`CHANGELOG.md` 根目录 / `{子项目}/CHANGELOG.md` 子项目）
 - 创建根目录 `CHANGELOG.md` 更新日志
-- 创建 `Portfolio/Portfolio-Changelog.md` 子项目更新日志
+- 创建 `Portfolio/CHANGELOG.md` 子项目更新日志
 
 ---
 

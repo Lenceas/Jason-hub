@@ -2,6 +2,10 @@
 
 ---
 
+## v1.0.19 (2026-05-30)
+
+- 无 Portfolio 直接变更，版本跟随根仓库文档与规范更新
+
 ## v1.0.18 (2026-05-30)
 
 - **修复**：全量 TypeScript 类型错误（BackToTop/Hero/Skills/ProjectCard/index.astro）
@@ -80,7 +84,7 @@
 ## v1.0.5 (2026-05-27 23:03 ~ 23:12)
 
 - **STYLE_GUIDE.md**：命名规范重构，按场景分为五种风格
-- **日志文件更名**：`Portfolio-Update.md` → `Portfolio-Changelog.md`
+- **日志文件更名**：`Portfolio-Update.md` → `CHANGELOG.md`
 
 ---
 
@@ -116,7 +120,7 @@
 - **Hero**：头像替换为个人微信头像
 - **tsconfig**：添加 `ignoreDeprecations: "6.0"` 消除 TS baseUrl 弃用警告
 - **STYLE_GUIDE.md**：新增命名规范
-- 创建本日志文件 `Portfolio-Changelog.md`
+- 创建本日志文件 `CHANGELOG.md`
 
 ---
 

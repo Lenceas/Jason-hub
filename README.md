@@ -27,16 +27,20 @@
 ```
 Jason-hub/
 ├── Portfolio/           ← Astro 6 个人主页（主站）
-├── <Name>/              ← 后续子项目 PascalCase (Vue 3 + .NET 10)
+├── Monitor/             ← Vue 3 + .NET 10 监控面板（planning）
 ├── .github/workflows/   ← GitHub Actions CI/CD
 ├── docker-compose.yml   ← Docker 容器编排
-├── AGENTS.md            ← AI 协作说明
-├── ARCHITECTURE.md      ← 架构设计
-├── CHANGELOG.md         ← Monorepo 更新日志
+├── .env.example         ← 环境变量模板
+├── PLAN.md              ← Monorepo 总体规划
+├── CHANGELOG.md         ← 主仓库变更日志
+├── CLAUDE.md            ← 会话记忆（自动维护）
+├── README.md            ← 项目总览（本文件）
 ├── DEPLOY.md            ← 部署规范（Nginx / SSL / CI-CD）
 ├── RELEASE.md           ← 发布工作流
+├── ARCHITECTURE.md      ← 架构设计
+├── AGENTS.md            ← AI 协作说明
 ├── STYLE_GUIDE.md       ← 编码与 Git 规范
-└── README.md            ← 项目总览（本文件）
+└── LICENSE              ← MIT 协议
 ```
 
 ### 快速开始
@@ -83,16 +87,20 @@ A personal project aggregation site built with [Astro 6](./Portfolio). The main 
 ```
 Jason-hub/
 ├── Portfolio/           ← Astro 6 homepage (main site)
-├── <Name>/              ← Upcoming sub-projects PascalCase (Vue 3 + .NET 10)
+├── Monitor/             ← Vue 3 + .NET 10 monitoring dashboard (planning)
 ├── .github/workflows/   ← GitHub Actions CI/CD
 ├── docker-compose.yml   ← Docker container orchestration
-├── AGENTS.md            ← AI agent instructions
-├── ARCHITECTURE.md      ← Architecture design
-├── CHANGELOG.md         ← Monorepo changelog
+├── .env.example         ← Environment variable template
+├── PLAN.md              ← Monorepo master plan
+├── CHANGELOG.md         ← Main repo changelog
+├── CLAUDE.md            ← Session memory (auto-maintained)
+├── README.md            ← Project overview (this file)
 ├── DEPLOY.md            ← Deployment guide (Nginx / SSL / CI-CD)
 ├── RELEASE.md           ← Release workflow
+├── ARCHITECTURE.md      ← Architecture design
+├── AGENTS.md            ← AI agent instructions
 ├── STYLE_GUIDE.md       ← Coding & Git standards
-└── README.md            ← Project overview (this file)
+└── LICENSE              ← MIT license
 ```
 
 ### Quick Start

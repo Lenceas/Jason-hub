@@ -16,7 +16,7 @@
                      │
          ┌───────────┼───────────┐
          │           │           │
-    portfolio:8000  note:8001  api-note:8051 ...
+    portfolio:8000  Monitor:8001  api-Monitor:8051 ...
          │           │           │
    ┌─────┴┐    ┌────┴────┐  ┌───┴────┐
    │ Astro │    │ Vue 3  │  │ .NET   │  ← Docker 容器
@@ -71,12 +71,12 @@
 子项目命名规则：`<name>.lujiesheng.cn` → 证书前缀 `<name>`
 
 ```bash
-# 以 Note 子项目为例
-~/.acme.sh/acme.sh --issue --dns dns_tencent -d note.lujiesheng.cn
-~/.acme.sh/acme.sh --install-cert -d note.lujiesheng.cn \
-  --key-file       ~/.acme.sh/ssl/note.lujiesheng.cn.key \
-  --fullchain-file ~/.acme.sh/ssl/note.lujiesheng.cn.pem \
-  --reloadcmd      "sudo cp ~/.acme.sh/ssl/note.lujiesheng.cn.key /etc/nginx/ssl/note.lujiesheng.cn.key && sudo cp ~/.acme.sh/ssl/note.lujiesheng.cn.pem /etc/nginx/ssl/note.lujiesheng.cn.pem && sudo chmod 600 /etc/nginx/ssl/note.lujiesheng.cn.key && sudo chmod 644 /etc/nginx/ssl/note.lujiesheng.cn.pem && sudo systemctl reload nginx"
+# 以 Monitor 子项目为例
+~/.acme.sh/acme.sh --issue --dns dns_tencent -d monitor.lujiesheng.cn
+~/.acme.sh/acme.sh --install-cert -d monitor.lujiesheng.cn \
+  --key-file       ~/.acme.sh/ssl/monitor.lujiesheng.cn.key \
+  --fullchain-file ~/.acme.sh/ssl/monitor.lujiesheng.cn.pem \
+  --reloadcmd      "sudo cp ~/.acme.sh/ssl/monitor.lujiesheng.cn.key /etc/nginx/ssl/monitor.lujiesheng.cn.key && sudo cp ~/.acme.sh/ssl/monitor.lujiesheng.cn.pem /etc/nginx/ssl/monitor.lujiesheng.cn.pem && sudo chmod 600 /etc/nginx/ssl/monitor.lujiesheng.cn.key && sudo chmod 644 /etc/nginx/ssl/monitor.lujiesheng.cn.pem && sudo systemctl reload nginx"
 ```
 
 ### 自动续期
@@ -145,17 +145,17 @@ server {
 # HTTP 跳转（子域名）
 server {
     listen 80;
-    server_name note.lujiesheng.cn api-note.lujiesheng.cn;
+    server_name monitor.lujiesheng.cn api-monitor.lujiesheng.cn;
     return 301 https://$host$request_uri;
 }
 
-# 子项目示例：Note 前端
+# 子项目示例：Monitor 前端
 server {
     listen 443 ssl;
-    server_name note.lujiesheng.cn;
+    server_name monitor.lujiesheng.cn;
 
-    ssl_certificate     /etc/nginx/ssl/note.lujiesheng.cn.pem;
-    ssl_certificate_key /etc/nginx/ssl/note.lujiesheng.cn.key;
+    ssl_certificate     /etc/nginx/ssl/monitor.lujiesheng.cn.pem;
+    ssl_certificate_key /etc/nginx/ssl/monitor.lujiesheng.cn.key;
     ssl_protocols       TLSv1.2 TLSv1.3;
     ssl_ciphers         HIGH:!aNULL:!MD5;
 
@@ -206,7 +206,7 @@ server {
 直接编译运行，不包含 Nginx：
 
 ```dockerfile
-# project-note/api/Dockerfile
+# Monitor/api/Dockerfile
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 COPY . .
@@ -273,7 +273,7 @@ services:
     ports: ["127.0.0.1:8000:80"]
     restart: unless-stopped
 
-  # ---- Monitor 监控面板 ----
+  # ---- Monitor 监控面板（待开发，当前 docker-compose.yml 中注释状态） ----
   monitor-web:
     build: ./Monitor/web
     ports: ["127.0.0.1:8001:80"]
@@ -282,6 +282,8 @@ services:
   monitor-api:
     build: ./Monitor/api
     ports: ["127.0.0.1:8051:8080"]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock    # Agent 采集 Docker 容器状态需要
     environment:
       - ConnectionStrings__Default=${MONITOR_DB_CONNECTION}
       - Redis__ConnectionString=${MONITOR_REDIS_CONNECTION}
@@ -378,7 +380,7 @@ GitHub Secrets 配置：
 │   ├── Dockerfile
 │   ├── nginx.conf
 │   └── src/...
-├── project-note/                ← 子项目示例
+├── Monitor/                ← 子项目示例
 │   ├── web/
 │   │   ├── Dockerfile
 │   │   └── ...
@@ -432,7 +434,7 @@ git push → GitHub Actions 触发
 | 项目 | 前端容器端口 | API 容器端口 | 域名 | 数据库 |
 |------|-------------|-------------|------|--------|
 | Portfolio | 8000 | — | `lujiesheng.cn` | — |
-| Note | 8001 | 8051 | `note.lujiesheng.cn` + `api-note.lujiesheng.cn` | 容器内 3306 |
+| Monitor | 8001 | 8051 | `monitor.lujiesheng.cn` + `api-monitor.lujiesheng.cn` | 容器内 3306 |
 | 项目 2 | 8002 | 8052 | `<name>.lujiesheng.cn` + `api-<name>.lujiesheng.cn` | 容器内 3307 |
 
 ---

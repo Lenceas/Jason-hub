@@ -12,7 +12,9 @@ Jason-hub 是一个个人项目聚合站，采用 Monorepo 结构管理所有子
 |------|------|------|
 | 主站框架 | **Astro 6** | 静态站点生成，默认零 JS 运行时 |
 | 样式方案 | **原生 CSS + CSS 自定义属性** | 极简清爽，蓝白配色，三端响应式 |
-| 子项目框架 | **Vue 3 + TypeScript** | 后续各子项目的统一技术栈 |
+| 子项目框架 | **Vue 3 + TypeScript** | 后续各子项目的统一前端技术栈 |
+| 子项目后端 | **.NET 10 + Minimal API** | 统一后端 API 技术栈，配套 SqlSugar ORM |
+| API 文档 | **Scalar** | 集成至 `/api/v1/docs`，蓝白主题适配 |
 | 包管理 | **npm** | |
 
 ## 目录结构
@@ -24,16 +26,33 @@ Jason-hub/
 │   ├── src/
 │   │   ├── pages/          ← 页面路由（单页：index.astro）
 │   │   ├── layouts/        ← 布局模板（BaseLayout）
-│   │   ├── components/     ← 组件（Header / Hero / Skills / Values / ProjectCard / ProjectGrid / Footer）
+│   │   ├── components/     ← 10 个组件
 │   │   ├── data/           ← 项目数据（JSON）
 │   │   └── styles/         ← 全局样式（CSS 变量 + Reset + 响应式）
+│   ├── PLAN.md             ← 方案设计
+│   ├── CHANGELOG.md        ← 变更日志
+│   ├── README.md           ← 技术说明（中英双语）
+│   ├── Dockerfile
+│   ├── nginx.conf
 │   ├── astro.config.mjs
 │   └── package.json
-├── ... (后续子项目文件夹)
-├── AGENTS.md               ← AI 通用说明（本文件）
+├── Monitor/                ← Vue 3 + .NET 10 监控面板（planning）
+│   ├── PLAN.md             ← 方案设计
+│   ├── CHANGELOG.md        ← 变更日志
+│   └── README.md           ← 技术说明（中英双语）
+├── .github/workflows/      ← GitHub Actions CI/CD
+├── docker-compose.yml      ← Docker 容器编排
+├── .env.example            ← 环境变量模板
+├── PLAN.md                 ← Monorepo 总体规划
+├── CHANGELOG.md            ← 主仓库变更日志
+├── CLAUDE.md               ← 会话记忆（自动维护）
+├── README.md               ← 项目总览（中英双语）
+├── DEPLOY.md               ← 部署规范
+├── RELEASE.md              ← 发布工作流
 ├── ARCHITECTURE.md         ← 整体架构设计
-├── README.md               ← 项目总览
-└── STYLE_GUIDE.md          ← 编码规范
+├── AGENTS.md               ← AI 通用说明（本文件）
+├── STYLE_GUIDE.md          ← 编码规范
+└── LICENSE                 ← MIT 协议
 ```
 
 ## 开发规范
@@ -77,7 +96,7 @@ Jason-hub/
 |------|------|------|------|
 | **Portfolio** | Astro 前端 | 8000 | `lujiesheng.cn` |
 | **Monitor** | Vue 3 前端 | 8001 | `monitor.lujiesheng.cn` |
-| Monitor API | .NET 10 后端 | 8051 | `api-monitor.lujiesheng.cn` |
+| Monitor API | .NET 10 后端（含 Agent 采集器） | 8051 | `api-monitor.lujiesheng.cn` |
 | 子项目 N | Vue 3 前端 | 8002+ | `<name>.lujiesheng.cn` |
 | 子项目 N API | .NET 10 后端 | 8052+ | `api-<name>.lujiesheng.cn` |
 
@@ -106,4 +125,4 @@ MySQL 8.4 / Redis 8 / MongoDB 8 三数据库作为全局基础设施，所有子
 | 子项目 | 技术栈 | 状态 | 说明 |
 |--------|--------|------|------|
 | Portfolio | Astro 6 | active | 个人主页主站 |
-| Monitor | Vue 3 + .NET 10 | planning | 监控面板，方案已定，详见 [Monitor/README.md](./Monitor/README.md) |
+| Monitor | Vue 3 + .NET 10 | planning | 监控面板，方案已定，详见 [Monitor/PLAN.md](./Monitor/PLAN.md) |

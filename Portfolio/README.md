@@ -46,7 +46,7 @@ Jason-hub 主站 · 个人主页
 
 ```
 Portfolio/
-├── public/images/          ← 静态资源（头像、Logo、项目封面）
+├── public/images/          ← 静态资源（头像、Logo、项目封面、favicon）
 ├── src/
 │   ├── pages/
 │   │   └── index.astro     ← 首页（单页）
@@ -140,7 +140,7 @@ Project card data lives in `src/data/projects.json`. Add a new entry whenever a 
 
 ```
 Portfolio/
-├── public/images/          ← Static assets (avatar, logo, thumbnails)
+├── public/images/          ← Static assets (avatar, logo, thumbnails, favicon)
 ├── src/
 │   ├── pages/
 │   │   └── index.astro     ← Single page entry
