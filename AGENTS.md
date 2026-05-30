@@ -106,3 +106,4 @@ MySQL 8.4 / Redis 8 / MongoDB 8 三数据库作为全局基础设施，所有子
 | 子项目 | 技术栈 | 状态 | 说明 |
 |--------|--------|------|------|
 | Portfolio | Astro 6 | active | 个人主页主站 |
+| Monitor | Vue 3 + .NET 10 | planning | 监控面板，方案已定，详见 [Monitor/README.md](./Monitor/README.md) |

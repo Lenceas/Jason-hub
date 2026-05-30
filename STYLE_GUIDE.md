@@ -13,6 +13,8 @@
 | **SCREAMING_SNAKE** | 大写下划线 | 环境变量、常量 | `TODO_DB_CONNECTION`, `MYSQL_ROOT_PW` |
 
 > 例外：子项目级更新日志使用 `{项目名}-Changelog.md`（如 `Portfolio-Changelog.md`）。
+>
+> 每个子项目根目录必须包含 `README.md`，作为该子项目的方案文档（动工前经确认）和技术说明（开发后持续更新）。
 
 ## CSS 规范
 
@@ -45,7 +47,7 @@
   "status": "active | planning | archived",
   "url": "https://项目部署地址",
   "thumbnail": "/images/项目封面.svg",
-  "tags": ["Vue3", "TypeScript"],
+  "tags": ["Vue 3", "TypeScript"],
   "year": 2026
 }
 ```

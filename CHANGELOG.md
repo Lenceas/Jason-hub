@@ -2,6 +2,17 @@
 
 ---
 
+## v1.0.19 (2026-05-30)
+
+- **新功能**：新增 `CLAUDE.md` 会话记忆同步机制 — 项目状态自动维护，换电脑后 `git pull` 即可续接进度
+- **文档**：RELEASE.md 新增「子项目立项流程」先行步骤，文档更新清单增加 CLAUDE.md（每次必更）
+- **文档**：ARCHITECTURE.md 子项目体系拆为方案设计 + 开发部署两阶段
+- **文档**：AGENTS.md 子项目表新增 Monitor（planning），引用方案文档
+- **文档**：STYLE_GUIDE.md 追加子项目 README.md 规范
+- **Monitor**：输出完整方案文档至 `Monitor/README.md`（五大模块/技术选型/API/DB/采集方案）
+
+---
+
 ## v1.0.18 (2026-05-30)
 
 - **修复**：全量 TypeScript 类型错误修复（BackToTop / Hero / Skills / ProjectCard / index），`astro check` 零错误通过
