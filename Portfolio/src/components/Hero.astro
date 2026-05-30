@@ -46,7 +46,7 @@ const svgIcons: Record<string, string> = {
 
       <!-- 文字介绍 -->
       <h1 class="hero__name">{name}</h1>
-      <p class="hero__tagline">
+      <p class="hero__tagline" data-tagline={tagline}>
         <span id="typing-text"></span><span id="typing-cursor" class="typing-cursor">|</span>
       </p>
 
@@ -328,10 +328,12 @@ const svgIcons: Record<string, string> = {
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const text = "用代码构建有趣的东西...";
-    const el = document.getElementById('typing-text');
-    const cursor = document.getElementById('typing-cursor');
-    if (!el || !cursor) return;
+    const source = document.querySelector('[data-tagline]');
+    const text = source ? source.getAttribute('data-tagline') || '' : '';
+    const el_ = document.getElementById('typing-text');
+    const cursor_ = document.getElementById('typing-cursor');
+    if (!(el_ instanceof HTMLElement) || !(cursor_ instanceof HTMLElement)) return;
+    const el = el_;
 
     let charIndex = 0;
     const typeSpeed = 120;

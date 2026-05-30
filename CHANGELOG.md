@@ -2,6 +2,18 @@
 
 ---
 
+## v1.0.18 (2026-05-30)
+
+- **修复**：全量 TypeScript 类型错误修复（BackToTop / Hero / Skills / ProjectCard / index），`astro check` 零错误通过
+- **修复**：Hero 打字机文案改为 prop 驱动，消除硬编码
+- **修复**：Divider 组件接入页面（Values 与 Skills 之间），原闲置组件正式启用
+- **文档**：ARCHITECTURE + Portfolio/README 中 Values 描述同步为"程序员价值观 12 词"
+- **文档**：CHANGELOG 数据库版本号修正（Redis 7→8, MongoDB 7→8）
+- **文档**：README 子项目命名统一为 PascalCase、STYLE_GUIDE 追加命名规则
+- **杂项**：tsconfig 清理、.gitignore 补全、avatar.svg 删除、新增 `npm run check`
+
+---
+
 ## v1.0.17 (2026-05-30)
 
 - **RELEASE.md**：版本位自动串联优化 — 步骤③判定的 `{versionBump}` 直接传递到步骤⑥摘要和步骤⑦执行命令，移除手动选择
@@ -23,7 +35,7 @@
 
 ## v1.0.14 (2026-05-29)
 
-- **基础设施**：Docker Compose 新增全局基础设施层 — MySQL 8 + Redis 7 + MongoDB 7，所有子项目共用
+- **基础设施**：Docker Compose 新增全局基础设施层 — MySQL 8.4 + Redis 8 + MongoDB 8，所有子项目共用
 - **文档**：AGENTS / ARCHITECTURE / DEPLOY 端口表与部署图更新，加入数据库层和 Monitor 子项目
 
 ---

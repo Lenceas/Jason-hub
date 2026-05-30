@@ -4,10 +4,12 @@ import Header from '../components/Header.astro';
 import Hero from '../components/Hero.astro';
 import Skills from '../components/Skills.astro';
 import Values from '../components/Values.astro';
+import Divider from '../components/Divider.astro';
 import ProjectGrid from '../components/ProjectGrid.astro';
 import Footer from '../components/Footer.astro';
 
 import projects from '../data/projects.json';
+import type { Props as CardProps } from '../components/ProjectCard.astro';
 
 const statusOrder: Record<string, number> = { completed: 0, active: 1, planning: 2, archived: 3 };
 const sortedProjects = [...projects].sort((a, b) => {
@@ -57,9 +59,11 @@ const skills = [
 
     <Values />
 
+    <Divider />
+
     <Skills {skills} />
 
-    <ProjectGrid projects={sortedProjects} />
+    <ProjectGrid projects={sortedProjects as CardProps[]} />
   </main>
   <Footer />
 

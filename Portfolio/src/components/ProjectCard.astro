@@ -12,7 +12,7 @@ export interface Props {
   featured?: boolean;
 }
 
-const { id, title, tagline, description, status, url, thumbnail, tags, year, featured } = Astro.props;
+const { title, tagline, description, status, url, thumbnail, tags, year, featured } = Astro.props;
 
 const statusLabel: Record<string, { text: string; color: string }> = {
   completed: { text: '已完成', color: '#10B981' },

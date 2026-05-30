@@ -2,6 +2,16 @@
 
 ---
 
+## v1.0.18 (2026-05-30)
+
+- **修复**：全量 TypeScript 类型错误（BackToTop/Hero/Skills/ProjectCard/index.astro）
+- **Hero**：打字机文案改为 prop 驱动，消除硬编码
+- **Divider**：组件接入 Values 与 Skills 之间，正式启用
+- **Config**：tsconfig 清理（移除未使用的 baseUrl/paths）、.gitignore 补全 IDE 目录
+- **Chore**：新增 `@astrojs/check` + `npm run check` 命令，avatar.svg 残留清理
+
+---
+
 ## v1.0.15 (2026-05-29)
 
 - 无 Portfolio 直接变更，版本跟随根仓库 Redis 密码认证更新
@@ -10,7 +20,7 @@
 
 ## v1.0.14 (2026-05-29)
 
-- **Docker Compose**：新增 MySQL / Redis / MongoDB 基础设施服务
+- **Docker Compose**：新增 MySQL 8.4 / Redis 8 / MongoDB 8 基础设施服务
 
 ---
 

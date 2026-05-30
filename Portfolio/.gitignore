@@ -4,3 +4,7 @@ dist/
 .env
 .DS_Store
 *.local
+.vscode/
+*.swp
+*.swo
+*~

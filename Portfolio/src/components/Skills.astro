@@ -49,7 +49,7 @@ const skillOverrides: Record<string, { color: string; bg: string; border: string
       {skills.map((s) => {
         const base = levelStyle[s.level];
         const override = skillOverrides[s.name];
-        const st = override || base;
+        const st = override ? { ...base, ...override } : base;
         const icon = icons[s.name] || '○';
         const tip = levelLabel[s.level];
         return (

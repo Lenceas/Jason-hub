@@ -25,10 +25,11 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    var btn = document.getElementById('back-to-top');
-    if (!btn) return;
-
-    var ring = document.getElementById('ring-progress');
+    const btn_ = document.getElementById('back-to-top');
+    const ring_ = document.getElementById('ring-progress');
+    if (!(btn_ instanceof HTMLElement)) return;
+    const btn = btn_;
+    const ring = ring_;
     var circumference = 2 * Math.PI * 20; // r=20
 
     if (ring) {

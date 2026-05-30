@@ -27,7 +27,7 @@
 ```
 Jason-hub/
 ├── Portfolio/           ← Astro 6 个人主页（主站）
-├── project-<name>/      ← 后续子项目 (Vue 3 + .NET 10)
+├── <Name>/              ← 后续子项目 PascalCase (Vue 3 + .NET 10)
 ├── .github/workflows/   ← GitHub Actions CI/CD
 ├── docker-compose.yml   ← Docker 容器编排
 ├── AGENTS.md            ← AI 协作说明
@@ -83,7 +83,7 @@ A personal project aggregation site built with [Astro 6](./Portfolio). The main 
 ```
 Jason-hub/
 ├── Portfolio/           ← Astro 6 homepage (main site)
-├── project-<name>/      ← Upcoming sub-projects (Vue 3 + .NET 10)
+├── <Name>/              ← Upcoming sub-projects PascalCase (Vue 3 + .NET 10)
 ├── .github/workflows/   ← GitHub Actions CI/CD
 ├── docker-compose.yml   ← Docker container orchestration
 ├── AGENTS.md            ← AI agent instructions

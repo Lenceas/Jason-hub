@@ -7,7 +7,7 @@
 | 风格 | 规范 | 适用场景 | 示例 |
 |------|------|----------|------|
 | **UPPER_CASE** | 全大写 + 扩展名 | 根目录项目文档（约定俗成，按字母序排前） | `README.md`, `CHANGELOG.md`, `LICENSE`, `DEPLOY.md` |
-| **PascalCase** | 首字母大写 | Vue/Astro 组件文件 | `ProjectCard.astro`, `Hero.astro` |
+| **PascalCase** | 首字母大写 | Vue/Astro 组件文件、子项目目录 | `ProjectCard.astro`, `Hero.astro`, `Monitor/` |
 | **kebab-case** | 小写连字符 | 普通文件、配置文件 | `global.css`, `astro.config.mjs`, `docker-compose.yml` |
 | **camelCase** | 小写驼峰 | JSON 字段、JS/TS 变量 | `projectId`, `tagline`, `socialLinks` |
 | **SCREAMING_SNAKE** | 大写下划线 | 环境变量、常量 | `TODO_DB_CONNECTION`, `MYSQL_ROOT_PW` |

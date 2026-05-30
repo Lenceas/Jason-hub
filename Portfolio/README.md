@@ -24,7 +24,7 @@ Jason-hub 主站 · 个人主页
 - **Header** — Logo、导航
 - **Hero** — 头像、名称、标语、简介、社交链接（品牌色图标按钮）
 - **Skills** — 彩色技能标签云（按熟练度分色 + 固定熟练度气泡）
-- **Values** — 水墨风格社会主义核心价值观展示（自动轮播高亮）
+- **Values** — 水墨风格程序员价值观展示（12 词自动轮播高亮）
 - **ProjectGrid** — 项目卡片网格（数据驱动，毛玻璃效果，精选星标）
 - **BackToTop** — 回到顶部按钮（滚动进度环 + 弹跳箭头动画）
 - **Footer** — 版权信息 & 备案号
@@ -118,7 +118,7 @@ A minimal personal homepage built with **Astro 6**, aggregating personal profile
 - **Header** — Logo, navigation
 - **Hero** — Avatar, name, tagline, bio, social links (brand-colored icon buttons)
 - **Skills** — Color-coded skill tags (proficiency level + fixed tooltip badges)
-- **Values** — Ink-wash style socialist core values display (auto-cycling highlight)
+- **Values** — Ink-wash style developer values (12 words, auto-cycling highlight)
 - **ProjectGrid** — Data-driven project card grid (glass morphism, featured star icon)
 - **BackToTop** — Scroll-to-top button (progress ring + bouncing arrow)
 - **Footer** — Copyright & ICP filing
