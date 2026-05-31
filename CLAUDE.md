@@ -13,7 +13,7 @@
 |------|-----|
 | 在线地址 | https://lujiesheng.cn |
 | 服务器 | 81.71.136.3（腾讯云 2C4G / Ubuntu 24.04） |
-| 当前版本 | v1.1.0 |
+| 当前版本 | v1.3.0 |
 | 技术栈 | Astro 6 / Vue 3 + TypeScript / .NET 10 |
 | 数据库 | MySQL 8.4 / Redis 8 / MongoDB 8 |
 | CI/CD | GitHub Actions → SCP → docker compose up |
@@ -41,6 +41,7 @@
 
 ### 最近完成
 
+- [完成] v1.3.0 — Auth 鉴权服务部署上线 + 敏感信息规范 + 分支策略修正
 - [完成] auth-v0.2.0 — Auth 鉴权服务部署上线（docker-compose / SSL / Nginx / CI/CD）
 - [完成] v1.2.0 — Auth 鉴权服务开发 + 数据库 `jason_` 命名规范 + 中文表注释
 - [完成] v1.1.0 — 文档体系全面重构（PLAN.md 规范/双轨发布流/中英双语/18 项审计修复）

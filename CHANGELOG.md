@@ -2,6 +2,16 @@
 
 ---
 
+## v1.3.0 (2026-05-31)
+
+- **feat**：Auth 鉴权服务部署上线 — docker-compose 编排 / SSL Let's Encrypt / Nginx 反代
+- **feat**：CI/CD 支持 Auth 构建部署（触发 project/auth 分支）
+- **security**：Auth `/healthz` 公网 Nginx 拦截（`return 404`）
+- **fix**：Auth Dockerfile 构建路径修复
+- **docs**：新增敏感信息红线规范（RELEASE.md 2c 检测 / CLAUDE.md 警示）
+- **docs**：修复子项目分支策略 — project/ 分支为长期迭代分支，合并后保留
+- **fix**：移除文档中的密码明文
+
 ## v1.2.0 (2026-05-30)
 
 - **feat**：新增 Auth 鉴权基础设施服务（.NET 10 + Minimal API，:8100）
