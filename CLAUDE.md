@@ -31,7 +31,7 @@
   - 6 大 API 端点 + Scalar API 文档 + 登录页 HTML
   - AuthShared 共享中间件库供各子项目引用
   - 数据库 `jason_auth`（auth_users / auth_clients / auth_refresh_tokens）
-- [待办] Auth 鉴权服务部署 — DNS / SSL / Nginx / docker-compose
+- [完成] Auth 鉴权服务部署 — DNS / SSL / Nginx / docker-compose ✅
 - [进行中] Notification 通知服务 / 任务调度 / 消息队列 — 方案待定
 - [进行中] Monitor 子项目 — 方案确定，待开发
   - 前端：Vue 3 + TypeScript / UnoCSS / ECharts / Pinia（端口 8001）
@@ -41,6 +41,7 @@
 
 ### 最近完成
 
+- [完成] auth-v0.2.0 — Auth 鉴权服务部署上线（docker-compose / SSL / Nginx / CI/CD）
 - [完成] v1.2.0 — Auth 鉴权服务开发 + 数据库 `jason_` 命名规范 + 中文表注释
 - [完成] v1.1.0 — 文档体系全面重构（PLAN.md 规范/双轨发布流/中英双语/18 项审计修复）
 

@@ -2,6 +2,21 @@
 
 ---
 
+## v0.2.0 (2026-05-31)
+
+- **feat**: Auth 部署配置 — docker-compose 服务编排 / `.env` 连接配置 / Nginx 反代
+- **feat**: CI/CD 支持 Auth 构建部署（触发 project/auth 分支）
+- **deploy**: Auth 服务正式部署上线 — 容器化运行 `:8100`
+- **deploy**: SSL 证书 Let's Encrypt ECC（`api-auth.lujiesheng.cn`）
+- **deploy**: `jason_auth` 数据库建表 + 初始化管理员
+- **fix**: Auth Dockerfile 构建路径修复（COPY Auth/ 目录结构）
+- **fix**: 移除 changelog 中的密码明文
+- **docs**: 初始管理员用户 jason → admin
+- **docs**: 新增敏感信息红线规范（RELEASE.md 2c 检测 / CLAUDE.md 警示）
+- **security**: `/healthz` 公网 Nginx 拦截（`return 404`）
+
+---
+
 ## v0.1.0 (2026-05-30)
 
 - **feat**: 项目骨架搭建（.NET 10 + Minimal API）

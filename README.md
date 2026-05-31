@@ -19,7 +19,7 @@
 | 项目 | 前端 | API | 技术栈 | 状态 |
 |------|------|----|--------|------|
 | Portfolio 主站 | `lujiesheng.cn` | — | Astro 6 | active |
-| Auth 鉴权服务 | — | `api-auth.lujiesheng.cn` | .NET 10 / Minimal API | dev |
+| Auth 鉴权服务 | — | `api-auth.lujiesheng.cn` | .NET 10 / Minimal API | active |
 | Monitor 监控面板 | `monitor.lujiesheng.cn` | `api-monitor.lujiesheng.cn` | Vue 3 / .NET 10 | planning |
 | 后续项目 | `<name>.lujiesheng.cn` | `api-<name>.lujiesheng.cn` | Vue 3 / .NET 10 | planning |
 
