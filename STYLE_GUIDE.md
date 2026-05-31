@@ -62,7 +62,7 @@
 | 分支 | 用途 | 说明 |
 |------|------|------|
 | `main` | 主分支 | 始终可部署，合并即发布 |
-| `project/<name>` | 子项目开发 | 每个子项目独立分支，开发完合并回 main 后删除 |
+| `project/<name>` | 子项目开发 | 每个子项目独立长期分支，开发里程碑合并回 main 后保留，继续迭代 |
 | `feat/<描述>` | 功能开发 | 某个子项目内的小功能（可选粒度） |
 | `fix/<描述>` | 修复 | Bug 修复 |
 
@@ -81,12 +81,12 @@ Tag: v1.0.0    v1.1.0    v1.1.1
 **开发一个新子项目：**
 ```bash
 git checkout -b project/todo-app    # 从 main 切出子项目分支
-# ... 开发 ...
+# ... 开发 ... (持续在分支上迭代)
 git checkout main
-git merge project/todo-app          # 合并回 main
-git branch -d project/todo-app      # 删除开发分支
+git merge project/todo-app          # 开发里程碑合并回 main
 git tag v1.1.0                      # 打版本标签
 git push origin main --tags
+# 子项目分支保留！后续开发继续在 project/todo-app 上
 ```
 
 ### 版本号规范

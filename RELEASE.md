@@ -212,7 +212,7 @@ git push && git push --tags
   → 是 → 自动执行：
       git checkout main
       git merge project/{子项目}
-      git branch -d project/{子项目}
+      git branch -d project/{子项目}  # ⚠️ 仅当子项目不再需要开发时才删除（如废弃/归档）
       合并完成，请说"提交代码"走主发布流
   → 否 → 流程结束，继续开发
 ```
