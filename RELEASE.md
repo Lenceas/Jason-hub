@@ -401,16 +401,18 @@ Commit 信息预览
 版本位直接使用步骤③确定的 `{versionBump}`，不再手动选择。
 
 ```bash
-# 选择性暂存：只加属于本次逻辑变更的路径
-git add <本次变更涉及的路径>
-
-# 更新主仓库版本号（根 CHANGELOG.md + tag）
+# 1. 更新主仓库版本号（先改版本，再统一暂存）
 cd Portfolio && npm version {versionBump} --no-git-tag-version
+cd ..
 
-# 如果涉及子项目，同步更新子项目版本号（可选）
+# 2. 暂存所有变更（含上一步改的 package.json + package-lock.json）
+git add <本次变更涉及的路径>
+git add Portfolio/package.json Portfolio/package-lock.json
+
+# 3. 如果涉及子项目，同步更新子项目版本号（可选）
 # 例如: Monitor/web/package.json 或 Monitor/api/*.csproj 的版本号
 
-cd ..
+# 4. 提交
 git commit -m "{type}: {描述} v{新版本}"
 
 git tag v{新版本}
