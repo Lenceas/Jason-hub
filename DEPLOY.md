@@ -147,7 +147,7 @@ server {
 # HTTP 跳转（子域名）
 server {
     listen 80;
-    server_name monitor.lujiesheng.cn api-monitor.lujiesheng.cn;
+    server_name monitor.lujiesheng.cn api-monitor.lujiesheng.cn api-auth.lujiesheng.cn;
     return 301 https://$host$request_uri;
 }
 

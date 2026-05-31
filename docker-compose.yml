@@ -56,6 +56,22 @@ services:
       - "127.0.0.1:8000:80"
     restart: unless-stopped
 
+  # ---- Auth 鉴权服务 ----
+  auth:
+    build:
+      context: .
+      dockerfile: Auth/api/Dockerfile
+    ports:
+      - "127.0.0.1:8100:8080"
+    volumes:
+      - auth-keys:/app/keys
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__Default=${AUTH_DB_CONNECTION}
+    depends_on:
+      mysql: { condition: service_healthy }
+    restart: unless-stopped
+
   # monitor-web:       ← 后续
   #   build: ./Monitor/web
   #   ports:
@@ -80,3 +96,4 @@ volumes:
   mysql-data:
   redis-data:
   mongo-data:
+  auth-keys:
