@@ -19,4 +19,4 @@
 - **docs**: 根 PLAN.md §八 Auth 方案定义
 - **docs**: Auth 子项目文档三件套（PLAN.md / CHANGELOG.md / README.md）
 - **db**: `jason_auth` 库建表（auth_users / auth_clients / auth_refresh_tokens）
-- **db**: 初始管理员用户（admin / admin@0122!）
+- **db**: 初始管理员用户（admin）
