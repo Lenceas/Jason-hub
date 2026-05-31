@@ -1,7 +1,7 @@
 name: Deploy
 on:
   push:
-    branches: [main]
+    branches: [main, project/auth]
 
 jobs:
   deploy:
@@ -19,10 +19,10 @@ jobs:
           sudo apt-get install -qq -y sshpass
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -o StrictHostKeyChecking=no deploy.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/tmp/deploy.tar.gz
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
-            rm -rf /opt/lujiesheng/Portfolio
+            rm -rf /opt/lujiesheng/Portfolio /opt/lujiesheng/Auth
             tar xzf /tmp/deploy.tar.gz -C /opt/lujiesheng
             rm /tmp/deploy.tar.gz
             cd /opt/lujiesheng
-            docker compose up --build -d portfolio
+            docker compose up --build -d portfolio auth
             docker image prune -f
           '
