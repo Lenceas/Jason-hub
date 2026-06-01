@@ -99,6 +99,7 @@
 | 2026-05-30 | 子项目独立版本管理：分支内自由发版，main +1 minor | `STYLE_GUIDE.md` |
 | 2026-05-30 | Monitor 方案扩展为 6 大模块（+Nginx 监控 + 数据库深度指标 + CI/CD 流水线） | `Monitor/PLAN.md` |
 | 2026-05-30 | 采集代理纳入 Monitor 架构体系 | `ARCHITECTURE.md` |
+| 2026-06-01 | 主发布流新增步骤⑧：根仓库规范变更自动同步到子项目分支（`--ff-only`） | `RELEASE.md` |
 
 ---
 

@@ -421,6 +421,21 @@ git push && git push --tags
 
 > 暂存提示：步骤③ 3b 已确定本次影响范围，`git add` 只添加属于该范围的路径。若本次同时有多个独立逻辑的未暂存改动，说明它们应分开发布，不要用 `git add -A` 打包。
 
+### ⑧ 同步子项目分支（可选）
+
+如果本次变更是**根仓库文档/规范类变更**（CLAUDE.md / RELEASE.md / STYLE_GUIDE.md / AGENTS.md / PLAN.md / DEPLOY.md），可自动合并到活跃子项目分支保持同步：
+
+```bash
+# 查找所有远程 project/ 分支
+git branch -r | grep 'origin/project/' | sed 's|origin/||' | while read branch; do
+  git checkout "$branch" && git merge main --ff-only && git push || echo "⚠️  $branch 无法 fast-forward，跳过"
+done
+git checkout main
+```
+
+> ⚠️ 使用 `--ff-only`，非 fast-forward 时跳过并提示手动处理，不阻塞主发布流。
+> 仅同步能从 main 快进的子项目分支，含独立改动的分支不受影响。
+
 ---
 
 ## 新增子项目补充检查项
