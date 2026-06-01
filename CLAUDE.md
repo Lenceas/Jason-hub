@@ -32,6 +32,7 @@
   - AuthShared 共享中间件库供各子项目引用
   - 数据库 `jason_auth`（auth_users / auth_clients / auth_refresh_tokens）
 - [完成] Auth 鉴权服务部署 — DNS / SSL / Nginx / docker-compose ✅
+- [完成] Auth v0.3.0 — 登录页全面重做 + RSA 前端加密 + 安全增强 + 审计日志 + 体验打磨 ✅
 - [进行中] Notification 通知服务 / 任务调度 / 消息队列 — 方案待定
 - [进行中] Monitor 子项目 — 方案确定，待开发
   - 前端：Vue 3 + TypeScript / UnoCSS / ECharts / Pinia（端口 8001）
@@ -100,6 +101,8 @@
 | 2026-05-30 | Monitor 方案扩展为 6 大模块（+Nginx 监控 + 数据库深度指标 + CI/CD 流水线） | `Monitor/PLAN.md` |
 | 2026-05-30 | 采集代理纳入 Monitor 架构体系 | `ARCHITECTURE.md` |
 | 2026-06-01 | 主发布流新增步骤⑧：根仓库规范变更自动同步到子项目分支（`--ff-only`） | `RELEASE.md` |
+| 2026-06-01 | Auth 登录密码 RSA-OAEP 前端加密（Web Crypto API + JwtService 解密） | `Auth/Program.cs` |
+| 2026-06-01 | Auth 安全响应头 + ForwardedHeaders 真实 IP + 审计日志 [IP] [UA] | `Auth/Program.cs` |
 
 ---
 

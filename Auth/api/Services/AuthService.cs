@@ -22,48 +22,68 @@ public class AuthService
         _logger = logger;
     }
 
-    /// <summary>用户密码登录</summary>
-    public async Task<LoginResponse?> Login(LoginRequest request)
+    /// <summary>用户密码登录 — 返回 null 表示成功以外的失败（用户不存在/锁定/密码错误）</summary>
+    public async Task<LoginResponse?> Login(LoginRequest request, string remoteIp, string userAgent)
     {
+        // 服务端输入校验
+        if (string.IsNullOrWhiteSpace(request.Username) || request.Username.Trim().Length < 5)
+        {
+            _logger.LogWarning("[审计] 登录请求用户名过短 [IP: {IP}] [UA: {UA}]", remoteIp, userAgent);
+            return new LoginResponse("", 0, "", "", null, 0, 0);
+        }
+        if (string.IsNullOrEmpty(request.Password) || request.Password.Length < 8)
+        {
+            _logger.LogWarning("[审计] 登录请求密码过短 [IP: {IP}] [UA: {UA}] [User: {User}]", remoteIp, userAgent, request.Username);
+            return new LoginResponse("", 0, "", "", null, 0, 0);
+        }
+
         var user = await _db.Queryable<AuthUser>()
             .FirstAsync(u => u.Username == request.Username);
 
         if (user == null)
         {
-            _logger.LogWarning("登录失败：用户不存在 [{User}]", request.Username);
-            return null;
+            _logger.LogWarning("[审计] 登录失败 [IP: {IP}] [UA: {UA}] [User: {User}] 原因: 用户不存在", remoteIp, userAgent, request.Username);
+            return null; // 统一返回，不暴露用户是否存在
         }
 
         // 检查是否锁定
         if (user.LockedUntil.HasValue && user.LockedUntil > DateTime.UtcNow)
         {
-            _logger.LogWarning("登录失败：账户已锁定 [{User}]", request.Username);
-            return null;
+            var remainingSec = (int)(user.LockedUntil.Value - DateTime.UtcNow).TotalSeconds;
+            _logger.LogWarning("[审计] 账户已锁定 [IP: {IP}] [UA: {UA}] [User: {User}] 剩余: {Sec}s", remoteIp, userAgent, request.Username, remainingSec);
+            return new LoginResponse("", 0, "", "", null, 10 - user.FailedAttempts, remainingSec);
         }
 
         // 验证密码
         if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
         {
-            // 原子递增失败计数，避免并发绕过（fix bug 2）
+            // 原子递增失败计数
             await _db.Updateable<AuthUser>()
                 .SetColumns(u => u.FailedAttempts == u.FailedAttempts + 1)
                 .Where(u => u.Id == user.Id)
                 .ExecuteCommandAsync();
 
-            // 重新查一次，判断是否需要锁定
             var updated = await _db.Queryable<AuthUser>().FirstAsync(u => u.Id == user.Id);
-            if (updated!.FailedAttempts >= 10)
+            var remaining = 10 - updated!.FailedAttempts;
+            var lockedSec = 0;
+
+            if (updated.FailedAttempts >= 10)
             {
                 await _db.Updateable<AuthUser>()
                     .SetColumns(u => u.LockedUntil == DateTime.UtcNow.AddMinutes(15))
                     .Where(u => u.Id == user.Id)
                     .ExecuteCommandAsync();
-                _logger.LogWarning("账户已锁定 [{User}]，连续失败 {Count} 次", request.Username, updated.FailedAttempts);
+                lockedSec = 900;
+                _logger.LogWarning("[审计] 账户已锁定 [IP: {IP}] [UA: {UA}] [User: {User}] 剩余尝试: 0", remoteIp, userAgent, request.Username);
             }
-            return null;
+            else
+            {
+                _logger.LogWarning("[审计] 登录失败 [IP: {IP}] [UA: {UA}] [User: {User}] 密码错误 剩余尝试: {Rem}", remoteIp, userAgent, request.Username, remaining);
+            }
+            return new LoginResponse("", 0, "", "", null, remaining > 0 ? remaining : 0, lockedSec);
         }
 
-        // 登录成功，重置失败计数
+        // 登录成功
         await _db.Updateable<AuthUser>()
             .SetColumns(u => new AuthUser
             {
@@ -76,7 +96,6 @@ public class AuthService
         var token = _jwt.CreateUserToken(user.Id, user.Username, user.Role);
         var refreshToken = _jwt.CreateRefreshToken(user.Id);
 
-        // 持久化刷新令牌
         await _db.Insertable(new AuthRefreshToken
         {
             UserId = user.Id,
@@ -84,9 +103,10 @@ public class AuthService
             ExpiresAt = DateTime.UtcNow.AddDays(30)
         }).ExecuteCommandAsync();
 
-        _logger.LogInformation("登录成功 [{User}] role={Role}", user.Username, user.Role);
+        _logger.LogInformation("[审计] 登录成功 [IP: {IP}] [UA: {UA}] [User: {User}] [Role: {Role}]",
+            remoteIp, userAgent, user.Username, user.Role);
 
-        return new LoginResponse(token, 86400, user.Username, user.Role, refreshToken);
+        return new LoginResponse(token, 86400, user.Username, user.Role, refreshToken, 10, 0);
     }
 
     /// <summary>服务间调用 — Client Credentials 认证</summary>

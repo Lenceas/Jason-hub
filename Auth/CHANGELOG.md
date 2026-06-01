@@ -2,6 +2,27 @@
 
 ---
 
+## v0.3.0 (2026-06-01)
+
+- **feat**: RSA-OAEP 前端加密密码 — Web Crypto API 加密，后端 JwtService 解密
+- **feat**: 安全响应头中间件（X-Content-Type-Options / X-Frame-Options / HSTS 等）
+- **feat**: ForwardedHeaders 中间件 — 信任 Nginx 反代头，获取真实客户端 IP
+- **feat**: 登录审计日志升级 — 每条日志含 `[IP] [UA] [User]`，真实外网 IP + User-Agent
+- **feat**: 服务端输入校验（用户名 ≥ 5 位、密码 ≥ 8 位），防绕过前端直接调 API
+- **feat**: 失焦校验 + 提交校验 — 按顺序先用户名后密码，空值不在失焦时提示
+- **feat**: 锁定倒计时 — 账户锁定时页面实时倒数，输入框和按钮全部禁用
+- **feat**: 登录来源识别 — 检测 `?redirect=` 参数，显示来源子项目名称
+- **feat**: 重定向安全校验 — 仅允许 `*.lujiesheng.cn` 域名，防 Open Redirect 攻击
+- **feat**: 输入框 X 清空按钮 — 用户名和密码各一个，有内容时显示
+- **feat**: 错误提示自动消失（2s）+ 按顺序校验拦截
+- **feat**: 登录页面 favicon 与 Portfolio 主站统一
+- **feat**: 动感渐变背景 + 三色渐变装饰圆 + 柔和漂移动画
+- **feat**: RSA 限流分区键改用 X-Real-IP（经反代后获取真实 IP）
+- **security**: 统一错误响应 — 不区分"用户不存在"和"密码错误"，防用户名枚举
+- **style**: 登录页文案简化（标题/placeholder/按钮）、必填红色 `*`、label 上下结构
+- **fix**: 输入框 CSS 类名冲突 — `.error` 和 `.error-msg` 分离，避免 display:none 覆盖
+- **fix**: JwtService 弃用警告 — `OperatingSystem.IsWindows()` 替代 try/catch
+
 ## v0.2.1 (2026-06-01)
 
 - **feat**: 登录页全面优化 — 加载状态 / 密码显隐切换 / 输入时清除错误

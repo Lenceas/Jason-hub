@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using System.Text;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
@@ -45,8 +46,9 @@ public class JwtService : IDisposable
             File.WriteAllText(privateKeyFile, new string(PemEncoding.Write("PRIVATE KEY", privateKey)));
             File.WriteAllText(publicKeyFile, PublicKeyPem);
 
-            // 限制文件权限（Linux）
-            try { File.SetUnixFileMode(privateKeyFile, UnixFileMode.UserRead); } catch { }
+            // 限制文件权限（仅 Linux）
+            if (!OperatingSystem.IsWindows())
+                File.SetUnixFileMode(privateKeyFile, UnixFileMode.UserRead);
         }
 
         _privateKey = new RsaSecurityKey(_rsa) { KeyId = "jason-auth-rs256" };
@@ -86,7 +88,7 @@ public class JwtService : IDisposable
         }, TimeSpan.FromHours(1));
     }
 
-    /// <summary>签发刷新令牌（30d 过期）</summary>
+    /// <summary>创建刷新令牌（30d 过期）</summary>
     public string CreateRefreshToken(int userId)
     {
         return CreateToken(new Dictionary<string, object>
@@ -95,6 +97,13 @@ public class JwtService : IDisposable
             ["type"] = "refresh",
             ["purpose"] = "refresh"
         }, TimeSpan.FromDays(30));
+    }
+
+    /// <summary>RSA-OAEP 解密（前端加密密码用）</summary>
+    public string Decrypt(byte[] ciphertext)
+    {
+        var plain = _rsa.Decrypt(ciphertext, RSAEncryptionPadding.OaepSHA256);
+        return Encoding.UTF8.GetString(plain);
     }
 
     private string CreateToken(Dictionary<string, object> claims, TimeSpan expiration)

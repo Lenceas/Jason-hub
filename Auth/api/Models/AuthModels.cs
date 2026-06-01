@@ -2,7 +2,8 @@ namespace AuthApi.Models;
 
 public record LoginRequest(
     string Username,
-    string Password
+    string Password,
+    bool Encrypted = false
 );
 
 public record TokenRequest(
@@ -26,5 +27,7 @@ public record LoginResponse(
     int ExpiresIn,
     string Username,
     string Role,
-    string? RefreshToken = null
+    string? RefreshToken = null,
+    int RemainingAttempts = 0,
+    int LockedRemainingSeconds = 0
 );
