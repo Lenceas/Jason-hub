@@ -119,32 +119,82 @@ app.MapGet("/login", () =>
                 font-family: -apple-system, "Microsoft YaHei", sans-serif;
                 background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%);
                 min-height: 100vh; display: flex; align-items: center; justify-content: center;
+                padding: 1rem;
+            }
+            @keyframes fadeUp {
+                from { opacity: 0; transform: translateY(24px); }
+                to   { opacity: 1; transform: translateY(0); }
             }
             .card {
                 background: rgba(255,255,255,0.9);
                 backdrop-filter: blur(12px);
                 padding: 2.5rem; border-radius: 16px;
                 box-shadow: 0 8px 32px rgba(59,130,246,0.1);
-                width: 380px; max-width: 90vw;
+                width: 380px; max-width: 100%;
+                animation: fadeUp 0.5s ease-out;
             }
             h1 { color: #1E293B; font-size: 1.5rem; text-align: center; margin-bottom: 0.5rem; }
             .subtitle { color: #64748B; text-align: center; font-size: 0.875rem; margin-bottom: 2rem; }
             .form-group { margin-bottom: 1.25rem; }
-            label { display: block; color: #475569; font-size: 0.875rem; margin-bottom: 0.375rem; }
-            input {
-                width: 100%; padding: 0.75rem 1rem; border: 1px solid #E2E8F0;
-                border-radius: 8px; font-size: 0.9375rem; transition: border-color 0.2s;
-                outline: none;
+            label {
+                display: block; color: #475569; font-size: 0.875rem;
+                margin-bottom: 0.375rem; font-weight: 500;
             }
-            input:focus { border-color: #3B82F6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-            button {
+            .input-wrap {
+                position: relative; display: flex; align-items: center;
+            }
+            .input-wrap input {
+                width: 100%; padding: 0.75rem 1rem; border: 1px solid #E2E8F0;
+                border-radius: 8px; font-size: 0.9375rem; transition: border-color 0.2s, box-shadow 0.2s;
+                outline: none; background: #fff;
+            }
+            .input-wrap input:focus {
+                border-color: #3B82F6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+            }
+            .input-wrap input.error {
+                border-color: #EF4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.1);
+            }
+            .pw-toggle {
+                position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+                background: none; border: none; cursor: pointer; padding: 4px;
+                color: #94A3B8; display: flex; align-items: center; justify-content: center;
+                transition: color 0.2s; width: auto;
+            }
+            .pw-toggle:hover { color: #475569; background: none; }
+            .pw-toggle svg { width: 20px; height: 20px; display: block; }
+            button[type="submit"] {
                 width: 100%; padding: 0.75rem; background: #3B82F6; color: white;
                 border: none; border-radius: 8px; font-size: 1rem; font-weight: 500;
-                cursor: pointer; transition: background 0.2s;
+                cursor: pointer; transition: background 0.2s, transform 0.15s;
+                display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+                position: relative;
             }
-            button:hover { background: #2563EB; }
-            .error { color: #EF4444; font-size: 0.875rem; text-align: center; margin-top: 1rem; display: none; }
+            button[type="submit"]:hover:not(:disabled) { background: #2563EB; }
+            button[type="submit"]:active:not(:disabled) { transform: scale(0.98); }
+            button[type="submit"]:disabled { background: #93C5FD; cursor: not-allowed; }
+            .spinner {
+                width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3);
+                border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite;
+                display: none;
+            }
+            button[type="submit"].loading .spinner { display: inline-block; }
+            button[type="submit"].loading .btn-text { display: none; }
+            @keyframes spin { to { transform: rotate(360deg); } }
+            .error {
+                color: #EF4444; font-size: 0.875rem; text-align: center;
+                margin-top: 1rem; display: none; padding: 0.5rem 0.75rem;
+                background: #FEF2F2; border-radius: 8px; border: 1px solid #FECACA;
+            }
             .brand { color: #3B82F6; font-weight: 700; }
+
+            @media (max-width: 480px) {
+                .card { padding: 1.75rem 1.25rem; }
+                h1 { font-size: 1.25rem; }
+                input { padding: 0.65rem 0.875rem; font-size: 0.875rem; }
+                button[type="submit"] { padding: 0.65rem; font-size: 0.9375rem; }
+                .subtitle { margin-bottom: 1.5rem; }
+                .form-group { margin-bottom: 1rem; }
+            }
         </style>
     </head>
     <body>
@@ -152,44 +202,108 @@ app.MapGet("/login", () =>
             <h1>Jason-hub <span class="brand">Auth</span></h1>
             <p class="subtitle">统一鉴权中心</p>
             <div id="error" class="error"></div>
-            <form id="loginForm">
+            <form id="loginForm" novalidate>
                 <div class="form-group">
                     <label for="username">用户名</label>
-                    <input type="text" id="username" name="username" placeholder="请输入用户名" autocomplete="username" required>
+                    <div class="input-wrap">
+                        <input type="text" id="username" name="username"
+                               placeholder="请输入用户名" autocomplete="username"
+                               autofocus required>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="password">密码</label>
-                    <input type="password" id="password" name="password" placeholder="请输入密码" autocomplete="current-password" required>
+                    <div class="input-wrap">
+                        <input type="password" id="password" name="password"
+                               placeholder="请输入密码" autocomplete="current-password" required>
+                        <button type="button" class="pw-toggle" id="pwToggle"
+                                aria-label="切换密码可见性" tabindex="-1">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path id="eyeIcon" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle id="eyePupil" cx="12" cy="12" r="3"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-                <button type="submit">登 录</button>
+                <button type="submit" id="submitBtn">
+                    <span class="spinner"></span>
+                    <span class="btn-text">登 录</span>
+                </button>
             </form>
         </div>
         <script>
-            document.getElementById('loginForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
+            (() => {
+                const form = document.getElementById('loginForm');
                 const error = document.getElementById('error');
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-                try {
-                    const res = await fetch('/api/v1/auth/login', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username, password })
-                    });
-                    const data = await res.json();
-                    if (!res.ok) {
-                        error.textContent = data.message || '登录失败';
+                const submitBtn = document.getElementById('submitBtn');
+                const username = document.getElementById('username');
+                const password = document.getElementById('password');
+                const pwToggle = document.getElementById('pwToggle');
+
+                // 密码显隐切换
+                pwToggle.addEventListener('click', () => {
+                    const isPw = password.type === 'password';
+                    password.type = isPw ? 'text' : 'password';
+                });
+
+                // 输入时清除错误
+                const clearError = () => {
+                    error.style.display = 'none';
+                    username.classList.remove('error');
+                    password.classList.remove('error');
+                };
+                username.addEventListener('input', clearError);
+                password.addEventListener('input', clearError);
+
+                // 登录提交
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    clearError();
+                    submitBtn.classList.add('loading');
+                    submitBtn.disabled = true;
+
+                    try {
+                        const res = await fetch('/api/v1/auth/login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                username: username.value.trim(),
+                                password: password.value
+                            })
+                        });
+                        const data = await res.json();
+
+                        if (!res.ok) {
+                            const msg = data.message || '登录失败';
+                            // 区分错误类型
+                            if (msg.includes('锁定')) {
+                                error.textContent = '🔒 ' + msg;
+                            } else if (res.status === 429) {
+                                error.textContent = '⏱ 登录过于频繁，请一分钟后再试';
+                            } else {
+                                error.textContent = '✕ ' + msg;
+                            }
+                            error.style.display = 'block';
+                            username.classList.add('error');
+                            password.classList.add('error');
+                            return;
+                        }
+
+                        // 登录成功 — 跳转
+                        const params = new URLSearchParams(window.location.search);
+                        const redirect = params.get('redirect') || '/';
+                        const sep = redirect.includes('?') ? '&' : '?';
+                        window.location.href = redirect + sep + 'token=' + data.accessToken;
+                    } catch (err) {
+                        error.textContent = '⚠ 网络错误，请检查网络连接后重试';
                         error.style.display = 'block';
-                        return;
+                    } finally {
+                        submitBtn.classList.remove('loading');
+                        submitBtn.disabled = false;
                     }
-                    const params = new URLSearchParams(window.location.search);
-                    const redirect = params.get('redirect') || '/';
-                    window.location.href = redirect + (redirect.includes('?') ? '&' : '?') + 'token=' + data.accessToken;
-                } catch (err) {
-                    error.textContent = '网络错误，请稍后再试';
-                    error.style.display = 'block';
-                }
-            });
+                });
+            })();
         </script>
     </body>
     </html>
