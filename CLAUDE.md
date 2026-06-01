@@ -99,3 +99,14 @@
 | 2026-05-30 | 子项目独立版本管理：分支内自由发版，main +1 minor | `STYLE_GUIDE.md` |
 | 2026-05-30 | Monitor 方案扩展为 6 大模块（+Nginx 监控 + 数据库深度指标 + CI/CD 流水线） | `Monitor/PLAN.md` |
 | 2026-05-30 | 采集代理纳入 Monitor 架构体系 | `ARCHITECTURE.md` |
+
+---
+
+## 加载项目指令
+
+当我说"**加载项目**"时，你需要：
+
+1. 读取本文件（CLAUDE.md）—— 已自动加载
+2. 读取根目录全部 `.md` 文档（PLAN.md / ARCHITECTURE.md / DEPLOY.md / RELEASE.md / AGENTS.md / STYLE_GUIDE.md / README.md / CHANGELOG.md）
+3. 读取各子项目的 PLAN.md / README.md / CHANGELOG.md
+4. 整理项目全景后输出摘要，然后等待我的下一步指令

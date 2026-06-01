@@ -2,6 +2,10 @@
 
 ---
 
+## v1.3.1 (2026-06-01)
+
+- **docs**：CLAUDE.md 新增"加载项目指令" — 一句话触发项目全景加载
+
 ## v1.3.0 (2026-05-31)
 
 - **feat**：Auth 鉴权服务部署上线 — docker-compose 编排 / SSL Let's Encrypt / Nginx 反代
