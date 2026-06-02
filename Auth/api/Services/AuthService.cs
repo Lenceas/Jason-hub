@@ -14,13 +14,15 @@ public class AuthService
     private readonly JwtService _jwt;
     private readonly JwtValidator _validator;
     private readonly ILogger<AuthService> _logger;
+    private readonly IpGeoService _ipGeo;
 
-    public AuthService(ISqlSugarClient db, JwtService jwt, JwtValidator validator, ILogger<AuthService> logger)
+    public AuthService(ISqlSugarClient db, JwtService jwt, JwtValidator validator, ILogger<AuthService> logger, IpGeoService ipGeo)
     {
         _db = db;
         _jwt = jwt;
         _validator = validator;
         _logger = logger;
+        _ipGeo = ipGeo;
     }
 
     /// <summary>用户密码登录 — 返回 null 表示成功以外的失败（用户不存在/锁定/密码错误）</summary>
@@ -85,11 +87,17 @@ public class AuthService
         }
 
         // 登录成功
+        var city = await _ipGeo.GetCityAsync(remoteIp);
+
         await _db.Updateable<AuthUser>()
             .SetColumns(u => new AuthUser
             {
                 FailedAttempts = 0,
-                LockedUntil = null
+                LockedUntil = null,
+                LastLoginAt = DateTime.UtcNow,
+                LastLoginIp = remoteIp,
+                LastLoginCity = city,
+                UpdatedAt = DateTime.UtcNow
             })
             .Where(u => u.Id == user.Id)
             .ExecuteCommandAsync();
@@ -104,8 +112,8 @@ public class AuthService
             ExpiresAt = DateTime.UtcNow.AddDays(30)
         }).ExecuteCommandAsync();
 
-        _logger.LogInformation("[审计] 登录成功 [IP: {IP}] [UA: {UA}] [User: {User}] [Role: {Role}]",
-            remoteIp, userAgent, user.Username, user.Role);
+        _logger.LogInformation("[审计] 登录成功 [IP: {IP}] [UA: {UA}] [User: {User}] [Role: {Role}] [City: {City}]",
+            remoteIp, userAgent, user.Username, user.Role, city ?? "unknown");
 
         return new LoginResponse(token, 86400, user.Username, user.Role, refreshToken, 10, 0);
     }

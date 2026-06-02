@@ -56,6 +56,12 @@ builder.Services.AddSingleton<AuthHandler>();
 // Auth Service
 builder.Services.AddScoped<AuthService>();
 
+// IpGeoService — IP 城市解析
+builder.Services.AddHttpClient<IpGeoService>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(3);
+});
+
 // CORS
 builder.Services.AddCors(options =>
 {

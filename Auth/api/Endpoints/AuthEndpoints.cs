@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using AuthApi.Models;
+using AuthApi.Models.Entities;
 using AuthApi.Pages;
 using AuthApi.Services;
 using AuthShared;
@@ -145,25 +146,37 @@ public static class AuthEndpoints
 
         // ======== 用户信息 ========
 
-        app.MapGet("/api/v1/auth/me", (HttpContext context) =>
+        app.MapGet("/api/v1/auth/me", async (HttpContext context, ISqlSugarClient db) =>
            {
                var user = context.User;
                if (user.Identity?.IsAuthenticated != true)
                    return Results.Json(new { message = "未登录" }, statusCode: 401);
 
+               var userId = user.FindFirstValue("sub");
+               var authUser = int.TryParse(userId, out var uid)
+                   ? await db.Queryable<AuthUser>().FirstAsync(u => u.Id == uid)
+                   : null;
+
                return Results.Json(new
                {
-                   userId = user.FindFirstValue("sub") ?? "",
+                   userId = userId ?? "",
                    username = user.FindFirstValue("username") ?? "",
+                   nickname = authUser?.Nickname ?? "",
+                   email = authUser?.Email ?? "",
+                   phone = authUser?.Phone ?? "",
+                   avatarUrl = authUser?.AvatarUrl ?? "",
+                   bio = authUser?.Bio ?? "",
                    role = user.FindFirstValue("role") ?? "",
                    scopes = user.FindFirstValue("scopes") ?? "",
-                   type = user.FindFirstValue("type") ?? "user",
-                   loginTime = DateTime.UtcNow
+                   lastLoginAt = authUser?.LastLoginAt,
+                   lastLoginIp = authUser?.LastLoginIp,
+                   lastLoginCity = authUser?.LastLoginCity,
+                   createdAt = authUser?.CreatedAt
                });
            })
            .WithTags("用户信息")
            .WithSummary("获取当前登录用户信息")
-           .WithDescription("从 HttpOnly Cookie 或 Authorization Header 中解析 JWT，返回当前用户信息。\n各子项目（Portfolio、Monitor 等）通过此接口判断用户登录状态。\n\n未登录返回 401，前端根据响应显示「用户信息」或「登录」按钮。")
+           .WithDescription("从 HttpOnly Cookie 或 Authorization Header 中解析 JWT，返回当前用户信息，含昵称/邮箱/头像等详细资料。\n各子项目（Portfolio、Monitor 等）通过此接口判断用户登录状态。\n\n未登录返回 401，前端根据响应显示「用户信息」或「登录」按钮。")
            .Produces(StatusCodes.Status200OK)
            .Produces(StatusCodes.Status401Unauthorized);
 
