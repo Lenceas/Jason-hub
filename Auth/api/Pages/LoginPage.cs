@@ -79,7 +79,7 @@ public static class LoginPage
                 .brand-icon svg { width: 40px; height: 40px; color: #3B82F6; }
                 .source-hint {
                     text-align: center; font-size: 0.8rem; color: #94A3B8;
-                    margin-bottom: 0.9rem; min-height: 1.2em;
+                    margin-bottom: 0.5rem; min-height: 1.2em;
                 }
                 .form-group { margin-bottom: 1.25rem; }
                 .form-group label {
@@ -161,7 +161,7 @@ public static class LoginPage
                     font-size: 0.875rem; margin-top: 0.75rem; font-weight: 500;
                 }
                 .back-link {
-                    display: block; text-align: center; margin-top: 0.4rem; margin-bottom: 0.9rem;
+                    display: block; text-align: center; margin-top: 0.4rem; margin-bottom: 0.5rem;
                     font-size: 0.8rem; color: #6B7280; text-decoration: none;
                     transition: color 0.15s;
                 }

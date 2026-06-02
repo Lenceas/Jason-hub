@@ -11,6 +11,7 @@
 - **feat**: Scalar API 文档全面增强 — 标签分组 + Summary/Description + 模型字段说明 + 项目信息 + 统一 favicon
 - **feat**: 登录页样式优化 — 锁形品牌图标 + 卡片细边框 + 登录成功绿勾动画 + 错误提示渐变过渡 + Chrome 自动填充样式修正 + 移动端装饰圆隐藏
 - **feat**: 已登录自动跳转 — 入口页检测到有效 Cookie 直接跳回来源站点
+- **style**: 登录页来源提示与表单间距收紧（0.9rem → 0.5rem）
 - **style**: 登录页「← 返回主页」间距优化
 - **style**: 代码结构分离 — Program.cs 瘦身（820→148行），拆分为 Endpoints/ + Pages/ + Models/Entities/
 - **style**: 端点链式调用风格化 — `.WithTags()` `.WithSummary()` `.WithDescription()` `.Produces<T>()`
