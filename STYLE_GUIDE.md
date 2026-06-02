@@ -37,9 +37,6 @@
 
 ## .NET 后端规范
 
-> 脚手架：`bash scripts/scaffold-dotnet.sh <项目名> [端口]`
-> 说 **"创建 XX 后端"** 即可自动生成标准项目结构。
-
 ### 目录结构（Auth 示例）
 
 ```
@@ -104,6 +101,42 @@ Program.cs                    ← 薄层（只做注册 + 管道）
 - `builder.Services.AddOpenApi()` 中添加 DocumentTransformer 设置 Title / Description / Version
 - Version 建议附带运行时版本：`v1.0.0 (.NET 10.0.8)`
 - Scalar 配置统一主题 `ScalarTheme.BluePlanet`
+
+### 脚手架
+
+创建新的 .NET 后端子项目时，使用脚手架自动生成标准结构：
+
+```
+bash scripts/scaffold-dotnet.sh <项目名> [端口号]
+```
+
+**示例：**
+```bash
+bash scripts/scaffold-dotnet.sh Monitor 8051
+```
+
+**生成结构：**
+```
+Monitor/
+├── api/
+│   ├── Program.cs                   ← 服务注册 + OpenAPI/Scalar
+│   ├── MonitorApi.csproj            ← .NET 10 项目文件
+│   ├── Endpoints/MonitorEndpoints.cs ← 端点（链式调用风格）
+│   ├── Models/MonitorModels.cs      ← DTO
+│   ├── Services/MonitorService.cs   ← 业务层
+│   └── Properties/
+└── Shared/MonitorShared.csproj      ← 共享库（供其他子项目引用）
+```
+
+**脚手架自动完成：**
+- 命名空间 `MonitorApi.Endpoints` / `MonitorApi.Services`  
+- 文件命名 `PascalCase` + 项目名前缀
+- OpenAPI 文档 Title / Description / Version
+- Scalar BluePlanet 主题 + 项目 favicon
+- `/healthz` 健康检查端点
+- 链式调用 `.WithTags()` `.WithSummary()` `.WithDescription()` 风格
+
+> 在对话中说 **"创建 XX 后端"** 即可自动执行脚手架。
 
 ## 项目数据规范
 
