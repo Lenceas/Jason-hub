@@ -1,9 +1,16 @@
+---
+import UserAuth from './UserAuth.astro';
+---
+
 <header class="header">
   <div class="container header__inner">
     <a href="/" class="header__logo" aria-label="回到首页">
       <img src="/images/logo.svg" alt="Jason Logo" width="100" height="30" class="header__logo-img" />
     </a>
-    <p class="header__subtitle">个人主页</p>
+    <div class="header__right">
+      <p class="header__subtitle">个人主页</p>
+      <UserAuth />
+    </div>
   </div>
 </header>
 
@@ -18,6 +25,12 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+  }
+
+  .header__right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
   }
 
   .header__logo {
