@@ -79,7 +79,7 @@ public static class LoginPage
                 .brand-icon svg { width: 40px; height: 40px; color: #3B82F6; }
                 .source-hint {
                     text-align: center; font-size: 0.8rem; color: #94A3B8;
-                    margin-bottom: 1.5rem; min-height: 1.2em;
+                    margin-bottom: 0.9rem; min-height: 1.2em;
                 }
                 .form-group { margin-bottom: 1.25rem; }
                 .form-group label {
