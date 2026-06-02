@@ -43,7 +43,7 @@
 
 ### 最近完成
 
-- [完成] Auth v0.5.0 — 用户表扩展 + ip2region + 登录样式升级 + Scalar 文档增强 + 结构分离
+- [完成] Auth v0.5.0 — 用户表扩展 + ip2region + 登录样式升级 + Scalar 文档增强 + 结构分离 + 间距微调 ✅
 - [完成] Auth v0.4.x — Token URL 泄露修复 + /me /logout 端点 + 登录页返回入口
 - [完成] Portfolio 用户认证模块 + 机器人检测（hover/click 下拉菜单）
 - [完成] .NET 后端工程规范 + 脚手架脚本
