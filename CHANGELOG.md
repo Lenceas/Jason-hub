@@ -2,6 +2,15 @@
 
 ---
 
+## v1.5.0 (2026-06-02)
+
+- **feat**: Portfolio 项目卡片全面更新 — Auth 鉴权服务（已上线）替换占位 Todo App、新增 Monitor 监控面板
+- **feat**: Portfolio 顶部导航 — 新增 Skills / Projects 锚点导航
+- **style**: Portfolio 移除 UserAuth 登录/头像组件（纯公开展示，子项目独立鉴权）
+- **style**: Portfolio 移除冗余 Divider 分隔线（Values 组件自带装饰线）
+- **chore**: 清理死代码 Divider.astro + UserAuth.astro
+- **docs**: CLAUDE.md 决策记录同步更新
+
 ## v1.4.6 (2026-06-02)
 
 - **feat**: Auth 时间字段精度提升至 DATETIME(3)（毫秒级）—— last_login_at / created_at / updated_at / locked_until

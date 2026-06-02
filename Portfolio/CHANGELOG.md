@@ -2,6 +2,14 @@
 
 ---
 
+## v1.0.21 (2026-06-02)
+
+- **feat**: 项目卡片更新 — Auth 鉴权服务（已上线）替换 Todo App 占位，新增 Monitor 卡片
+- **feat**: 顶部导航 — 新增 Skills / Projects 锚点链接
+- **style**: 移除 UserAuth 登录/头像模块（Portfolio 纯公开展示）
+- **style**: 移除冗余 Divider 分隔线
+- **chore**: 清理 UserAuth.astro + Divider.astro 死代码
+
 ## v1.0.20 (2026-06-02)
 
 - **feat**: 右上角用户认证模块 — 自动检测登录状态，显示用户信息 / 登录入口

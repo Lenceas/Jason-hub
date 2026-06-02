@@ -13,7 +13,7 @@
 |------|-----|
 | 在线地址 | https://lujiesheng.cn |
 | 服务器 | 81.71.136.3（腾讯云 2C4G / Ubuntu 24.04） |
-| 当前版本 | v1.4.6 |
+| 当前版本 | v1.5.0 |
 | 技术栈 | Astro 6 / Vue 3 + TypeScript / .NET 10 |
 | 数据库 | MySQL 8.4 / Redis 8 / MongoDB 8 |
 | CI/CD | GitHub Actions → SCP → docker compose up |
@@ -47,7 +47,8 @@ Jason-hub/
   - Scalar API 文档增强（标签分组/Schema 字段描述/项目信息）
   - 代码结构分离（Program.cs 820→148行）+ 链式调用风格化
   - Token 安全修复 + 退出登录 Open Redirect 防护
-- [完成] Portfolio 用户认证模块 ✅ — 自动检测登录状态，右上角显示用户信息/登录入口
+- [完成] Portfolio 用户认证 改为 子项目自行鉴权策略 — Portfolio 纯公开展示，各子项目 SPA 启动时独立检测登录态 ✅
+- [完成] Portfolio 项目卡片更新 — Auth（已上线）替换 Todo App 占位，新增 Monitor 卡片，顶部导航 Skills/Projects ✅
 - [完成] .NET 后端脚手架 ✅ — `/scaffold-dotnet` skill
 - [进行中] Notification 通知服务 / 任务调度 / 消息队列 — 方案待定
 - [进行中] Monitor 子项目 — 方案确定，待开发
@@ -107,7 +108,7 @@ Jason-hub/
 | 2026-06-02 | Auth 代码结构分离：Program.cs 拆为 Endpoints/ + Pages/ + Models/Entities/，端点到 Services 分层 | `Auth/api/` |
 | 2026-06-02 | OpenAPI 端点采用链式调用风格 `.WithTags() .WithSummary() .WithDescription() .Produces<T>()` | `AuthEndpoints.cs` |
 | 2026-06-02 | IP 城市解析方案：ip2region 国产离线库（11MB），CI/CD 自动下载 + 服务器 cron 每月更新 | `Ip2RegionService.cs` |
-| 2026-06-02 | Portfolio 用户认证：Header 集成 UserAuth 组件，通过 /api/v1/auth/me 判断登录态 | `UserAuth.astro` |
+| 2026-06-02 | Portfolio 移除 UserAuth — Portfolio 纯公开展示，子项目各自负责鉴权检测 | — |
 | 2026-06-02 | .NET 后端脚手架：`templates/dotnet-service/` + `scripts/scaffold-dotnet.sh` | `.claude/skills/scaffold-dotnet.md` |
 | 2026-06-02 | CI/CD 仅从 main 触发部署（去重），往 sub-branch 合并不再触发 | `.github/workflows/deploy.yml` |
 

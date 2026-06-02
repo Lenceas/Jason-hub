@@ -1,14 +1,26 @@
 [
   {
-    "id": "todo-app",
-    "title": "Todo App",
-    "tagline": "Vue 3 + TypeScript · 任务管理",
-    "description": "一个简洁的任务管理应用，支持分类、标签、拖拽排序，后端基于 .NET 10 + PostgreSQL 构建，前后端分离部署。",
-    "status": "completed",
+    "id": "auth-service",
+    "title": "Auth 鉴权服务",
+    "tagline": ".NET 10 + JWT RS256 · 统一登录中心",
+    "description": "Jason-hub 统一鉴权中心，提供 JWT 签发与验证。支持 RSA-OAEP 前端加密、IP 城市解析（ip2region）、爆破防御、跨子域 HttpOnly Cookie 共享、Scalar API 文档。",
+    "status": "active",
     "featured": true,
+    "url": "https://api-auth.lujiesheng.cn/login",
+    "thumbnail": "/images/auth-login.png",
+    "tags": [".NET 10", "JWT", "RS256", "MySQL"],
+    "year": 2026
+  },
+  {
+    "id": "monitor",
+    "title": "Monitor 监控面板",
+    "tagline": "Vue 3 + .NET 10 · 实时监控与告警",
+    "description": "统一监控平台，覆盖服务器指标、Docker 容器、站点可用性、应用健康检查、Nginx 反向代理、CI/CD 流水线六大模块，支持多渠道告警通知。",
+    "status": "planning",
+    "featured": false,
     "url": "https://github.com/Lenceas/Jason-hub",
     "thumbnail": "/images/placeholder-project.svg",
-    "tags": ["Vue 3", "TypeScript", ".NET", "PostgreSQL"],
+    "tags": ["Vue 3", ".NET 10", "ECharts", "Redis"],
     "year": 2026
   },
   {
@@ -16,23 +28,11 @@
     "title": "个人博客",
     "tagline": "静态博客 · Markdown 驱动",
     "description": "基于 Astro 构建的个人博客，支持 Markdown/MDX 编写，自动生成目录、标签聚合、RSS 订阅。",
-    "status": "active",
-    "featured": false,
-    "url": "https://github.com/Lenceas/Jason-hub",
-    "thumbnail": "/images/placeholder-project.svg",
-    "tags": ["Astro", "Markdown", "MDX"],
-    "year": 2026
-  },
-  {
-    "id": "iot-dashboard",
-    "title": "IoT Dashboard",
-    "tagline": "MQTT + Redis · 实时数据看板",
-    "description": "物联网设备数据监控面板，通过 MQTT 采集数据，Redis 缓存实时状态，Vue 3 前端可视化展示。",
     "status": "planning",
     "featured": false,
     "url": "https://github.com/Lenceas/Jason-hub",
     "thumbnail": "/images/placeholder-project.svg",
-    "tags": ["Vue 3", "MQTT", "Redis", "仪表盘"],
+    "tags": ["Astro", "Markdown", "MDX"],
     "year": 2026
   },
   {
