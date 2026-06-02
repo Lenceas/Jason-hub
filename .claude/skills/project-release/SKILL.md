@@ -158,8 +158,8 @@ Commit 信息预览
 ### ⑦ 自动执行
 
 ```bash
-# 选择性暂存子项目文件
-git add {子项目}/
+# 暂存子项目代码 + 已更新的 CLAUDE.md 版本号
+git add {子项目}/ CLAUDE.md
 
 # 提交
 git commit -m "release: {子项目} v{新版本}"
@@ -177,7 +177,7 @@ git push && git push --tags
 当前 {子项目} v{新版本} 是否已准备好合并到 main？
   → 是 → 自动执行：
       git checkout main
-      git merge project/{子项目}
+      git merge project/{子项目} --no-ff -m "merge: {子项目} v{新版本}"
       git branch -d project/{子项目}  # ⚠️ 仅当子项目不再需要开发时才删除（如废弃/归档）
       合并完成，请说"提交代码"走主发布流
   → 否 → 流程结束，继续开发

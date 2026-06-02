@@ -58,4 +58,14 @@ bash scripts/scaffold-dotnet.sh <项目名> [端口号]
   3. 在 Services/{项目名}Service.cs 中实现业务逻辑
 ```
 
+### ④ 分支指引
+
+创建完成后，检查当前分支。如果不在 `project/` 分支上，提示用户切到子项目开发分支：
+
+```
+提示：请在 project/<项目名> 分支上开发此后端项目。
+  git checkout -b project/<项目名> main
+  git push origin project/<项目名>
+```
+
 **敏感信息红线**：创建完成后检查 `appsettings.json`、`Program.cs` 等文件，确认没有明文密码/Token/连接串出现。连接字符串中的密码使用 `***` 或环境变量引用。

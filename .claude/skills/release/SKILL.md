@@ -212,7 +212,9 @@ Commit 信息预览
 cd Portfolio && npm version {versionBump} --no-git-tag-version
 cd ..
 
-# 2. 暂存所有变更（含上一步改的 package.json + package-lock.json）
+# 2. 暂存所有变更（根据步骤③的影响范围选择对应路径）
+#    文档变更：git add *.md .claude/ 等
+#    CI/CD：git add .github/ 等
 git add <本次变更涉及的路径>
 git add Portfolio/package.json Portfolio/package-lock.json
 
@@ -242,6 +244,7 @@ git checkout main
 
 > ⚠️ 使用 `--ff-only`，非 fast-forward 时跳过并提示手动处理，不阻塞主发布流。
 > 仅同步能从 main 快进的子项目分支，含独立改动的分支不受影响。
+> CLAUDE.md 的版本号会随同步更新到子项目分支，这是预期行为（CLAUDE.md 版本始终为主仓库版本）。
 
 ## 新增子项目补充检查项
 
