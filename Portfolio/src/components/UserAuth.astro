@@ -7,16 +7,13 @@
     <button class="user-auth__avatar-btn" id="user-auth-toggle" aria-label="用户菜单">
       <span class="user-auth__avatar" id="user-auth-avatar"></span>
       <span class="user-auth__name" id="user-auth-name"></span>
+      <span class="user-auth__role" id="user-auth-role-badge"></span>
       <svg class="user-auth__arrow" width="12" height="12" viewBox="0 0 12 12" fill="none">
         <path d="M3 5L6 8L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
     <div class="user-auth__dropdown" id="user-auth-dropdown">
-      <div class="user-auth__dropdown-info">
-        <span class="user-auth__dropdown-role" id="user-auth-role"></span>
-      </div>
-      <hr class="user-auth__divider" />
-      <a href="https://api-auth.lujiesheng.cn/login?redirect=https://lujiesheng.cn" class="user-auth__dropdown-item" id="user-auth-logout">
+      <a href="https://api-auth.lujiesheng.cn/logout?redirect=https://lujiesheng.cn" class="user-auth__dropdown-item" id="user-auth-logout">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <path d="M5 13H2.5C2.102 13 1.904 13 1.755 12.922C1.622 12.853 1.517 12.748 1.448 12.615C1.37 12.466 1.37 12.268 1.37 11.87V2.13C1.37 1.732 1.37 1.534 1.448 1.385C1.517 1.252 1.622 1.147 1.755 1.078C1.904 1 2.102 1 2.5 1H5M9.5 10L13 7M13 7L9.5 4M13 7H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -28,22 +25,56 @@
 
 <script is:inline>
 (function() {
-  const AUTH_API = 'https://api-auth.lujiesheng.cn';
-  const LOGIN_URL = AUTH_API + '/login?redirect=' + encodeURIComponent(window.location.origin);
+  var AUTH_API = 'https://api-auth.lujiesheng.cn';
+  var LOGIN_URL = AUTH_API + '/login?redirect=' + encodeURIComponent(window.location.origin);
 
   var loadingEl = document.getElementById('user-auth-loading');
   var loginEl = document.getElementById('user-auth-login');
   var panelEl = document.getElementById('user-auth-panel');
   var nameEl = document.getElementById('user-auth-name');
   var avatarEl = document.getElementById('user-auth-avatar');
-  var roleEl = document.getElementById('user-auth-role');
+  var roleBadgeEl = document.getElementById('user-auth-role-badge');
   var toggleBtn = document.getElementById('user-auth-toggle');
   var dropdownEl = document.getElementById('user-auth-dropdown');
   var logoutEl = document.getElementById('user-auth-logout');
 
-  // 更新登录链接（保留当前路径）
+  var hoverTimer = null;
+  var isOpen = false;
+
   loginEl.href = LOGIN_URL;
-  logoutEl.href = LOGIN_URL;
+  logoutEl.href = AUTH_API + '/logout?redirect=' + encodeURIComponent(window.location.origin);
+
+  function openDropdown() {
+    clearTimeout(hoverTimer);
+    dropdownEl.classList.add('user-auth__dropdown--open');
+    isOpen = true;
+  }
+
+  function closeDropdown() {
+    dropdownEl.classList.remove('user-auth__dropdown--open');
+    isOpen = false;
+  }
+
+  function closeAfterDelay() {
+    hoverTimer = setTimeout(closeDropdown, 200);
+  }
+
+  // 点击头像切换
+  toggleBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (isOpen) closeDropdown(); else openDropdown();
+  });
+
+  // 悬停展开
+  panelEl.addEventListener('mouseenter', openDropdown);
+  panelEl.addEventListener('mouseleave', closeAfterDelay);
+  dropdownEl.addEventListener('mouseenter', function() { clearTimeout(hoverTimer); });
+  dropdownEl.addEventListener('mouseleave', closeAfterDelay);
+
+  // 点击外部关闭
+  document.addEventListener('click', function(e) {
+    if (!panelEl.contains(e.target)) closeDropdown();
+  });
 
   // 检查登录状态
   fetch(AUTH_API + '/api/v1/auth/me', { credentials: 'include' })
@@ -55,25 +86,12 @@
       loadingEl.style.display = 'none';
       panelEl.style.display = '';
 
-      // 显示用户名（取首字符作为头像占位）
       var displayName = data.username || '?';
       nameEl.textContent = displayName;
       avatarEl.textContent = displayName.charAt(0).toUpperCase();
-      roleEl.textContent = data.role === 'admin' ? '管理员' : '用户';
-
-      // 点击头像切换下拉菜单
-      toggleBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        dropdownEl.classList.toggle('user-auth__dropdown--open');
-      });
-
-      // 点击外部关闭下拉
-      document.addEventListener('click', function() {
-        dropdownEl.classList.remove('user-auth__dropdown--open');
-      });
+      roleBadgeEl.textContent = data.role === 'admin' ? '管理员' : '用户';
     })
     .catch(function() {
-      // 未登录 — 显示登录按钮
       loadingEl.style.display = 'none';
       loginEl.style.display = '';
     });
@@ -125,13 +143,14 @@
   .user-auth__avatar-btn {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.35rem;
     background: none;
     border: none;
     cursor: pointer;
     padding: 0.25rem 0.5rem;
     border-radius: 6px;
     transition: background 0.15s;
+    white-space: nowrap;
   }
 
   .user-auth__avatar-btn:hover {
@@ -162,16 +181,21 @@
     white-space: nowrap;
   }
 
+  .user-auth__role {
+    font-size: 0.7rem;
+    color: var(--color-text-muted, #9ca3af);
+    background: var(--color-bg-muted, #f3f4f6);
+    padding: 0.1rem 0.45rem;
+    border-radius: 4px;
+    font-weight: 450;
+    line-height: 1.4;
+  }
+
   .user-auth__arrow {
     transition: transform 0.2s;
     color: var(--color-text-muted, #9ca3af);
   }
 
-  .user-auth__arrow {
-    transition: transform 0.2s;
-  }
-
-  .user-auth__dropdown--open ~ .user-auth__arrow,
   .user-auth__dropdown--open .user-auth__arrow {
     transform: rotate(180deg);
   }
@@ -184,7 +208,7 @@
     border: 1px solid var(--color-border, #e5e7eb);
     border-radius: 8px;
     box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-    min-width: 160px;
+    min-width: 140px;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-4px);
@@ -198,21 +222,6 @@
     transform: translateY(0);
   }
 
-  .user-auth__dropdown-info {
-    padding: 0.6rem 0.75rem;
-  }
-
-  .user-auth__dropdown-role {
-    font-size: 0.75rem;
-    color: var(--color-text-muted, #9ca3af);
-  }
-
-  .user-auth__divider {
-    border: none;
-    border-top: 1px solid var(--color-border, #e5e7eb);
-    margin: 0;
-  }
-
   .user-auth__dropdown-item {
     display: flex;
     align-items: center;
@@ -222,7 +231,7 @@
     color: var(--color-text-muted, #6b7280);
     text-decoration: none;
     transition: background 0.15s, color 0.15s;
-    border-radius: 0 0 8px 8px;
+    border-radius: 8px;
   }
 
   .user-auth__dropdown-item:hover {
