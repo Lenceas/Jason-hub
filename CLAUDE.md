@@ -35,6 +35,7 @@
 - [完成] Auth v0.3.0 — 登录页全面重做 + RSA 前端加密 + 安全增强 + 审计日志 + 体验打磨 ✅
 - [完成] Auth v0.3.1 — 修复 Token 通过 URL 参数泄露的安全问题 ✅
 - [完成] Auth v0.4.0 — 新增 `/api/v1/auth/me` 用户信息端点 ✅
+- [完成] Portfolio 右上角用户认证模块 — 自动检测登录状态，显示用户信息/登录入口 ✅
 - [进行中] Notification 通知服务 / 任务调度 / 消息队列 — 方案待定
 - [进行中] Monitor 子项目 — 方案确定，待开发
   - 前端：Vue 3 + TypeScript / UnoCSS / ECharts / Pinia（端口 8001）
