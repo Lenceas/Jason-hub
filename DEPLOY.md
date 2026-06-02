@@ -339,7 +339,7 @@ volumes:
   auth-keys:
 ```
 
-> ip2region 目录（`./ip2region:/app/ip2region`）为 bind mount，CI/CD 打包时从 GitHub 自动下载最新 xdb。
+> ip2region 目录（`./ip2region:/app/ip2region`）为 bind mount，由服务器 cron（每月 1 号凌晨 3:00）自动更新数据库文件。
 > 服务器另设 cron（每月 1 号凌晨 3:00）自动检查更新。
 
 **.env 文件**（不提交到 git）：
@@ -381,9 +381,9 @@ jobs:
           sudo apt-get install -qq -y sshpass
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -o StrictHostKeyChecking=no deploy.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/tmp/deploy.tar.gz
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
-            rm -rf /opt/lujiesheng/Portfolio
-            tar xzf /tmp/deploy.tar.gz -C /opt/lujiesheng
-            rm /tmp/deploy.tar.gz
+            sudo rm -rf /opt/lujiesheng/Portfolio
+            sudo tar xzf /tmp/deploy.tar.gz -C /opt/lujiesheng
+            sudo rm /tmp/deploy.tar.gz
             cd /opt/lujiesheng
             docker compose up --build -d portfolio
             docker image prune -f

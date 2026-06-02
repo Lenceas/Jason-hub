@@ -15,25 +15,17 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: 下载 ip2region 离线 IP 库
-        run: |
-          curl -sL -o ip2region_v4.xdb \
-            "https://raw.githubusercontent.com/lionsoul2014/ip2region/master/data/ip2region_v4.xdb"
-          mkdir -p ip2region
-          cp ip2region_v4.xdb ip2region/
-          echo "ip2region 大小: $(ls -lh ip2region/ip2region_v4.xdb | awk '{print $5}')"
-
       - name: 打包代码
-        run: tar czf deploy.tar.gz $(git ls-files) ip2region/
+        run: tar czf deploy.tar.gz $(git ls-files)
 
       - name: 部署到服务器
         run: |
           sudo apt-get install -qq -y sshpass
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -o StrictHostKeyChecking=no deploy.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/tmp/deploy.tar.gz
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
-            rm -rf /opt/lujiesheng/Portfolio /opt/lujiesheng/Auth /opt/lujiesheng/ip2region
-            tar xzf /tmp/deploy.tar.gz -C /opt/lujiesheng
-            rm /tmp/deploy.tar.gz
+            sudo rm -rf /opt/lujiesheng/Portfolio /opt/lujiesheng/Auth
+            sudo tar xzf /tmp/deploy.tar.gz -C /opt/lujiesheng
+            sudo rm /tmp/deploy.tar.gz
             cd /opt/lujiesheng
             docker compose up --build -d portfolio auth
             docker image prune -f

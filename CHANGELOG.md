@@ -2,6 +2,11 @@
 
 ---
 
+## v1.4.5 (2026-06-02)
+
+- **fix**: CI/CD 部署修复 — 加 sudo 解决 docker root 文件权限问题；移除 ip2region 打包（瘦身 11MB，由服务器 cron 维护）
+- **perf**: Portfolio Dockerfile 拆分 npm ci 层，依赖文件未变时走缓存
+
 ## v1.4.4 (2026-06-02)
 
 - **docs**: release skill 预检新增自动清理已合并的 feat/fix 分支
