@@ -12,14 +12,14 @@
 
 ### 在线地址
 
-**https://lujiesheng.cn**
+<a href="https://lujiesheng.cn" target="_blank" rel="noopener">**https://lujiesheng.cn**</a>
 
 ### 子项目
 
 | 项目 | 前端 | API 文档 | 技术栈 | 状态 |
 |------|------|---------|--------|------|
-| Portfolio 主站 | `lujiesheng.cn` | — | Astro 6 | active |
-| Auth 鉴权服务 | `api-auth.lujiesheng.cn/login` | `api-auth.lujiesheng.cn/scalar/v1` | .NET 10 / Minimal API | active |
+| Portfolio 主站 | <a href="https://lujiesheng.cn" target="_blank" rel="noopener">lujiesheng.cn</a> | — | Astro 6 | active |
+| Auth 鉴权服务 | <a href="https://api-auth.lujiesheng.cn/login" target="_blank" rel="noopener">登录页</a> | <a href="https://api-auth.lujiesheng.cn/scalar/v1" target="_blank" rel="noopener">Scalar 文档</a> | .NET 10 / Minimal API | active |
 | Monitor 监控面板 | `monitor.lujiesheng.cn` | `api-monitor.lujiesheng.cn` | Vue 3 / .NET 10 | planning |
 | 后续项目 | `<name>.lujiesheng.cn` | `api-<name>.lujiesheng.cn` | Vue 3 / .NET 10 | planning |
 
@@ -78,14 +78,14 @@ A personal project aggregation site built with [Astro 6](./Portfolio). The main 
 
 ### Live Site
 
-**https://lujiesheng.cn**
+<a href="https://lujiesheng.cn" target="_blank" rel="noopener">**https://lujiesheng.cn**</a>
 
 ### Sub-Projects
 
 | Project | Frontend | API Docs | Stack | Status |
 |---------|----------|----------|-------|--------|
-| Portfolio | `lujiesheng.cn` | — | Astro 6 | active |
-| Auth | `api-auth.lujiesheng.cn/login` | `api-auth.lujiesheng.cn/scalar/v1` | .NET 10 / Minimal API | active |
+| Portfolio | <a href="https://lujiesheng.cn" target="_blank" rel="noopener">lujiesheng.cn</a> | — | Astro 6 | active |
+| Auth | <a href="https://api-auth.lujiesheng.cn/login" target="_blank" rel="noopener">Login</a> | <a href="https://api-auth.lujiesheng.cn/scalar/v1" target="_blank" rel="noopener">Scalar Docs</a> | .NET 10 / Minimal API | active |
 | Monitor | `monitor.lujiesheng.cn` | `api-monitor.lujiesheng.cn` | Vue 3 / .NET 10 | planning |
 | Upcoming | `<name>.lujiesheng.cn` | `api-<name>.lujiesheng.cn` | Vue 3 / .NET 10 | planning |
 
