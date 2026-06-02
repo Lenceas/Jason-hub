@@ -35,6 +35,76 @@
 - 每个组件职责单一，不做太多事
 - 部分组件使用内联样式 + `is:global` 处理响应式（避免 scoped CSS 不生效的问题）
 
+## .NET 后端规范
+
+> 脚手架：`bash scripts/scaffold-dotnet.sh <项目名> [端口]`
+> 说 **"创建 XX 后端"** 即可自动生成标准项目结构。
+
+### 目录结构（Auth 示例）
+
+```
+Auth/
+├── api/                        ← 子项目主应用
+│   ├── Program.cs              ← 入口（仅服务注册 + 中间件管道）
+│   ├── {子项目}Api.csproj
+│   ├── Endpoints/              ← 端点层：API 路由映射
+│   │   └── {子项目}Endpoints.cs
+│   ├── Models/
+│   │   ├── {子项目}Models.cs   ← DTO：请求/响应 record
+│   │   └── Entities/           ← 数据库实体
+│   │       └── {entity}.cs
+│   ├── Pages/                  ← 页面（内嵌 HTML）
+│   │   └── {name}Page.cs
+│   ├── Services/               ← 业务服务层
+│   │   └── {name}Service.cs
+│   └── Properties/
+├── Shared/                     ← 共享库（供所有子项目引用）
+│   └── {name}.cs
+└── 标准文档 (CHANGELOG / PLAN / README)
+```
+
+### 命名规范
+
+| 类型 | 规则 | 示例 |
+|------|------|------|
+| 目录 | PascalCase，复数 | `Endpoints/` `Services/` `Models/Entities/` |
+| .cs 文件 | PascalCase，前缀子项目名 | `AuthModels.cs` `AuthService.cs` |
+| .csproj | `{子项目}{模块}.csproj` | `AuthApi.csproj` `AuthShared.csproj` |
+| 命名空间 | `{子项目}{模块}` | `AuthApi.Endpoints` `AuthShared` |
+| 请求 DTO | `{动词}Request` | `LoginRequest` `TokenRequest` |
+| 响应 DTO | `{名词}Response` | `LoginResponse` `JwtTokenResponse` |
+| 实体 | `{子项目}{表名}`（无后缀） | `AuthUser` `AuthRefreshToken` |
+| 数据库列 | **snake_case** | `password_hash` `failed_attempts` |
+
+### 代码分层
+
+```
+Program.cs                    ← 薄层（只做注册 + 管道）
+  └── Endpoints/*Endpoints.cs ← 端点映射 + OpenAPI 描述 (WithTags/WithSummary)
+        └── Services/*Service.cs ← 核心业务逻辑
+              └── Models/Entities/* ← 数据实体
+```
+
+- **Program.cs** 不写业务逻辑
+- **Endpoints** 只做参数校验 + 调 Service，不写核心逻辑
+- **Services** 做核心业务，不暴露 HTTP 细节
+- 端点使用链式调用风格：`.WithTags()` `.WithSummary()` `.WithDescription()` `.Produces<T>()`
+
+### 端点命名
+
+```
+/api/v1/{子项目}/{资源}    ← 版本化
+/api/v1/auth/login          ← 动词
+/api/v1/auth/me             ← 代词
+/api/v1/auth/public-key     ← 连字符
+```
+
+### OpenAPI 文档
+
+- `builder.Services.AddOpenApi()` 中添加 DocumentTransformer 设置 Title / Description / Version
+- Version 建议附带运行时版本：`v1.0.0 (.NET 10.0.8)`
+- Scalar 配置统一主题 `ScalarTheme.BluePlanet`
+
 ## 项目数据规范
 
 `projects.json` 中每条记录的字段：

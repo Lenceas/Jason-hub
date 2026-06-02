@@ -1,4 +1,5 @@
 using AuthApi.Models;
+using AuthApi.Models.Entities;
 using AuthShared;
 using SqlSugar;
 
@@ -173,56 +174,3 @@ public class AuthService
     }
 }
 
-// SQL 映射实体（注意：数据库列名为 snake_case）
-[SugarTable("auth_users")]
-public class AuthUser
-{
-    [SugarColumn(IsPrimaryKey = true, IsIdentity = true, ColumnName = "id")]
-    public int Id { get; set; }
-    [SugarColumn(ColumnName = "username")]
-    public string Username { get; set; } = "";
-    [SugarColumn(ColumnName = "password_hash")]
-    public string PasswordHash { get; set; } = "";
-    [SugarColumn(ColumnName = "role")]
-    public string Role { get; set; } = "admin";
-    [SugarColumn(ColumnName = "failed_attempts")]
-    public int FailedAttempts { get; set; }
-    [SugarColumn(ColumnName = "locked_until")]
-    public DateTime? LockedUntil { get; set; }
-    [SugarColumn(ColumnName = "created_at")]
-    public DateTime CreatedAt { get; set; }
-}
-
-[SugarTable("auth_refresh_tokens")]
-public class AuthRefreshToken
-{
-    [SugarColumn(IsPrimaryKey = true, IsIdentity = true, ColumnName = "id")]
-    public long Id { get; set; }
-    [SugarColumn(ColumnName = "user_id")]
-    public int UserId { get; set; }
-    [SugarColumn(ColumnName = "token_hash")]
-    public string TokenHash { get; set; } = "";
-    [SugarColumn(ColumnName = "expires_at")]
-    public DateTime ExpiresAt { get; set; }
-    [SugarColumn(ColumnName = "revoked")]
-    public bool Revoked { get; set; }
-}
-
-[SugarTable("auth_clients")]
-public class AuthClient
-{
-    [SugarColumn(IsPrimaryKey = true, IsIdentity = true, ColumnName = "id")]
-    public int Id { get; set; }
-    [SugarColumn(ColumnName = "client_id")]
-    public string ClientId { get; set; } = "";
-    [SugarColumn(ColumnName = "client_secret_hash")]
-    public string ClientSecretHash { get; set; } = "";
-    [SugarColumn(ColumnName = "name")]
-    public string Name { get; set; } = "";
-    [SugarColumn(ColumnName = "scopes")]
-    public string Scopes { get; set; } = "";
-    [SugarColumn(ColumnName = "is_active")]
-    public bool IsActive { get; set; }
-    [SugarColumn(ColumnName = "created_at")]
-    public DateTime CreatedAt { get; set; }
-}
