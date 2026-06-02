@@ -2,6 +2,11 @@
 
 ---
 
+## v1.4.3 (2026-06-02)
+
+- **docs**: release/project-release skill 新增版本号陷阱提示（CLAUDE.md "当前版本"应设为发布目标版本）
+- **fix**: CLAUDE.md 版本号同步更新（v1.4.2 → v1.4.3）
+
 ## v1.4.2 (2026-06-02)
 
 - **docs**: 文档体系重构 — 将 RELEASE.md 详细步骤迁移到 Claude Code skills，精简为速查版
