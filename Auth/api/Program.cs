@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text;
 using System.Threading.RateLimiting;
 using AuthApi.Models;
@@ -695,6 +696,24 @@ app.MapPost("/api/v1/auth/refresh", async (RefreshRequest request, AuthService a
 // 公钥端点
 app.MapGet("/api/v1/auth/public-key", (JwtService jwt) =>
     Results.Content(jwt.PublicKeyPem, "text/plain; charset=utf-8"));
+
+// 获取当前登录用户信息
+app.MapGet("/api/v1/auth/me", (HttpContext context) =>
+{
+    var user = context.User;
+    if (user.Identity?.IsAuthenticated != true)
+        return Results.Json(new { message = "未登录" }, statusCode: 401);
+
+    return Results.Json(new
+    {
+        userId = user.FindFirstValue("sub") ?? "",
+        username = user.FindFirstValue("username") ?? "",
+        role = user.FindFirstValue("role") ?? "",
+        scopes = user.FindFirstValue("scopes") ?? "",
+        type = user.FindFirstValue("type") ?? "user",
+        loginTime = DateTime.UtcNow
+    });
+});
 
 app.Run();
 

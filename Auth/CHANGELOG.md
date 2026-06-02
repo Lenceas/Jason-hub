@@ -2,6 +2,10 @@
 
 ---
 
+## v0.4.0 (2026-06-02)
+
+- **feat**: 新增 `/api/v1/auth/me` 端点 — 获取当前登录用户信息（userId / username / role / scopes），受 JWT 保护，供各子项目读取登录状态
+
 ## v0.3.1 (2026-06-02)
 
 - **security**: 移除登录成功跳转时 URL 中的 `?token=` 参数 — Token 已通过 HttpOnly Cookie 传递，防止泄露于浏览器历史/服务端日志/Referer 头
