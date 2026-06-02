@@ -2,6 +2,21 @@
 
 ---
 
+## v0.5.0 (2026-06-02)
+
+- **feat**: 用户表全面扩展 — 新增 nickname / email / phone / avatar_url / bio / status / last_login_at / last_login_ip / last_login_city / updated_at
+- **feat**: IP 城市解析 — 登录时自动记录用户所在城市（ip2region 离线库，微秒级查询，国产开源）
+- **feat**: `/api/v1/auth/me` 返回完整用户信息 — nickname / email / avatarUrl / bio / lastLoginAt / lastLoginIp / lastLoginCity
+- **feat**: CodeFirst 自动建表 — 启动时自动同步实体与数据库表结构
+- **feat**: Scalar API 文档全面增强 — 标签分组 + Summary/Description + 模型字段说明 + 项目信息 + 统一 favicon
+- **feat**: 登录页样式优化 — 锁形品牌图标 + 卡片细边框 + 登录成功绿勾动画 + 错误提示渐变过渡 + Chrome 自动填充样式修正 + 移动端装饰圆隐藏
+- **feat**: 已登录自动跳转 — 入口页检测到有效 Cookie 直接跳回来源站点
+- **style**: 登录页「← 返回主页」间距优化
+- **style**: 代码结构分离 — Program.cs 瘦身（820→148行），拆分为 Endpoints/ + Pages/ + Models/Entities/
+- **style**: 端点链式调用风格化 — `.WithTags()` `.WithSummary()` `.WithDescription()` `.Produces<T>()`
+- **refactor**: IP 城市解析最终方案 — ip2region 离线库（11MB），CI/CD 自动下载 + 服务器 cron 每月更新
+- **security**: 退出登录 `/logout` 服务端域名白名单校验，防 Open Redirect
+
 ## v0.4.1 (2026-06-02)
 
 - **feat**: 新增 `/logout` 退出登录端点 — 清除 JWT Cookie，支持 `?redirect=` 参数跳回指定页面
