@@ -13,8 +13,9 @@ jobs:
 
       - name: 下载 GeoLite2 离线 IP 库
         run: |
-          curl -sL -o /tmp/GeoLite2-City.tar.gz \
-            "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=${{ secrets.MAXMIND_LICENSE_KEY }}&suffix=tar.gz"
+          curl -sL -u "${{ secrets.MAXMIND_ACCOUNT_ID }}:${{ secrets.MAXMIND_LICENSE_KEY }}" \
+            -o /tmp/GeoLite2-City.tar.gz \
+            "https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz"
           tar xzf /tmp/GeoLite2-City.tar.gz -C /tmp
           mkdir -p GeoIP
           cp /tmp/GeoLite2-City_*/GeoLite2-City.mmdb GeoIP/
