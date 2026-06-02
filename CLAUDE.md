@@ -33,6 +33,7 @@
   - 数据库 `jason_auth`（auth_users / auth_clients / auth_refresh_tokens）
 - [完成] Auth 鉴权服务部署 — DNS / SSL / Nginx / docker-compose ✅
 - [完成] Auth v0.3.0 — 登录页全面重做 + RSA 前端加密 + 安全增强 + 审计日志 + 体验打磨 ✅
+- [完成] Auth v0.3.1 — 修复 Token 通过 URL 参数泄露的安全问题 ✅
 - [进行中] Notification 通知服务 / 任务调度 / 消息队列 — 方案待定
 - [进行中] Monitor 子项目 — 方案确定，待开发
   - 前端：Vue 3 + TypeScript / UnoCSS / ECharts / Pinia（端口 8001）
@@ -42,6 +43,8 @@
 
 ### 最近完成
 
+- [完成] auth-v0.3.1 — 修复 Token 通过 URL 参数泄露的安全问题
+- [完成] auth-v0.3.0 — Auth 登录页全面重做 + RSA 前端加密 + 安全增强 + 审计日志 + 体验打磨
 - [完成] v1.3.0 — Auth 鉴权服务部署上线 + 敏感信息规范 + 分支策略修正
 - [完成] auth-v0.2.0 — Auth 鉴权服务部署上线（docker-compose / SSL / Nginx / CI/CD）
 - [完成] v1.2.0 — Auth 鉴权服务开发 + 数据库 `jason_` 命名规范 + 中文表注释
@@ -103,6 +106,7 @@
 | 2026-06-01 | 主发布流新增步骤⑧：根仓库规范变更自动同步到子项目分支（`--ff-only`） | `RELEASE.md` |
 | 2026-06-01 | Auth 登录密码 RSA-OAEP 前端加密（Web Crypto API + JwtService 解密） | `Auth/Program.cs` |
 | 2026-06-01 | Auth 安全响应头 + ForwardedHeaders 真实 IP + 审计日志 [IP] [UA] | `Auth/Program.cs` |
+| 2026-06-02 | Auth v0.3.1 — 移除登录成功跳转 URL 中的 `?token=`，Token 仅通过 HttpOnly Cookie 传递 | `Auth/Program.cs` |
 
 ---
 

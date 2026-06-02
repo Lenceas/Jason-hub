@@ -576,12 +576,12 @@ app.MapGet("/login", () =>
 
                         // 登录成功 — 跳回来源子项目
                         const dest = redirectUrl || 'https://lujiesheng.cn';
-                        const sep = dest.includes('?') ? '&' : '?';
+                        // Token 已由服务端写入 HttpOnly Cookie，直接跳转无需 URL 传参
                         // 显示成功提示 500ms 再跳转
                         sourceHint.textContent = '登录成功，正在跳转…';
                         sourceHint.style.color = '#10B981';
                         setTimeout(() => {
-                            window.location.href = dest + sep + 'token=' + data.accessToken;
+                            window.location.href = dest;
                         }, 500);
                     } catch (err) {
                         showError('网络错误，请检查网络连接后重试', '⚠ ');

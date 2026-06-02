@@ -2,6 +2,10 @@
 
 ---
 
+## v0.3.1 (2026-06-02)
+
+- **security**: 移除登录成功跳转时 URL 中的 `?token=` 参数 — Token 已通过 HttpOnly Cookie 传递，防止泄露于浏览器历史/服务端日志/Referer 头
+
 ## v0.3.0 (2026-06-01)
 
 - **feat**: RSA-OAEP 前端加密密码 — Web Crypto API 加密，后端 JwtService 解密
