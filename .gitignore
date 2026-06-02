@@ -19,6 +19,9 @@ appsettings.*.local.json
 # ======== 开发密钥 ========
 dev-keys/
 
+# ======== IP 离线库（CI/CD 自动下载） ========
+ip2region/
+
 # ======== 系统文件 ========
 .DS_Store
 Thumbs.db

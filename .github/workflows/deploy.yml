@@ -11,8 +11,16 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: 打包代码（含 ip2region 离线 IP 库）
-        run: tar czf deploy.tar.gz $(git ls-files)
+      - name: 下载 ip2region 离线 IP 库
+        run: |
+          curl -sL -o ip2region_v4.xdb \
+            "https://raw.githubusercontent.com/lionsoul2014/ip2region/master/data/ip2region_v4.xdb"
+          mkdir -p ip2region
+          cp ip2region_v4.xdb ip2region/
+          echo "ip2region 大小: $(ls -lh ip2region/ip2region_v4.xdb | awk '{print $5}')"
+
+      - name: 打包代码
+        run: tar czf deploy.tar.gz $(git ls-files) ip2region/
 
       - name: 部署到服务器
         run: |
