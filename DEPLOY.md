@@ -303,8 +303,12 @@ services:
   auth:
     build: ./Auth/api
     ports: ["127.0.0.1:8100:8080"]
+    volumes:
+      - auth-keys:/app/keys
+      - ./ip2region:/app/ip2region
     environment:
       - ConnectionStrings__Default=${AUTH_DB_CONNECTION}
+      - ip2region__DatabasePath=/app/ip2region/ip2region_v4.xdb
     depends_on:
       mysql: { condition: service_healthy }
     restart: unless-stopped
@@ -332,7 +336,11 @@ volumes:
   mysql-data:
   redis-data:
   mongo-data:
+  auth-keys:
 ```
+
+> ip2region 目录（`./ip2region:/app/ip2region`）为 bind mount，CI/CD 打包时从 GitHub 自动下载最新 xdb。
+> 服务器另设 cron（每月 1 号凌晨 3:00）自动检查更新。
 
 **.env 文件**（不提交到 git）：
 

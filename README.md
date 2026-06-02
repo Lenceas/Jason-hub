@@ -16,10 +16,10 @@
 
 ### 子项目
 
-| 项目 | 前端 | API | 技术栈 | 状态 |
-|------|------|----|--------|------|
+| 项目 | 前端 | API 文档 | 技术栈 | 状态 |
+|------|------|---------|--------|------|
 | Portfolio 主站 | `lujiesheng.cn` | — | Astro 6 | active |
-| Auth 鉴权服务 | — | `api-auth.lujiesheng.cn` | .NET 10 / Minimal API | active |
+| Auth 鉴权服务 | `api-auth.lujiesheng.cn/login` | `api-auth.lujiesheng.cn/scalar/v1` | .NET 10 / Minimal API | active |
 | Monitor 监控面板 | `monitor.lujiesheng.cn` | `api-monitor.lujiesheng.cn` | Vue 3 / .NET 10 | planning |
 | 后续项目 | `<name>.lujiesheng.cn` | `api-<name>.lujiesheng.cn` | Vue 3 / .NET 10 | planning |
 
@@ -30,6 +30,10 @@ Jason-hub/
 ├── Portfolio/           ← Astro 6 个人主页（主站）
 ├── Auth/                ← .NET 10 鉴权服务（基础设施）
 ├── Monitor/             ← Vue 3 + .NET 10 监控面板（planning）
+├── templates/           ← 项目脚手架模板
+│   └── dotnet-service/  ← .NET 后端子项目模板
+├── scripts/             ← 辅助脚本
+│   └── scaffold-dotnet.sh ← .NET 后端子项目生成器
 ├── .github/workflows/   ← GitHub Actions CI/CD
 ├── docker-compose.yml   ← Docker 容器编排
 ├── .env.example         ← 环境变量模板
@@ -78,10 +82,10 @@ A personal project aggregation site built with [Astro 6](./Portfolio). The main 
 
 ### Sub-Projects
 
-| Project | Frontend | API | Stack | Status |
-|---------|----------|-----|-------|--------|
+| Project | Frontend | API Docs | Stack | Status |
+|---------|----------|----------|-------|--------|
 | Portfolio | `lujiesheng.cn` | — | Astro 6 | active |
-| Auth | — | `api-auth.lujiesheng.cn` | .NET 10 / Minimal API | dev |
+| Auth | `api-auth.lujiesheng.cn/login` | `api-auth.lujiesheng.cn/scalar/v1` | .NET 10 / Minimal API | active |
 | Monitor | `monitor.lujiesheng.cn` | `api-monitor.lujiesheng.cn` | Vue 3 / .NET 10 | planning |
 | Upcoming | `<name>.lujiesheng.cn` | `api-<name>.lujiesheng.cn` | Vue 3 / .NET 10 | planning |
 
@@ -92,6 +96,10 @@ Jason-hub/
 ├── Portfolio/           ← Astro 6 homepage (main site)
 ├── Auth/                ← .NET 10 auth service (infrastructure)
 ├── Monitor/             ← Vue 3 + .NET 10 monitoring dashboard (planning)
+├── templates/           ← Project scaffold templates
+│   └── dotnet-service/  ← .NET backend sub-project template
+├── scripts/             ← Utility scripts
+│   └── scaffold-dotnet.sh ← .NET backend sub-project generator
 ├── .github/workflows/   ← GitHub Actions CI/CD
 ├── docker-compose.yml   ← Docker container orchestration
 ├── .env.example         ← Environment variable template

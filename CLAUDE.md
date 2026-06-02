@@ -26,32 +26,28 @@
 
 ### 本期焦点：基础设施服务 + Monitor 监控面板
 
-- [完成] Auth 鉴权服务开发 — JWT + RS256 本地验证，端口 8100 ✅
-  - .NET 10 + Minimal API + SqlSugar + BCrypt
-  - 6 大 API 端点 + Scalar API 文档 + 登录页 HTML
-  - AuthShared 共享中间件库供各子项目引用
-  - 数据库 `jason_auth`（auth_users / auth_clients / auth_refresh_tokens）
-- [完成] Auth 鉴权服务部署 — DNS / SSL / Nginx / docker-compose ✅
-- [完成] Auth v0.3.0 — 登录页全面重做 + RSA 前端加密 + 安全增强 + 审计日志 + 体验打磨 ✅
-- [完成] Auth v0.3.1 — 修复 Token 通过 URL 参数泄露的安全问题 ✅
-- [完成] Auth v0.4.1 — 新增 `/logout` 退出端点 + 登录页返回主站入口 ✅
-- [完成] Auth v0.4.0 — 新增 `/api/v1/auth/me` 用户信息端点 ✅
-- [完成] Portfolio 右上角用户认证模块 — 自动检测登录状态，显示用户信息/登录入口 ✅
+- [完成] Auth 鉴权服务 v0.5.0 ✅
+  - 用户表全面扩展（nickname/email/phone/avatar/bio/status/登录审计字段）
+  - IP 城市解析（ip2region 国产离线库，微秒级查询）
+  - 登录页样式全面升级（品牌图标/成功动画/错误过渡/移动端优化）
+  - Scalar API 文档增强（标签分组/Schema 字段描述/项目信息）
+  - 代码结构分离（Program.cs 820→148行）+ 链式调用风格化
+  - Token 安全修复 + 退出登录 Open Redirect 防护
+- [完成] Portfolio 用户认证模块 ✅ — 自动检测登录状态，右上角显示用户信息/登录入口
+- [完成] .NET 后端脚手架 ✅ — `templates/dotnet-service/` + `scripts/scaffold-dotnet.sh`
 - [进行中] Notification 通知服务 / 任务调度 / 消息队列 — 方案待定
 - [进行中] Monitor 子项目 — 方案确定，待开发
   - 前端：Vue 3 + TypeScript / UnoCSS / ECharts / Pinia（端口 8001）
   - 后端：.NET 10 / SqlSugar / Scalar / Minimal API（端口 8051）
   - 域名：`monitor.lujiesheng.cn` / `api-monitor.lujiesheng.cn`
-  - 方案文档：`Monitor/PLAN.md`（6 大模块 + CI/CD 流水线监控）
 
 ### 最近完成
 
-- [完成] auth-v0.3.1 — 修复 Token 通过 URL 参数泄露的安全问题
-- [完成] auth-v0.3.0 — Auth 登录页全面重做 + RSA 前端加密 + 安全增强 + 审计日志 + 体验打磨
-- [完成] v1.3.0 — Auth 鉴权服务部署上线 + 敏感信息规范 + 分支策略修正
-- [完成] auth-v0.2.0 — Auth 鉴权服务部署上线（docker-compose / SSL / Nginx / CI/CD）
-- [完成] v1.2.0 — Auth 鉴权服务开发 + 数据库 `jason_` 命名规范 + 中文表注释
-- [完成] v1.1.0 — 文档体系全面重构（PLAN.md 规范/双轨发布流/中英双语/18 项审计修复）
+- [完成] Auth v0.5.0 — 用户表扩展 + ip2region + 登录样式升级 + Scalar 文档增强 + 结构分离
+- [完成] Auth v0.4.x — Token URL 泄露修复 + /me /logout 端点 + 登录页返回入口
+- [完成] Portfolio 用户认证模块 + 机器人检测（hover/click 下拉菜单）
+- [完成] .NET 后端工程规范 + 脚手架脚本
+- [完成] v1.3.0 — Auth 鉴权服务部署上线 + 敏感信息规范
 
 ---
 
@@ -110,6 +106,12 @@
 | 2026-06-01 | Auth 登录密码 RSA-OAEP 前端加密（Web Crypto API + JwtService 解密） | `Auth/Program.cs` |
 | 2026-06-01 | Auth 安全响应头 + ForwardedHeaders 真实 IP + 审计日志 [IP] [UA] | `Auth/Program.cs` |
 | 2026-06-02 | Auth v0.3.1 — 移除登录成功跳转 URL 中的 `?token=`，Token 仅通过 HttpOnly Cookie 传递 | `Auth/Program.cs` |
+| 2026-06-02 | Auth 代码结构分离：Program.cs 拆为 Endpoints/ + Pages/ + Models/Entities/，端点到 Services 分层 | `Auth/api/` |
+| 2026-06-02 | OpenAPI 端点采用链式调用风格 `.WithTags() .WithSummary() .WithDescription() .Produces<T>()` | `AuthEndpoints.cs` |
+| 2026-06-02 | IP 城市解析方案：ip2region 国产离线库（11MB），CI/CD 自动下载 + 服务器 cron 每月更新 | `Ip2RegionService.cs` |
+| 2026-06-02 | Portfolio 用户认证：Header 集成 UserAuth 组件，通过 /api/v1/auth/me 判断登录态 | `UserAuth.astro` |
+| 2026-06-02 | .NET 后端脚手架：`templates/dotnet-service/` + `scripts/scaffold-dotnet.sh`，说「创建 XX 后端」一键生成 | `STYLE_GUIDE.md` |
+| 2026-06-02 | CI/CD 仅从 main 触发部署（去重），往 sub-branch 合并不再触发 | `.github/workflows/deploy.yml` |
 
 ---
 
