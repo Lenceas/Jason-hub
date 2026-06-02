@@ -286,6 +286,12 @@ app.MapGet("/login", () =>
                 display: none; text-align: center; color: #F59E0B;
                 font-size: 0.875rem; margin-top: 0.75rem; font-weight: 500;
             }
+            .back-link {
+                display: block; text-align: center; margin-top: 0.4rem;
+                font-size: 0.8rem; color: #6B7280; text-decoration: none;
+                transition: color 0.15s;
+            }
+            .back-link:hover { color: #3B82F6; }
             @media (max-width: 480px) {
                 .card { padding: 1.75rem 1.25rem; }
                 h1 { font-size: 1.25rem; }
@@ -301,6 +307,7 @@ app.MapGet("/login", () =>
         <div class="glow glow-3"></div>
         <div class="card">
             <h1>Jason-hub 统一鉴权</h1>
+            <a href="https://lujiesheng.cn" class="back-link">← 返回主页</a>
             <p id="sourceHint" class="source-hint"></p>
             <div id="error" class="error-msg"></div>
             <form id="loginForm" novalidate>
@@ -715,13 +722,33 @@ app.MapGet("/api/v1/auth/me", (HttpContext context) =>
     });
 });
 
+// 退出登录 — 清除 Cookie，可选重定向
+app.MapGet("/logout", (HttpContext context) =>
+{
+    context.Response.Cookies.Append("jwt", "", new CookieOptions
+    {
+        Domain = ".lujiesheng.cn",
+        HttpOnly = true,
+        Secure = true,
+        SameSite = SameSiteMode.Lax,
+        Expires = DateTimeOffset.UnixEpoch,
+        Path = "/"
+    });
+
+    var redirect = context.Request.Query["redirect"].FirstOrDefault();
+    if (!string.IsNullOrEmpty(redirect))
+        return Results.Redirect(redirect);
+
+    return Results.Json(new { message = "已退出登录" });
+});
+
 app.Run();
 
 // ======== 中间件 ========
 static async Task AuthHandlerMiddleware(HttpContext context, RequestDelegate next)
 {
     var path = context.Request.Path.Value ?? "";
-    if (path is "/healthz" or "/login" or "/api/v1/auth/public-key" or "/api/v1/auth/login" or "/api/v1/auth/token")
+    if (path is "/healthz" or "/login" or "/logout" or "/api/v1/auth/public-key" or "/api/v1/auth/login" or "/api/v1/auth/token")
     {
         await next(context);
         return;
