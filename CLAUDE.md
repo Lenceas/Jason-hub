@@ -13,7 +13,7 @@
 |------|-----|
 | 在线地址 | https://lujiesheng.cn |
 | 服务器 | 81.71.136.3（腾讯云 2C4G / Ubuntu 24.04） |
-| 当前版本 | v1.4.3 |
+| 当前版本 | v1.4.4 |
 | 技术栈 | Astro 6 / Vue 3 + TypeScript / .NET 10 |
 | 数据库 | MySQL 8.4 / Redis 8 / MongoDB 8 |
 | CI/CD | GitHub Actions → SCP → docker compose up |

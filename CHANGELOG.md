@@ -2,6 +2,10 @@
 
 ---
 
+## v1.4.4 (2026-06-02)
+
+- **docs**: release skill 预检新增自动清理已合并的 feat/fix 分支
+
 ## v1.4.3 (2026-06-02)
 
 - **docs**: release/project-release skill 新增版本号陷阱提示（CLAUDE.md "当前版本"应设为发布目标版本）
