@@ -2,6 +2,15 @@
 
 ---
 
+## v1.4.2 (2026-06-02)
+
+- **docs**: 文档体系重构 — 将 RELEASE.md 详细步骤迁移到 Claude Code skills，精简为速查版
+- **docs**: CLAUDE.md 内容重构 — 新增仓库结构图、技能命令速查表、归档历史决策记录到 ARCHITECTURE.md
+- **docs**: ARCHITECTURE.md 新增历史决策记录附录
+- **docs**: STYLE_GUIDE.md 精简脚手架/多项目提交策略章节，改为 skill 引用
+- **fix**: RELEASE.md 残留文字碎片清理
+- **fix**: CLAUDE.md 版本号同步更新（v1.3.0 → v1.4.1）
+
 ## v1.4.1 (2026-06-02)
 
 - **style**: Auth 登录页间距微调 + CI/CD 跳过纯文档变更

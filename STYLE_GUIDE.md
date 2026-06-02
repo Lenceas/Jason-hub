@@ -102,41 +102,8 @@ Program.cs                    ← 薄层（只做注册 + 管道）
 - Version 建议附带运行时版本：`v1.0.0 (.NET 10.0.8)`
 - Scalar 配置统一主题 `ScalarTheme.BluePlanet`
 
-### 脚手架
-
-创建新的 .NET 后端子项目时，使用脚手架自动生成标准结构：
-
-```
-bash scripts/scaffold-dotnet.sh <项目名> [端口号]
-```
-
-**示例：**
-```bash
-bash scripts/scaffold-dotnet.sh Monitor 8051
-```
-
-**生成结构：**
-```
-Monitor/
-├── api/
-│   ├── Program.cs                   ← 服务注册 + OpenAPI/Scalar
-│   ├── MonitorApi.csproj            ← .NET 10 项目文件
-│   ├── Endpoints/MonitorEndpoints.cs ← 端点（链式调用风格）
-│   ├── Models/MonitorModels.cs      ← DTO
-│   ├── Services/MonitorService.cs   ← 业务层
-│   └── Properties/
-└── Shared/MonitorShared.csproj      ← 共享库（供其他子项目引用）
-```
-
-**脚手架自动完成：**
-- 命名空间 `MonitorApi.Endpoints` / `MonitorApi.Services`  
-- 文件命名 `PascalCase` + 项目名前缀
-- OpenAPI 文档 Title / Description / Version
-- Scalar BluePlanet 主题 + 项目 favicon
-- `/healthz` 健康检查端点
-- 链式调用 `.WithTags()` `.WithSummary()` `.WithDescription()` 风格
-
-> 在对话中说 **"创建 XX 后端"** 即可自动执行脚手架。
+> 创建新的 .NET 后端子项目请使用 `/scaffold-dotnet` 技能，基于 `templates/dotnet-service/` 模板一键生成。
+> 生成结构：`api/Program.cs` + `Endpoints/` + `Models/` + `Services/` + `Shared/`
 
 ## 项目数据规范
 
@@ -216,19 +183,6 @@ git push origin main --tags
 | Portfolio 版本 | 在 `Portfolio/package.json` 中独立记录，不受子项目版本影响 |
 
 **示例**: Monitor 子项目开发到 v1.0.0 后合并 → main v1.0.19 → v1.1.0
-
-### 多项目同时变更时的提交策略
-
-同时涉及多个子项目的变更时，按以下规则处理：
-
-| 场景 | 做法 |
-|------|------|
-| `project/<name>` 分支内同时改本子项目 + Portfolio | **一个 commit**，属于同一逻辑变更（集成新子项目） |
-| main 上同时改 Portfolio + 某个子项目 | **分两个 commit**，各自走发布流程，便于追溯和回滚 |
-| 紧急修复跨两个子项目 | **分 commit 提交**，先修优先级高的先发版 |
-| 合并子项目分支到 main | **merge commit 本身就是一次提交**，无需拆分 |
-
-> **原则**：commit 按逻辑单元拆分，而非按文件拆分。同一逻辑变更（如"集成 Monitor"）只需一个 commit；不同逻辑变更（如"修 Portfolio 样式"和"修 Monitor 日志"）建议分开提交。
 
 ### 提交信息规范
 
