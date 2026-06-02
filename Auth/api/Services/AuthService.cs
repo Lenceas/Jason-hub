@@ -14,9 +14,9 @@ public class AuthService
     private readonly JwtService _jwt;
     private readonly JwtValidator _validator;
     private readonly ILogger<AuthService> _logger;
-    private readonly IpGeoService _ipGeo;
+    private readonly Ip2RegionService _ipGeo;
 
-    public AuthService(ISqlSugarClient db, JwtService jwt, JwtValidator validator, ILogger<AuthService> logger, IpGeoService ipGeo)
+    public AuthService(ISqlSugarClient db, JwtService jwt, JwtValidator validator, ILogger<AuthService> logger, Ip2RegionService ipGeo)
     {
         _db = db;
         _jwt = jwt;

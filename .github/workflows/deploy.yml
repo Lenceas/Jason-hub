@@ -11,25 +11,15 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: 下载 GeoLite2 离线 IP 库
-        run: |
-          curl -sL -u "${{ secrets.MAXMIND_ACCOUNT_ID }}:${{ secrets.MAXMIND_LICENSE_KEY }}" \
-            -o /tmp/GeoLite2-City.tar.gz \
-            "https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz"
-          tar xzf /tmp/GeoLite2-City.tar.gz -C /tmp
-          mkdir -p GeoIP
-          cp /tmp/GeoLite2-City_*/GeoLite2-City.mmdb GeoIP/
-          echo "数据库大小: $(ls -lh GeoIP/GeoLite2-City.mmdb | awk '{print $5}')"
-
-      - name: 打包代码
-        run: tar czf deploy.tar.gz $(git ls-files) GeoIP/
+      - name: 打包代码（含 ip2region 离线 IP 库）
+        run: tar czf deploy.tar.gz $(git ls-files)
 
       - name: 部署到服务器
         run: |
           sudo apt-get install -qq -y sshpass
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -o StrictHostKeyChecking=no deploy.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/tmp/deploy.tar.gz
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
-            rm -rf /opt/lujiesheng/Portfolio /opt/lujiesheng/Auth /opt/lujiesheng/GeoIP
+            rm -rf /opt/lujiesheng/Portfolio /opt/lujiesheng/Auth /opt/lujiesheng/ip2region
             tar xzf /tmp/deploy.tar.gz -C /opt/lujiesheng
             rm /tmp/deploy.tar.gz
             cd /opt/lujiesheng
