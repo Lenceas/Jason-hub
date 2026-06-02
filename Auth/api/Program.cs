@@ -287,7 +287,7 @@ app.MapGet("/login", () =>
                 font-size: 0.875rem; margin-top: 0.75rem; font-weight: 500;
             }
             .back-link {
-                display: block; text-align: center; margin-top: 0.4rem;
+                display: block; text-align: center; margin-top: 0.4rem; margin-bottom: 0.9rem;
                 font-size: 0.8rem; color: #6B7280; text-decoration: none;
                 transition: color 0.15s;
             }
@@ -396,6 +396,13 @@ app.MapGet("/login", () =>
                 let countdownTimer = null;
                 let errorTimer = null;
                 let cryptoKey = null; // 缓存的 RSA 公钥
+
+                // 已登录自动跳转（Cookie 有效则直接放行）
+                if (redirectUrl) {
+                    fetch('/api/v1/auth/me', { credentials: 'include' })
+                        .then(r => { if (r.ok) window.location.href = redirectUrl; })
+                        .catch(() => {}); // 未登录忽略
+                }
 
                 // 预加载 RSA 公钥（页面加载时异步获取）
                 const loadPublicKey = async () => {
@@ -722,7 +729,7 @@ app.MapGet("/api/v1/auth/me", (HttpContext context) =>
     });
 });
 
-// 退出登录 — 清除 Cookie，可选重定向
+// 退出登录 — 清除 Cookie，可选重定向（限 *.lujiesheng.cn）
 app.MapGet("/logout", (HttpContext context) =>
 {
     context.Response.Cookies.Append("jwt", "", new CookieOptions
@@ -737,7 +744,18 @@ app.MapGet("/logout", (HttpContext context) =>
 
     var redirect = context.Request.Query["redirect"].FirstOrDefault();
     if (!string.IsNullOrEmpty(redirect))
-        return Results.Redirect(redirect);
+    {
+        // 只允许跳转到 *.lujiesheng.cn，防 Open Redirect
+        try
+        {
+            var uri = new Uri(redirect, UriKind.Absolute);
+            var host = uri.Host;
+            if (host == "lujiesheng.cn" || host.EndsWith(".lujiesheng.cn"))
+                return Results.Redirect(redirect);
+        }
+        catch { }
+        return Results.Redirect("https://lujiesheng.cn");
+    }
 
     return Results.Json(new { message = "已退出登录" });
 });
