@@ -54,7 +54,7 @@ public class AuthUser
     public string Status { get; set; } = "enabled";
 
     /// <summary>最后登录时间</summary>
-    [SugarColumn(ColumnName = "last_login_at")]
+    [SugarColumn(ColumnName = "last_login_at", ColumnDataType = "DATETIME(3)")]
     public DateTime? LastLoginAt { get; set; }
 
     /// <summary>最后登录 IP</summary>
@@ -70,14 +70,14 @@ public class AuthUser
     public int FailedAttempts { get; set; }
 
     /// <summary>锁定截止时间（null 表示未锁定；未到期时禁止登录）</summary>
-    [SugarColumn(ColumnName = "locked_until")]
+    [SugarColumn(ColumnName = "locked_until", ColumnDataType = "DATETIME(3)")]
     public DateTime? LockedUntil { get; set; }
 
     /// <summary>账户创建时间</summary>
-    [SugarColumn(ColumnName = "created_at")]
+    [SugarColumn(ColumnName = "created_at", ColumnDataType = "DATETIME(3)")]
     public DateTime CreatedAt { get; set; }
 
     /// <summary>记录更新时间</summary>
-    [SugarColumn(ColumnName = "updated_at")]
+    [SugarColumn(ColumnName = "updated_at", ColumnDataType = "DATETIME(3)")]
     public DateTime? UpdatedAt { get; set; }
 }
