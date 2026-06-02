@@ -1,24 +1,22 @@
+using System.Collections.Concurrent;
 using System.Net.Http.Json;
-using MaxMind.GeoIP2;
 
 namespace AuthApi.Services;
 
 /// <summary>
 /// IP 地理定位服务
-/// <para>优先查询 MaxMind GeoLite2 离线数据库（<1ms），查不到时 fallback 到 ip-api.com。</para>
-/// <para>数据库文件路径通过配置项 GeoIP:DatabasePath 指定，默认 /app/GeoIP/GeoLite2-City.mmdb。</para>
+/// <para>通过 ip-api.com 免费接口查询，结果缓存 24 小时避免重复请求。</para>
+/// <para>免费限制：45 次/分钟/来源 IP，缓存命中后几乎不消耗配额。</para>
 /// </summary>
-public class IpGeoService : IDisposable
+public class IpGeoService
 {
     private readonly HttpClient _http;
-    private readonly string _dbPath;
-    private DatabaseReader? _reader;
-    private readonly object _lock = new();
+    private static readonly ConcurrentDictionary<string, CacheEntry> _cache = new();
+    private static readonly TimeSpan CacheTtl = TimeSpan.FromHours(24);
 
-    public IpGeoService(HttpClient http, IConfiguration config)
+    public IpGeoService(HttpClient http)
     {
         _http = http;
-        _dbPath = config.GetValue<string>("GeoIP:DatabasePath") ?? "/app/GeoIP/GeoLite2-City.mmdb";
     }
 
     /// <summary>解析 IP 所在城市</summary>
@@ -27,72 +25,34 @@ public class IpGeoService : IDisposable
         if (string.IsNullOrEmpty(ip) || IsPrivateIp(ip))
             return null;
 
-        // 1. 优先离线数据库
-        var local = GetCityFromLocal(ip);
-        if (local != null) return local;
+        // 命中缓存 → 直接返回
+        if (_cache.TryGetValue(ip, out var cached) && cached.ExpiresAt > DateTime.UtcNow)
+            return cached.City;
 
-        // 2. fallback 到在线 API
-        return await GetCityFromApiAsync(ip);
-    }
-
-    private string? GetCityFromLocal(string ip)
-    {
-        try
-        {
-            var reader = GetReader();
-            if (reader == null) return null;
-
-            if (reader.TryCity(ip, out var response))
-            {
-                var parts = new[]
-                {
-                    response?.Country?.Names?.GetValueOrDefault("zh-CN"),
-                    response?.MostSpecificSubdivision?.Names?.GetValueOrDefault("zh-CN"),
-                    response?.City?.Names?.GetValueOrDefault("zh-CN")
-                }.Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
-
-                return parts.Count > 0 ? string.Join("·", parts) : null;
-            }
-        }
-        catch
-        {
-            // 数据库损坏或格式不兼容，走 fallback
-        }
-        return null;
-    }
-
-    private DatabaseReader? GetReader()
-    {
-        if (_reader != null) return _reader;
-
-        lock (_lock)
-        {
-            if (_reader != null) return _reader;
-            if (File.Exists(_dbPath))
-            {
-                _reader = new DatabaseReader(_dbPath);
-                return _reader;
-            }
-        }
-        return null;
-    }
-
-    private async Task<string?> GetCityFromApiAsync(string ip)
-    {
+        // 缓存过期或未命中 → 查在线 API
         try
         {
             var result = await _http.GetFromJsonAsync<IpApiResponse>(
-                $"http://ip-api.com/json/{ip}?fields=country,regionName,city,status");
+                $"http://ip-api.com/json/{ip}?fields=country,regionName,city,status",
+                CancellationToken.None);
 
+            string? city = null;
             if (result?.Status == "success")
             {
                 var parts = new[] { result.Country, result.RegionName, result.City }
                     .Where(x => !string.IsNullOrEmpty(x)).Distinct();
-                return string.Join("·", parts);
+                city = string.Join("·", parts);
             }
+
+            // 写入缓存（查不到也缓存，避免反复请求无效 IP）
+            _cache[ip] = new CacheEntry(city, DateTime.UtcNow.Add(CacheTtl));
+            return city;
         }
-        catch { }
-        return null;
+        catch
+        {
+            // 网络超时，返回 null（不缓存，下次重试）
+            return null;
+        }
     }
 
     private static bool IsPrivateIp(string ip)
@@ -102,7 +62,7 @@ public class IpGeoService : IDisposable
         return false;
     }
 
-    public void Dispose() => _reader?.Dispose();
+    private record CacheEntry(string? City, DateTime ExpiresAt);
 
     private class IpApiResponse
     {
