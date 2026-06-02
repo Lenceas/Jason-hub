@@ -2,6 +2,11 @@
 
 ---
 
+## v1.4.6 (2026-06-02)
+
+- **feat**: Auth 时间字段精度提升至 DATETIME(3)（毫秒级）—— last_login_at / created_at / updated_at / locked_until
+- **fix**: docker-compose.yml 补上 ip2region volume 挂载和环境变量，修复 Auth 500 错误
+
 ## v1.4.5 (2026-06-02)
 
 - **fix**: CI/CD 部署修复 — 加 sudo 解决 docker root 文件权限问题；移除 ip2region 打包（瘦身 11MB，由服务器 cron 维护）
