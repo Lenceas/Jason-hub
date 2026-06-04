@@ -36,7 +36,7 @@ Jason-hub/
 │   ├── nginx.conf
 │   ├── astro.config.mjs
 │   └── package.json
-├── Monitor/                ← Vue 3 + .NET 10 监控面板（planning）
+├── Monitor/                ← Vue 3 + .NET 10 监控面板（development）
 │   ├── PLAN.md             ← 方案设计
 │   ├── CHANGELOG.md        ← 变更日志
 │   └── README.md           ← 技术说明（中英双语）
@@ -130,4 +130,4 @@ MySQL 8.4 / Redis 8 / MongoDB 8 三数据库作为全局基础设施，所有子
 | 子项目 | 技术栈 | 状态 | 说明 |
 |--------|--------|------|------|
 | Portfolio | Astro 6 | active | 个人主页主站 |
-| Monitor | Vue 3 + .NET 10 | planning | 监控面板，方案已定，详见 [Monitor/PLAN.md](./Monitor/PLAN.md) |
+| Monitor | Vue 3 + .NET 10 | development | 监控面板，开发中，详见 [Monitor/PLAN.md](./Monitor/PLAN.md) |

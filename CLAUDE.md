@@ -24,7 +24,7 @@
 Jason-hub/
 ├── Portfolio/         ← 主站（Astro 6 + Vue 3）
 ├── Auth/              ← 鉴权服务（.NET 10 + RS256）
-├── Monitor/           ← 监控面板（Vue 3 + .NET 10，待开发）
+├── Monitor/           ← 监控面板（Vue 3 + .NET 10，开发中）
 ├── templates/         ← 脚手架模板（dotnet-service）
 ├── scripts/           ← 工具脚本（scaffold-dotnet.sh 等）
 ├── .claude/skills/    ← Claude Code 技能命令
@@ -49,12 +49,13 @@ Jason-hub/
   - Token 安全修复 + 退出登录 Open Redirect 防护
 - [完成] Portfolio 用户认证 改为 子项目自行鉴权策略 — Portfolio 纯公开展示，各子项目 SPA 启动时独立检测登录态 ✅
 - [完成] Portfolio 项目卡片更新 — Auth（已上线）替换 Todo App 占位，新增 Monitor 卡片，顶部导航 Skills/Projects ✅
-- [完成] .NET 后端脚手架 ✅ — `/scaffold-dotnet` skill
-- [进行中] Notification 通知服务 / 任务调度 / 消息队列 — 方案待定
-- [进行中] Monitor 子项目 — 方案确定，待开发
+- [完成] .NET 后端脚手架 ✅
+- [进行中] Monitor 子项目 v0.1.0 — 后端骨架 + 前端骨架 + Worker 采集 已开发完成，待发布
+  - 后端：.NET 10 / SqlSugar / Scalar / Minimal API / Background Worker（端口 8051）
   - 前端：Vue 3 + TypeScript / UnoCSS / ECharts / Pinia（端口 8001）
-  - 后端：.NET 10 / SqlSugar / Scalar / Minimal API（端口 8051）
   - 域名：`monitor.lujiesheng.cn` / `api-monitor.lujiesheng.cn`
+- [待办] Notification 通知服务 / 任务调度 / 消息队列 — 方案待定
+- [待办] Monitor Docker SDK 集成 + 数据库深度指标 + CI/CD 流水线
 
 ---
 

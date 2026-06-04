@@ -1,0 +1,31 @@
+/* ======= 继承 Portfolio 全局主题 ======= */
+
+:root {
+  --color-primary: #3B82F6;
+  --color-primary-light: #60A5FA;
+  --color-primary-dark: #2563EB;
+  --color-bg: #FFFFFF;
+  --color-bg-alt: #F8FAFC;
+  --color-bg-card: #FFFFFF;
+  --color-text: #1E293B;
+  --color-text-secondary: #64748B;
+
+  /* 监控专用状态色 */
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+  --color-info: #06B6D4;
+
+  /* 侧边栏 */
+  --sidebar-width: 240px;
+  --sidebar-bg: #0F172A;
+  --sidebar-text: #CBD5E1;
+  --sidebar-active: #3B82F6;
+
+  /* 卡片 */
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --card-radius: 12px;
+
+  /* 字体 */
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
