@@ -144,7 +144,7 @@
 | 阶段 | 项目 | 时间 | 状态 |
 |------|------|------|------|
 | Phase 0 | Portfolio 主站 | 2026-05 | ✅ active |
-| Phase 1 | Monitor 监控面板 | 2026-06 | 🚧 planning |
+| Phase 1 | Monitor 监控面板 | 2026-06 | 🚧 development |
 | Phase 2 | 个人博客 | 待定 | 📋 backlog |
 | Phase 3 | IoT Dashboard | 待定 | 📋 backlog |
 | Phase 4 | 更多子项目 | 待定 | 🔮 待定 |

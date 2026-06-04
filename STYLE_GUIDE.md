@@ -82,10 +82,41 @@ Program.cs                    ← 薄层（只做注册 + 管道）
               └── Models/Entities/* ← 数据实体
 ```
 
-- **Program.cs** 不写业务逻辑
+- **Program.cs** 不写业务逻辑。必须包含：
+  - `UseForwardedHeaders`（Nginx 反代取真实 IP）
+  - 安全响应头中间件（`X-Content-Type-Options` / `X-Frame-Options` / `HSTS` 等）
+  - `UseCors()`
+  - `/api/v1/docs` → 跳转到 Scalar 文档页
 - **Endpoints** 只做参数校验 + 调 Service，不写核心逻辑
 - **Services** 做核心业务，不暴露 HTTP 细节
-- 端点使用链式调用风格：`.WithTags()` `.WithSummary()` `.WithDescription()` `.Produces<T>()`
+- 端点使用链式调用风格，以下方法**全部必填**：
+
+  | 方法 | 说明 | 示例 |
+  |------|------|------|
+  | `.WithTags("模块名")` | Scalar 分组标签 | `.WithTags("认证")` |
+  | `.WithSummary("一句话")` | 端点的简短标题 | `.WithSummary("用户密码登录")` |
+  | `.WithDescription("详细")` | 多行说明，含参数/返回值/边界情况 | 参考 Auth 的 `.WithDescription()` |
+  | `.Produces<T>(200)` | 成功响应类型 | `.Produces<LoginResponse>(StatusCodes.Status200OK)` |
+  | `.Produces(401)` / `.Produces(404)` | 各错误响应（每状态码一行） | `.Produces(StatusCodes.Status401Unauthorized)` |
+
+- 每个端点必须有至少一个 `.Produces<SuccessType>()` + 所有可能错误状态的 `.Produces()`
+- `.WithDescription()` 应包含参数说明、边界情况、示例值，多行用 `\n` 分隔
+
+### Program.cs 入口模板
+
+```csharp
+// ======== 中间件 ========
+app.UseForwardedHeaders(new ForwardedHeadersOptions { ... });
+app.Use(async (context, next) => { /* 安全响应头 */ });
+app.UseCors();
+
+// ======== 端点 ========
+app.MapGet("/api/v1/docs", () => Results.Redirect("/scalar/v1"))
+   .WithTags("文档").WithSummary("跳转到 Scalar API 文档页面");
+app.MapOpenApi();
+app.MapScalarApiReference("scalar/v1", options => { ... });
+app.Map{子项目}Endpoints();
+```
 
 ### 端点命名
 
@@ -101,6 +132,50 @@ Program.cs                    ← 薄层（只做注册 + 管道）
 - `builder.Services.AddOpenApi()` 中添加 DocumentTransformer 设置 Title / Description / Version
 - Version 建议附带运行时版本：`v1.0.0 (.NET 10.0.8)`
 - Scalar 配置统一主题 `ScalarTheme.BluePlanet`
+
+### XML 文档注释规范
+
+所有 .NET 后端代码的 **public 方法**必须加 XML 文档注释，包含以下标签：
+
+| 标签 | 适用场景 | 示例 |
+|------|---------|------|
+| `<summary>` | 方法用途说明（必填） | `/// <summary>获取最新服务器指标</summary>` |
+| `<param name="...">` | 每个入参的说明（必填） | `/// <param name="rangeHours">查询范围（小时），默认24h</param>` |
+| `<returns>` | 返回值说明（必填） | `/// <returns>指标列表（按时间正序）</returns>` |
+| `<example>` | 可选：用法示例 | `/// <example>var m = await svc.GetAsync();</example>` |
+
+**DTO record 规范（每条 DTO 都需遵守）：**
+
+| 要求 | 说明 |
+|------|------|
+| `/// <summary>` | 每条 DTO record 头部必须有 summary 注释 |
+| `[property: Description("字段说明")]` | 每个字段必填，生成 OpenAPI Schema 描述 |
+| `[property: JsonPropertyName("snake_case")]` | 每个字段必填，控制 JSON 序列化字段名 |
+| 格式化 | 每个字段独占一行，属性注解在上方，字段名在下方对齐 |
+
+```csharp
+/// <summary>用户登录请求</summary>
+public record LoginRequest(
+    [property: Description("用户名（至少 5 位）")]
+    [property: JsonPropertyName("username")]
+    string Username,
+
+    [property: Description("密码（明文或 RSA-OAEP 加密）")]
+    [property: JsonPropertyName("password")]
+    string Password,
+    ...
+);
+```
+
+**Entities 属性**：使用 `[SugarColumn(ColumnDescription = "字段说明")]`，CodeFirst 建表时生成 MySQL COMMENT。
+
+**`<param>` vs `[property: Description]` 的区别：**
+- 方法入参 → XML `<param>`
+- record 构造参数 → `[property: Description]`（只有它才生成 OpenAPI Schema）
+- HTTP 端点方法 + 端点类扩展方法 → XML `<param>`
+- Service 方法 → XML `<param>` + `<returns>`
+
+> 脚手架模板 `templates/dotnet-service/` 已内置注释样板，`/scaffold-dotnet` 生成后按此规范补齐即可。
 
 > 创建新的 .NET 后端子项目请使用 `/scaffold-dotnet` 技能，基于 `templates/dotnet-service/` 模板一键生成。
 > 生成结构：`api/Program.cs` + `Endpoints/` + `Models/` + `Services/` + `Shared/`

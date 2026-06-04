@@ -23,7 +23,7 @@ Jason-hub 统一监控平台 · 子域名 `monitor.lujiesheng.cn`
 
 ```
 Monitor/
-├── web/          ← Vue 3 前端（规划中）
+├── web/          ← Vue 3 前端（开发中）
 │   ├── src/
 │   │   ├── views/       ← 7 个页面
 │   │   ├── components/  ← 6 个通用组件
@@ -33,13 +33,14 @@ Monitor/
 │   ├── Dockerfile
 │   ├── nginx.conf
 │   └── package.json
-├── api/          ← .NET 10 后端（规划中）
-│   ├── Controllers/
-│   ├── Services/
-│   ├── Models/
-│   ├── Data/
-│   └── Worker/         ← 后台采集服务
-├── PLAN.md       ← 方案设计文档（动工前经确认）
+├── api/          ← .NET 10 后端（开发中）
+│   ├── Endpoints/       ← API 端点
+│   ├── Services/        ← 业务服务
+│   ├── Models/          ← DTO + 实体
+│   ├── Worker/          ← 后台采集服务
+│   └── Dockerfile
+├── Shared/       ← 共享库
+├── PLAN.md       ← 方案设计文档
 ├── CHANGELOG.md  ← 版本变更日志
 └── README.md     ← 技术说明（本文件）
 ```
@@ -47,15 +48,15 @@ Monitor/
 ### 开发命令
 
 ```bash
-# 前端
+# 前端 → 详见 [web/README.md](./web/README.md)
 cd Monitor/web
 npm install
-npm run dev          # 开发服务器 → http://localhost:8001
+npm run dev          # http://localhost:8001
 
-# 后端
+# 后端 → 详见 [api/README.md](./api/README.md)
 cd Monitor/api
 dotnet restore
-dotnet run           # → http://localhost:8051
+dotnet run           # http://localhost:8051
 ```
 
 ### 相关文档

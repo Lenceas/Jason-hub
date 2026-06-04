@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using __ProjectName__Api.Endpoints;
 using __ProjectName__Api.Services;
 using Scalar.AspNetCore;
@@ -41,9 +42,31 @@ var app = builder.Build();
 
 // ======== 中间件 ========
 
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
+// 安全响应头
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.Append("X-Frame-Options", "DENY");
+    context.Response.Headers.Append("X-XSS-Protection", "0");
+    context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
+    context.Response.Headers.Append("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+    if (!app.Environment.IsDevelopment())
+        context.Response.Headers.Append("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+    await next(context);
+});
+
 app.UseCors();
 
 // ======== 端点 ========
+
+app.MapGet("/api/v1/docs", () => Results.Redirect("/scalar/v1"))
+   .WithTags("文档")
+   .WithSummary("跳转到 Scalar API 文档页面");
 
 app.MapOpenApi();
 app.MapScalarApiReference("scalar/v1", options =>
