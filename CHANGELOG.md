@@ -2,6 +2,16 @@
 
 ---
 
+## v1.6.0 (2026-06-04)
+
+- **feat**: Monitor 监控面板子项目 v0.1.0 — 后端骨架（SqlSugar + 21 API 端点 + Worker 采集）+ 前端骨架（Vue 3 + 7 页面 + 6 组件） + 模板规范同步更新
+- **feat**: Auth README 重构为中英双语格式，本地开发端口统一为 8100
+- **feat**: STYLE_GUIDE.md 新增 README 语言规范 + 本地端口统一规则 + .NET 注释规范 + 端点 Produces 规范
+- **feat**: .NET 后端模板（scaffold-dotnet）— 新增安全响应头、ForwardedHeaders、Produces、注释样板
+- **fix**: ServerMetricsCollector scoped → singleton（CPU delta 跨周期正确累积）
+- **fix**: HealthCheckCollector Auth 端口 8100 → 8080（Docker 容器内端口）
+- **docs**: AGENTS.md / PLAN.md / README.md Monitor 状态 planning → development
+
 ## v1.5.0 (2026-06-02)
 
 - **feat**: Portfolio 项目卡片全面更新 — Auth 鉴权服务（已上线）替换占位 Todo App、新增 Monitor 监控面板

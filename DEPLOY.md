@@ -313,7 +313,7 @@ services:
       mysql: { condition: service_healthy }
     restart: unless-stopped
 
-  # ---- Monitor 监控面板（待开发，当前 docker-compose.yml 中注释状态） ----
+  # ---- Monitor 监控面板（开发中） ----
   monitor-web:
     build: ./Monitor/web
     ports: ["127.0.0.1:8001:80"]
