@@ -1,15 +1,21 @@
 # Auth 鉴权服务
 
+> [中文](#zh) · [English](#en)
+
+---
+
+<h2 id="zh">中文</h2>
+
 Jason-hub 统一鉴权中心 — JWT + RS256 非对称签名。
 
-## 在线地址
+### 在线地址
 
 | 类型 | 地址 |
 |------|------|
 | 登录页 | `api-auth.lujiesheng.cn/login` |
 | API 文档 | `api-auth.lujiesheng.cn/scalar/v1` |
 
-## 技术栈
+### 技术栈
 
 | 模块 | 技术 |
 |------|------|
@@ -21,7 +27,7 @@ Jason-hub 统一鉴权中心 — JWT + RS256 非对称签名。
 | 数据库 | MySQL 8.4（`jason_auth`） |
 | API 文档 | Scalar · BluePlanet 主题 |
 
-## 项目结构
+### 项目结构
 
 ```
 Auth/
@@ -47,7 +53,7 @@ Auth/
     └── JwtValidator.cs              ← RS256 验证器
 ```
 
-## 开发
+### 开发
 
 ```bash
 # 启动（需本地 MySQL 隧道）
@@ -55,12 +61,12 @@ cd Auth/api
 ASPNETCORE_ENVIRONMENT=Development dotnet run
 
 # 本地访问
-http://localhost:5100/healthz     # 健康检查
-http://localhost:5100/login        # 登录页
-http://localhost:5100/scalar/v1    # API 文档
+http://localhost:8100/healthz     # 健康检查
+http://localhost:8100/login        # 登录页
+http://localhost:8100/scalar/v1    # API 文档
 ```
 
-## API 端点
+### API 端点
 
 | 路径 | 方法 | 说明 | 认证 |
 |------|------|------|------|
@@ -75,7 +81,7 @@ http://localhost:5100/scalar/v1    # API 文档
 | `GET /api/v1/auth/public-key` | GET | RSA 公钥 | 公开 |
 | `GET /api/v1/docs` | GET | 跳转到 Scalar 文档 | JWT |
 
-## 共享库
+### 共享库
 
 `Auth/Shared/` 提供给各子项目 API 引用，实现本地 JWT 验证：
 
@@ -88,12 +94,108 @@ app.MapGet("/api/v1/alerts", () => { ... })
    .RequireScope("alerts:read");
 ```
 
-## 部署
+### 部署
 
 ```bash
 docker compose up -d auth
 ```
 
-端口：8100（容器内 8080）  
-域名：`api-auth.lujiesheng.cn`  
+端口：8100（容器内 8080）
+域名：`api-auth.lujiesheng.cn`
 数据库：`jason_auth`（MySQL 8.4）
+
+---
+
+<h2 id="en">English</h2>
+
+Jason-hub unified authentication center — JWT with RS256 asymmetric signing.
+
+### Live URLs
+
+| Type | URL |
+|------|-----|
+| Login Page | `api-auth.lujiesheng.cn/login` |
+| API Docs | `api-auth.lujiesheng.cn/scalar/v1` |
+
+### Tech Stack
+
+| Module | Technology |
+|--------|-----------|
+| Framework | .NET 10 + Minimal API |
+| ORM | SqlSugar + CodeFirst |
+| Auth | JWT RS256 (asymmetric) |
+| Password | BCrypt |
+| IP Geolocation | ip2region (offline, Chinese) |
+| Database | MySQL 8.4 (`jason_auth`) |
+| API Docs | Scalar · BluePlanet theme |
+
+### Project Structure
+
+```
+Auth/
+├── api/
+│   ├── Program.cs                   ← Entry point
+│   ├── AuthApi.csproj
+│   ├── Endpoints/
+│   │   └── AuthEndpoints.cs         ← All API endpoints
+│   ├── Models/
+│   │   ├── AuthModels.cs            ← Request/Response DTOs
+│   │   └── Entities/
+│   │       ├── AuthUser.cs
+│   │       ├── AuthRefreshToken.cs
+│   │       └── AuthClient.cs
+│   ├── Pages/
+│   │   └── LoginPage.cs             ← Login page HTML
+│   └── Services/
+│       ├── AuthService.cs           ← Business logic
+│       ├── JwtService.cs            ← JWT issuance
+│       └── Ip2RegionService.cs      ← IP geolocation
+└── Shared/
+    ├── AuthHandler.cs               ← JWT middleware
+    └── JwtValidator.cs              ← RS256 validator
+```
+
+### Development
+
+```bash
+cd Auth/api
+ASPNETCORE_ENVIRONMENT=Development dotnet run
+
+# Local access
+http://localhost:8100/healthz
+http://localhost:8100/login
+http://localhost:8100/scalar/v1
+```
+
+### API Endpoints
+
+| Path | Method | Description | Auth |
+|------|--------|-------------|------|
+| `GET /login` | GET | Unified login page | Public |
+| `GET /logout` | GET | Logout, clear cookie | Public |
+| `GET /healthz` | GET | Public health check | Public |
+| `GET /api/v1/auth/health` | GET | Deep health check (+DB) | JWT |
+| `POST /api/v1/auth/login` | POST | Password login | Public |
+| `POST /api/v1/auth/token` | POST | Service-to-service auth | ClientId/Secret |
+| `POST /api/v1/auth/refresh` | POST | Refresh AccessToken | RefreshToken |
+| `GET /api/v1/auth/me` | GET | Current user info | JWT |
+| `GET /api/v1/auth/public-key` | GET | RSA public key | Public |
+| `GET /api/v1/docs` | GET | Redirect to Scalar docs | JWT |
+
+### Shared Library
+
+`Auth/Shared/` provides JWT validation for other sub-projects:
+
+```bash
+dotnet add reference ../Shared/AuthShared.csproj
+```
+
+### Deployment
+
+```bash
+docker compose up -d auth
+```
+
+Port: 8100 (container internal 8080)
+Domain: `api-auth.lujiesheng.cn`
+Database: `jason_auth` (MySQL 8.4)

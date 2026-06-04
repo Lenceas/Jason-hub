@@ -16,6 +16,14 @@
 > 根目录和每个子项目各自包含标准 MD 文档体系：
 > - **根目录**：`PLAN.md`（总体规划）+ `CHANGELOG.md`（变更日志）+ `README.md`（项目总览）
 > - **子项目**：`PLAN.md`（方案设计）+ `CHANGELOG.md`（变更日志）+ `README.md`（技术说明）
+>
+> **README 语言规范：**
+> | 层级 | 语言 | 示例 |
+> |------|------|------|
+> | 根目录 README.md | **中英双语** | 当前已是双语 |
+> | 子项目根 README.md | **中英双语** | `Auth/README.md`、`Monitor/README.md` |
+> | 子项目内部 README.md | **中文** | `Monitor/web/README.md`、`Auth/api/README.md`（如存在） |
+> | 其他文档（CHANGELOG / PLAN） | **中文** | 全文中文即可 |
 
 ## CSS 规范
 
@@ -212,3 +220,9 @@ feat: 添加 ProjectCard 组件
 ## 端口规则
 
 详见 [AGENTS.md](./AGENTS.md) 端口分配表。
+
+**本地开发端口应与部署端口保持一致**，一个项目一个端口号，避免混淆：
+- `launchSettings.json`（后端）的 `applicationUrl` → 设为分配端口
+- `vite.config.ts`（前端）的 `server.port` → 设为分配端口
+
+示例：Auth 部署端口 8100，`launchSettings.json` 也是 8100。
