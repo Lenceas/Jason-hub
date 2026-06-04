@@ -2,7 +2,11 @@
 
 ---
 
-## v0.5.0 (2026-06-02)
+## v0.5.1 (2026-06-04)
+
+- **docs**: Auth README 重构为中英双语格式
+- **docs**: STYLE_GUIDE.md 新增 README 语言规范 + 本地端口统一规则
+- **fix**: launchSettings.json 端口 5098 → 8100（与部署端口保持一致）
 
 - **feat**: 用户表全面扩展 — 新增 nickname / email / phone / avatar_url / bio / status / last_login_at / last_login_ip / last_login_city / updated_at
 - **feat**: IP 城市解析 — 登录时自动记录用户所在城市（ip2region 离线库，微秒级查询，国产开源）
