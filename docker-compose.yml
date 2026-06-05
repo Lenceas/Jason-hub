@@ -75,13 +75,17 @@ services:
     restart: unless-stopped
 
   monitor-web:
-    build: ./Monitor/web
+    build:
+      context: .
+      dockerfile: Monitor/web/Dockerfile
     ports:
       - "127.0.0.1:8001:80"
     restart: unless-stopped
 
   monitor-api:
-    build: ./Monitor/api
+    build:
+      context: .
+      dockerfile: Monitor/api/Dockerfile
     ports:
       - "127.0.0.1:8051:8051"
     volumes:
