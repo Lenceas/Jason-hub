@@ -11,9 +11,10 @@ const props = defineProps<{
 
 const chartRef: Ref<HTMLDivElement | null> = ref(null)
 let instance: echarts.ECharts | null = null
+let isDisposed = false
 
 function render() {
-  if (!chartRef.value) return
+  if (!chartRef.value || isDisposed) return
   instance ??= echarts.init(chartRef.value)
   const pct = props.value ?? 0
   const max = props.max ?? 100
@@ -51,7 +52,9 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  isDisposed = true
   instance?.dispose()
+  instance = null
 })
 </script>
 

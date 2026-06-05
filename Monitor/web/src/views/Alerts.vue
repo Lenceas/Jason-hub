@@ -47,8 +47,8 @@ onMounted(() => { store.loadAlertRules(); store.loadAlertEvents() })
 </template>
 
 <style scoped>
-.grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
-.card { background: white; border: 1px solid #E2E8F0; border-radius: var(--card-radius); padding: 20px; box-shadow: var(--card-shadow); }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.card { background: white; border: 1px solid #E2E8F0; border-radius: var(--card-radius); padding: 16px; box-shadow: var(--card-shadow); overflow: hidden; }
 .card-title { font-size: 15px; font-weight: 600; margin-bottom: 16px; }
 .rules-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .rules-table th { text-align: left; padding: 10px 12px; color: var(--color-text-secondary); font-weight: 600; border-bottom: 2px solid #E2E8F0; }
@@ -56,4 +56,16 @@ onMounted(() => { store.loadAlertRules(); store.loadAlertEvents() })
 .rules-table code { font-family: var(--font-mono); font-size: 12px; background: #F1F5F9; padding: 2px 6px; border-radius: 4px; }
 .cell-name { font-weight: 600; }
 .empty-text { padding: 32px; text-align: center; color: var(--color-text-secondary); }
+
+@media (max-width: 768px) {
+  .grid-3 { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+}
+
+@media (max-width: 480px) {
+  .grid-3 { grid-template-columns: 1fr; gap: 8px; }
+  .rules-table th:nth-child(2),
+  .rules-table td:nth-child(2),
+  .rules-table th:nth-child(4),
+  .rules-table td:nth-child(4) { display: none; }
+}
 </style>

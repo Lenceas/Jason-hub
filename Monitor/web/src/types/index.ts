@@ -4,6 +4,8 @@ export interface ServerMetrics {
   mem_used: number | null
   mem_total: number | null
   disk_pct: number | null
+  disk_used: number | null
+  disk_total: number | null
   net_in: number | null
   net_out: number | null
   load_1m: number | null

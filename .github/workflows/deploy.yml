@@ -25,10 +25,10 @@ jobs:
           sudo apt-get install -qq -y sshpass
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -o StrictHostKeyChecking=no deploy.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/tmp/deploy.tar.gz
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
-            sudo rm -rf /opt/lujiesheng/Portfolio /opt/lujiesheng/Auth
+            sudo rm -rf /opt/lujiesheng/Portfolio /opt/lujiesheng/Auth /opt/lujiesheng/Monitor
             sudo tar xzf /tmp/deploy.tar.gz -C /opt/lujiesheng
             sudo rm /tmp/deploy.tar.gz
             cd /opt/lujiesheng
-            docker compose up --build -d portfolio auth
+            docker compose up --build -d portfolio auth monitor-web monitor-api
             docker image prune -f
           '

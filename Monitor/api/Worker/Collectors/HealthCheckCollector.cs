@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using MonitorApi.Models.Entities;
 using MonitorApi.Services;
 
@@ -11,13 +12,23 @@ public class HealthCheckCollector
     private readonly HttpClient _httpClient;
 
     // 被监控的服务列表（Docker Compose 网络内使用容器端口）
-    private static readonly List<(string name, string url)> Services =
+    private static readonly List<(string name, string url)> LinuxServices =
     [
-        ("auth",      "http://auth:8080/healthz"),
+        ("auth",      "http://auth:8100/healthz"),
         ("monitor",   "http://localhost:8051/healthz")
-        // TODO: notification 上线后追加（容器内端口 8080）
-        // ("notification", "http://notification:8080/healthz"),
+        // TODO: notification 上线后追加
+        // ("notification", "http://notification:8110/healthz"),
     ];
+
+    // Windows 本地开发 — 只检查本地可达的服务
+    private static readonly List<(string name, string url)> WindowsServices =
+    [
+        ("monitor",   "http://localhost:8051/healthz")
+    ];
+
+    private List<(string name, string url)> Services => RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+        ? WindowsServices
+        : LinuxServices;
 
     public HealthCheckCollector(ILogger<HealthCheckCollector> logger, IHttpClientFactory httpClientFactory)
     {

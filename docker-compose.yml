@@ -62,7 +62,7 @@ services:
       context: .
       dockerfile: Auth/api/Dockerfile
     ports:
-      - "127.0.0.1:8100:8080"
+      - "127.0.0.1:8100:8100"
     volumes:
       - auth-keys:/app/keys
       - ./ip2region:/app/ip2region
@@ -74,25 +74,25 @@ services:
       mysql: { condition: service_healthy }
     restart: unless-stopped
 
-  # monitor-web:       ← 后续
-  #   build: ./Monitor/web
-  #   ports:
-  #     - "127.0.0.1:8001:80"
-  #   restart: unless-stopped
-  #
-  # monitor-api:
-  #   build: ./Monitor/api
-  #   ports:
-  #     - "127.0.0.1:8051:8080"
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock    # Agent 采集需要
-  #   environment:
-  #     - ConnectionStrings__Default=${MONITOR_DB_CONNECTION}
-  #     - Redis__ConnectionString=${MONITOR_REDIS_CONNECTION}
-  #   depends_on:
-  #     mysql:    { condition: service_healthy }
-  #     redis:    { condition: service_healthy }
-  #   restart: unless-stopped
+  monitor-web:
+    build: ./Monitor/web
+    ports:
+      - "127.0.0.1:8001:80"
+    restart: unless-stopped
+
+  monitor-api:
+    build: ./Monitor/api
+    ports:
+      - "127.0.0.1:8051:8051"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock    # Agent 采集需要
+    environment:
+      - ConnectionStrings__Default=${MONITOR_DB_CONNECTION}
+      - ConnectionStrings__Redis=${MONITOR_REDIS_CONNECTION}
+    depends_on:
+      mysql:    { condition: service_healthy }
+      redis:    { condition: service_healthy }
+    restart: unless-stopped
 
 volumes:
   mysql-data:

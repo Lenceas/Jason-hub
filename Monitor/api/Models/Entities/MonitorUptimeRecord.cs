@@ -4,6 +4,7 @@ namespace MonitorApi.Models.Entities;
 
 /// <summary>站点检查记录表</summary>
 [SugarTable("uptime_records")]
+[SugarIndex("idx_site_checked", nameof(SiteId), OrderByType.Asc, nameof(CheckedAt), OrderByType.Desc)]
 public class MonitorUptimeRecord
 {
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true, ColumnDescription = "记录ID")]
@@ -12,10 +13,10 @@ public class MonitorUptimeRecord
     [SugarColumn(ColumnDescription = "站点ID（关联sites）")]
     public int SiteId { get; set; }
 
-    [SugarColumn(ColumnDescription = "HTTP状态码")]
+    [SugarColumn(IsNullable = true, ColumnDescription = "HTTP状态码")]
     public int? StatusCode { get; set; }
 
-    [SugarColumn(ColumnDescription = "响应时间（毫秒）")]
+    [SugarColumn(IsNullable = true, ColumnDescription = "响应时间（毫秒）")]
     public int? ResponseMs { get; set; }
 
     [SugarColumn(ColumnDescription = "检查时间")]

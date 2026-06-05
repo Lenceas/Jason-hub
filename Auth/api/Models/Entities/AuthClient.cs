@@ -8,6 +8,7 @@ namespace AuthApi.Models.Entities;
 /// <para>用于 OAuth2 Client Credentials 模式，签发服务 Token（1 小时有效期）。</para>
 /// </summary>
 [SugarTable("auth_clients")]
+[SugarIndex("idx_client_id", nameof(ClientId), OrderByType.Asc)]
 public class AuthClient
 {
     /// <summary>记录 ID（自增主键）</summary>

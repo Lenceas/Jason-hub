@@ -100,7 +100,7 @@ app.MapGet("/api/v1/alerts", () => { ... })
 docker compose up -d auth
 ```
 
-端口：8100（容器内 8080）
+端口：8100
 域名：`api-auth.lujiesheng.cn`
 数据库：`jason_auth`（MySQL 8.4）
 
@@ -196,6 +196,6 @@ dotnet add reference ../Shared/AuthShared.csproj
 docker compose up -d auth
 ```
 
-Port: 8100 (container internal 8080)
+Port: 8100
 Domain: `api-auth.lujiesheng.cn`
 Database: `jason_auth` (MySQL 8.4)

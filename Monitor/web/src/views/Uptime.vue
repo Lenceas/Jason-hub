@@ -47,13 +47,27 @@ function latestOk(_siteId: number): boolean | null {
 </template>
 
 <style scoped>
-.grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
-.card { background: white; border: 1px solid #E2E8F0; border-radius: var(--card-radius); padding: 20px; box-shadow: var(--card-shadow); }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.card { background: white; border: 1px solid #E2E8F0; border-radius: var(--card-radius); padding: 16px; box-shadow: var(--card-shadow); overflow: hidden; }
 .card-title { font-size: 15px; font-weight: 600; margin-bottom: 16px; }
 .uptime-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .uptime-table th { text-align: left; padding: 10px 12px; color: var(--color-text-secondary); font-weight: 600; border-bottom: 2px solid #E2E8F0; }
 .uptime-table td { padding: 10px 12px; border-bottom: 1px solid #F1F5F9; }
 .cell-name { font-weight: 600; }
-.cell-url { font-family: var(--font-mono); font-size: 12px; color: var(--color-primary); max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cell-url { font-family: var(--font-mono); font-size: 12px; color: var(--color-primary); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .empty-text { padding: 32px; text-align: center; color: var(--color-text-secondary); }
+
+@media (max-width: 768px) {
+  .grid-3 { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .uptime-table th:nth-child(2),
+  .uptime-table td:nth-child(2) { display: none; }
+}
+
+@media (max-width: 480px) {
+  .grid-3 { grid-template-columns: 1fr; gap: 8px; }
+  .uptime-table th:nth-child(3),
+  .uptime-table td:nth-child(3),
+  .uptime-table th:nth-child(5),
+  .uptime-table td:nth-child(5) { display: none; }
+}
 </style>

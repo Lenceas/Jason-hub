@@ -7,6 +7,13 @@ import GaugeChart from '../components/GaugeChart.vue'
 
 const store = useMonitorStore()
 onMounted(() => store.refreshAll())
+
+function thresholdColor(v: number | null | undefined, warn = 60, danger = 80): string {
+  if (v == null) return 'var(--color-primary)'
+  if (v >= danger) return 'var(--color-danger)'
+  if (v >= warn) return 'var(--color-warning)'
+  return 'var(--color-success)'
+}
 </script>
 
 <template>
@@ -16,21 +23,21 @@ onMounted(() => store.refreshAll())
         label="CPU"
         :value="store.metrics?.cpu_pct"
         unit="%"
-        :color="(store.metrics?.cpu_pct ?? 0) > 80 ? 'var(--color-danger)' : 'var(--color-primary)'"
+        :color="thresholdColor(store.metrics?.cpu_pct, 60, 80)"
         icon="🔲"
       />
       <MetricsCard
         label="内存"
         :value="store.metrics?.mem_pct"
         unit="%"
-        :color="(store.metrics?.mem_pct ?? 0) > 80 ? 'var(--color-danger)' : 'var(--color-success)'"
+        :color="thresholdColor(store.metrics?.mem_pct, 60, 80)"
         icon="🧠"
       />
       <MetricsCard
         label="磁盘"
         :value="store.metrics?.disk_pct"
         unit="%"
-        :color="(store.metrics?.disk_pct ?? 0) > 85 ? 'var(--color-danger)' : 'var(--color-warning)'"
+        :color="thresholdColor(store.metrics?.disk_pct, 70, 85)"
         icon="💾"
       />
       <MetricsCard
@@ -67,11 +74,11 @@ onMounted(() => store.refreshAll())
 </template>
 
 <style scoped>
-.grid-4 { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .card {
   background: white; border: 1px solid #E2E8F0; border-radius: var(--card-radius);
-  padding: 20px; box-shadow: var(--card-shadow);
+  padding: 16px; box-shadow: var(--card-shadow); overflow: hidden; min-width: 0;
 }
 .card-title { font-size: 15px; font-weight: 600; margin-bottom: 16px; }
 .gauges-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
@@ -80,4 +87,15 @@ onMounted(() => store.refreshAll())
 .service-name { flex: 1; font-weight: 600; font-size: 14px; }
 .service-latency { font-family: var(--font-mono); font-size: 12px; color: var(--color-text-secondary); }
 .empty-text { color: var(--color-text-secondary); padding: 24px; text-align: center; }
+
+@media (max-width: 768px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .gauges-row { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 480px) {
+  .grid-4 { grid-template-columns: 1fr; gap: 8px; }
+  .gauges-row { grid-template-columns: 1fr; }
+}
 </style>

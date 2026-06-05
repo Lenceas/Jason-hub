@@ -302,7 +302,7 @@ services:
   # ---- Auth 鉴权服务（基础设施） ----
   auth:
     build: ./Auth/api
-    ports: ["127.0.0.1:8100:8080"]
+    ports: ["127.0.0.1:8100:8100"]
     volumes:
       - auth-keys:/app/keys
       - ./ip2region:/app/ip2region
@@ -321,7 +321,7 @@ services:
 
   monitor-api:
     build: ./Monitor/api
-    ports: ["127.0.0.1:8051:8080"]
+    ports: ["127.0.0.1:8051:8051"]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock    # Agent 采集 Docker 容器状态需要
     environment:

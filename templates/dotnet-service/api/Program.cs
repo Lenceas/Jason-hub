@@ -5,6 +5,12 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ======== JSON 序列化：UTC → 北京时间 ========
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new DateTimeBjtConverter());
+});
+
 // ======== 服务注册 ========
 
 // OpenAPI / Scalar
@@ -60,6 +66,7 @@ app.Use(async (context, next) =>
     await next(context);
 });
 
+app.UseStaticFiles();            // 提供 wwwroot/ 静态资源（Scalar favicon 等）
 app.UseCors();
 
 // ======== 端点 ========

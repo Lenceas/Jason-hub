@@ -10,6 +10,12 @@ using SqlSugar;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ======== JSON 序列化：UTC → 北京时间 ========
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new DateTimeBjtConverter());
+});
+
 // ======== 服务注册 ========
 
 // OpenAPI / Scalar
@@ -32,11 +38,12 @@ builder.Services.AddOpenApi(options =>
 });
 
 // SqlSugar
-builder.Services.AddSingleton<ISqlSugarClient>(sp =>
+builder.Services.AddScoped<ISqlSugarClient>(sp =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
-    var connStr = config.GetConnectionString("Default")
-        ?? Environment.GetEnvironmentVariable("AUTH_DB_CONNECTION")
+    var connStr = (string.IsNullOrEmpty(config.GetConnectionString("Default"))
+        ? Environment.GetEnvironmentVariable("AUTH_DB_CONNECTION")
+        : config.GetConnectionString("Default"))
         ?? throw new InvalidOperationException("缺少数据库连接配置：请设置 AUTH_DB_CONNECTION 环境变量或 ConnectionStrings:Default");
     return new SqlSugarClient(new ConnectionConfig
     {
@@ -146,19 +153,28 @@ app.MapScalarApiReference("scalar/v1", options =>
 app.MapAuthEndpoints();
 
 // ======== CodeFirst — 自动建表/加列 ========
-try
+// 仅处理新表和新增列，不处理索引（见下方 IndexMigration）
+using (var scope = app.Services.CreateScope())
 {
-    var db = app.Services.GetRequiredService<ISqlSugarClient>();
+    var db = scope.ServiceProvider.GetRequiredService<ISqlSugarClient>();
     db.CodeFirst.InitTables(
         typeof(AuthUser),
         typeof(AuthRefreshToken),
         typeof(AuthClient)
     );
-}
-catch (Exception ex)
-{
-    var logger = app.Services.GetRequiredService<ILogger<Program>>();
-    logger.LogWarning(ex, "CodeFirst 初始化跳过（开发环境或无数据库连接）");
+
+    // ======== 索引迁移 — 补建缺失索引（不丢数据）= ========
+    var indexes = new (string table, string name, string cols)[]
+    {
+        ("auth_refresh_tokens", "idx_token_hash",          "token_hash"),
+        ("auth_refresh_tokens", "idx_user_revoked_expires", "user_id, revoked, expires_at"),
+        ("auth_clients",        "idx_client_id",            "client_id"),
+    };
+    foreach (var (table, name, cols) in indexes)
+    {
+        try { db.Ado.ExecuteCommand($"CREATE INDEX IF NOT EXISTS {name} ON {table} ({cols})"); }
+        catch { /* 已存在则跳过 */ }
+    }
 }
 
 app.Run();

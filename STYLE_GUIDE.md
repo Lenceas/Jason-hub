@@ -28,11 +28,77 @@
 ## CSS 规范
 
 - 使用 **CSS 自定义属性**管理主题色，变量定义在 `global.css` 的 `:root` 中
-- 采用 **Mobile First** 响应式：默认写手机样式，`@media (min-width: ...)` 向上适配
-- 标准断点：
-  - `≥ 640px` — 平板
+- 采用 **Mobile First** 响应式：默认写手机样式，`@media (min-width: ...)` 向上适配（Portfolio 主站）
+- 标准断点（子项目前端通用）：
+  - `< 480px` — 小屏手机（单列卡片）
+  - `≥ 480px` — 手机（≤2 列卡片）
+  - `≥ 768px` — 平板
   - `≥ 1024px` — 桌面
 - 避免 `!important`
+
+### 子项目前端响应式（Vue 3 必需）
+
+> 所有 Vue 3 子项目前端必须支持三端响应式，不可仅适配桌面。
+
+| 要求 | 说明 |
+|------|------|
+| **侧边栏** | 手机端隐藏，通过汉堡菜单按钮滑入，平板端可收窄 |
+| **卡片网格** | 手机端 ≤2 列，平板/桌面 auto-fill |
+| **图表容器** | 手机端单列，平板及以上双列 |
+| **数据表格** | 容器加 `overflow-x: auto`，手机端字号缩小，不换列表头 |
+| **间距** | 手机端 `gap: 8px` / `padding: 12px`，桌面端 `12-16px` |
+| **viewport** | `index.html` 必须含 `<meta name="viewport" content="width=device-width, initial-scale=1.0">` |
+| **CSS 变量** | 响应式断点用 CSS 变量控制，如 `--sidebar-width` 在 `@media` 中调整 |
+
+> 示例见 `Monitor/web/src/layouts/DashboardLayout.vue`（汉堡菜单 + overlay + CSS 变量断点）。
+
+### 时序图表（ECharts 强制）
+
+> 所有时序趋势图表必须使用 `xAxis: { type: 'time' }` 而非 `type: 'category'`。
+
+| 规则 | 说明 |
+|------|------|
+| **xAxis 类型** | 必须 `type: 'time'`，传入 `min/max` 时间戳实现滑动窗口 |
+| **数据格式** | `series.data` 为 `[timestamp, value][]` 二元组，不是字符串标签 |
+| **滑动窗口** | 通过 `xMin`/`xMax` 响应式变量控制，每 N 秒推进一次 |
+| **后端聚合** | 数据量大（>200 点）时后端做时间桶平均，前端直接渲染 |
+| **动画** | `animation: false`，靠时间轴平移实现平滑滚动，避免抽搐 |
+| **多图表对齐** | 所有图表共用同一个 `xMin/xMax`，横轴天然对齐 |
+
+```ts
+// ✅ time axis
+xAxis: { type: 'time', min: props.xMin, max: props.xMax }
+series: [{ data: [[1760000000, 45], [1760000060, 52]] }]
+
+// ❌ category axis（时序数据不要用）
+xAxis: { type: 'category', data: ['13:00', '13:05'] }
+series: [{ data: [45, 52] }]
+```
+
+> 示例见 `Monitor/web/src/components/LineChart.vue`
+
+### 前端代码质量（强制）
+
+> 所有 Vue 3 子项目必须配置 ESLint + TypeScript 检查，`build` 前自动执行。
+
+| 规则 | 说明 |
+|------|------|
+| **ESLint** | 必须配 `eslint.config.mjs`，基础规则 = `@eslint/js` + `typescript-eslint` + `vue-eslint-plugin` |
+| **TypeScript** | 必须 `vue-tsc --noEmit`，零类型错误 |
+| **build 脚本** | `"build": "npm run lint && npm run typecheck && vite build"`，任一失败即中止 |
+| **清理命令** | 必须提供 `lint` / `lint:fix` / `typecheck` 三个脚本 |
+
+```json
+// package.json
+{
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "vue-tsc --noEmit",
+    "build": "npm run lint && npm run typecheck && vite build"
+  }
+}
+```
 - 颜色值统一引用 CSS 变量，不写死
 - 部分组件（Skills、Values）使用**内联样式**，因 Astro 的 scoped CSS 在动态渲染中存在兼容问题
 
@@ -44,6 +110,50 @@
 - 部分组件使用内联样式 + `is:global` 处理响应式（避免 scoped CSS 不生效的问题）
 
 ## .NET 后端规范
+
+### 数据库索引（强制）
+> 所有涉及 `WHERE` / `ORDER BY` / `JOIN` 查询的字段必须建索引。两步走：实体类加 `[SugarIndex]` 标记 + Program.cs 加迁移脚本。
+
+| 规则 | 说明 |
+|------|------|
+| 查询字段必建 | 但凡出现在 `Where()`、`OrderBy()`、`Join()` 中的属性，必须建索引 |
+| 复合索引 | 经常一起查询的多字段用联合索引，字段顺序 = 查询频率降序 |
+| 声明位置 | 实体类级别 `[SugarIndex]` 用于文档 + 脚手架生成，实际由 IndexMigration 创建 |
+| 迁移脚本 | Program.cs CodeFirst 之后用 `CREATE INDEX IF NOT EXISTS` 补齐，不丢历史数据 |
+
+```csharp
+// 实体：声明索引意图
+[SugarTable("uptime_records")]
+[SugarIndex("idx_site_checked", nameof(SiteId), OrderByType.Asc, nameof(CheckedAt), OrderByType.Desc)]
+public class MonitorUptimeRecord { ... }
+
+// Program.cs「索引迁移」段（CodeFirst 之后执行）
+// SqlSugar CodeFirst 不会补建已有表的索引，需手动迁移
+var indexes = new (string table, string name, string cols)[]
+{
+    ("server_metrics", "idx_ts", "Ts"),
+    ("uptime_records", "idx_site_checked", "SiteId, CheckedAt"),
+};
+foreach (var (table, name, cols) in indexes)
+{
+    try { db.Ado.ExecuteCommand($"CREATE INDEX IF NOT EXISTS {name} ON {table} ({cols})"); }
+    catch { /* 已存在则跳过 */ }
+}
+```
+
+> 新增查询逻辑 → 同步加 `[SugarIndex]` + 索引迁移条目。生产环境 `IF NOT EXISTS` 保证幂等安全。
+
+### 时间处理（强制）
+> 数据库统一存 UTC（`DateTime.UtcNow`），返回给前端的 JSON 统一通过 `DateTimeBjtConverter` 转为北京时间（UTC+8）。
+
+| 层级 | 规则 |
+|------|------|
+| 数据库写入 | 全部用 `DateTime.UtcNow` |
+| JSON 响应 | 全局 `JsonConverter` 自动 `+8h`，无需手动转 |
+| 注册方式 | `builder.Services.ConfigureHttpJsonOptions(o => o.SerializerOptions.Converters.Add(new DateTimeBjtConverter()))` |
+| 前端显示 | 直接用 `new Date(isoStr)` 或 `toLocaleString()`，无需额外处理 |
+
+> 示例见 `Monitor/api/Services/DateTimeBjtConverter.cs`（可跨项目复用）。
 
 ### 目录结构（Auth 示例）
 
@@ -93,6 +203,7 @@ Program.cs                    ← 薄层（只做注册 + 管道）
 - **Program.cs** 不写业务逻辑。必须包含：
   - `UseForwardedHeaders`（Nginx 反代取真实 IP）
   - 安全响应头中间件（`X-Content-Type-Options` / `X-Frame-Options` / `HSTS` 等）
+  - `UseStaticFiles()` — 如有 `wwwroot/` 静态资源（如 Scalar favicon）需要提供
   - `UseCors()`
   - `/api/v1/docs` → 跳转到 Scalar 文档页
 - **Endpoints** 只做参数校验 + 调 Service，不写核心逻辑
@@ -116,13 +227,17 @@ Program.cs                    ← 薄层（只做注册 + 管道）
 // ======== 中间件 ========
 app.UseForwardedHeaders(new ForwardedHeadersOptions { ... });
 app.Use(async (context, next) => { /* 安全响应头 */ });
+app.UseStaticFiles();            // 提供 wwwroot/ 静态资源（Scalar favicon 等）
 app.UseCors();
 
 // ======== 端点 ========
 app.MapGet("/api/v1/docs", () => Results.Redirect("/scalar/v1"))
    .WithTags("文档").WithSummary("跳转到 Scalar API 文档页面");
 app.MapOpenApi();
-app.MapScalarApiReference("scalar/v1", options => { ... });
+app.MapScalarApiReference("scalar/v1", options => {
+    options.WithTheme(ScalarTheme.BluePlanet)
+           .WithFavicon("/images/favicon.png");
+});
 app.Map{子项目}Endpoints();
 ```
 

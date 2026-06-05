@@ -2,6 +2,13 @@
 
 ---
 
+## v1.6.1 (2026-06-05)
+
+- **feat**: 集成 Monitor v0.2.0 — Redis 缓存 + 时间聚合 + 索引 + 响应式 + 翻牌时钟 + ESLint + Docker 部署
+- **refactor**: Auth/Monitor 端口统一 8100 + SqlSugar AddScoped + 全局北京时间转换器
+- **docs**: STYLE_GUIDE 新增时序图表/索引/代码质量三大强制规范
+- **docs**: Portfolio ESLint 统一配置
+
 ## v1.6.0 (2026-06-04)
 
 - **feat**: Monitor 监控面板子项目 v0.1.0 — 后端骨架（SqlSugar + 21 API 端点 + Worker 采集）+ 前端骨架（Vue 3 + 7 页面 + 6 组件） + 模板规范同步更新

@@ -33,7 +33,7 @@ onMounted(() => store.loadHealth())
 </template>
 
 <style scoped>
-.card { background: white; border: 1px solid #E2E8F0; border-radius: var(--card-radius); padding: 20px; box-shadow: var(--card-shadow); }
+.card { background: white; border: 1px solid #E2E8F0; border-radius: var(--card-radius); padding: 16px; box-shadow: var(--card-shadow); overflow: hidden; }
 .card-title { font-size: 15px; font-weight: 600; margin-bottom: 16px; }
 .health-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .health-table th { text-align: left; padding: 10px 12px; color: var(--color-text-secondary); font-weight: 600; border-bottom: 2px solid #E2E8F0; }
@@ -43,4 +43,9 @@ onMounted(() => store.loadHealth())
 .cell-latency { font-family: var(--font-mono); font-size: 12px; }
 .cell-time { font-family: var(--font-mono); font-size: 12px; color: var(--color-text-secondary); }
 .empty-text { padding: 32px; text-align: center; color: var(--color-text-secondary); }
+
+@media (max-width: 480px) {
+  .health-table th:nth-child(4),
+  .health-table td:nth-child(4) { display: none; }
+}
 </style>

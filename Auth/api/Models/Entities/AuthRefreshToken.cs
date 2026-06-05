@@ -8,6 +8,8 @@ namespace AuthApi.Models.Entities;
 /// <para>不保存令牌原文，仅保存 BCrypt 哈希值。支持吊销（revoked）标记。</para>
 /// </summary>
 [SugarTable("auth_refresh_tokens")]
+[SugarIndex("idx_token_hash", nameof(TokenHash), OrderByType.Asc)]
+[SugarIndex("idx_user_revoked_expires", nameof(UserId), OrderByType.Asc, nameof(Revoked), OrderByType.Asc, nameof(ExpiresAt), OrderByType.Asc)]
 public class AuthRefreshToken
 {
     /// <summary>记录 ID（自增主键）</summary>

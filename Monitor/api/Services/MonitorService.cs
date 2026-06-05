@@ -8,35 +8,97 @@ namespace MonitorApi.Services;
 public class MonitorService
 {
     private readonly ISqlSugarClient _db;
+    private readonly RedisCacheService _cache;
 
-    public MonitorService(ISqlSugarClient db)
+    private static readonly string CacheKeyMetrics = "monitor:metrics:latest";
+
+    public MonitorService(ISqlSugarClient db, RedisCacheService cache)
     {
         _db = db;
+        _cache = cache;
     }
 
     // ======== 服务器指标 ========
 
-    /// <summary>获取最新的服务器指标</summary>
+    /// <summary>获取最新的服务器指标（缓存优先：Redis 60s TTL，穿透查 MySQL）</summary>
     /// <returns>最新一条指标记录，无数据则返回 null</returns>
     public async Task<ServerMetricsResponse?> GetLatestMetricsAsync()
     {
+        var cached = await _cache.GetAsync<ServerMetricsResponse>(CacheKeyMetrics);
+        if (cached is not null) return cached;
+
         var record = await _db.Queryable<MonitorServerMetric>()
             .OrderByDescending(m => m.Ts)
             .FirstAsync();
-        return record is null ? null : MapMetric(record);
+        if (record is null) return null;
+
+        var result = MapMetric(record);
+        await _cache.SetAsync(CacheKeyMetrics, result, 60);
+        return result;
     }
 
-    /// <summary>获取历史指标</summary>
-    /// <param name="rangeHours">查询范围（小时），默认 24h，范围 1-168h</param>
-    /// <returns>指定时间范围内的指标记录列表（按时间正序）</returns>
+    /// <summary>获取历史指标（≤6h 原始数据，>6h 按时间桶聚合）</summary>
+    /// <param name="rangeHours">查询范围（小时），默认 24h，范围 1-720h</param>
+    /// <returns>最多 200 个数据点，按时间正序</returns>
     public async Task<List<ServerMetricsResponse>> GetMetricsHistoryAsync(int rangeHours = 24)
     {
         var since = DateTime.UtcNow.AddHours(-rangeHours);
-        var records = await _db.Queryable<MonitorServerMetric>()
+        const int maxPoints = 200;
+
+        // 短范围：直接返回原始数据
+        if (rangeHours <= 6)
+        {
+            var records = await _db.Queryable<MonitorServerMetric>()
+                .Where(m => m.Ts >= since)
+                .OrderBy(m => m.Ts)
+                .ToListAsync();
+            return records.Select(MapMetric).ToList();
+        }
+
+        // 长范围：时间桶聚合（每桶 avg/max，最多 maxPoints 个桶）
+        var totalSeconds = rangeHours * 3600;
+        var bucketSeconds = (int)Math.Ceiling((double)totalSeconds / maxPoints);
+
+        var raw = await _db.Queryable<MonitorServerMetric>()
             .Where(m => m.Ts >= since)
             .OrderBy(m => m.Ts)
             .ToListAsync();
-        return records.Select(MapMetric).ToList();
+
+        if (raw.Count <= maxPoints)
+            return raw.Select(MapMetric).ToList();
+
+        var buckets = new Dictionary<long, List<MonitorServerMetric>>();
+        foreach (var m in raw)
+        {
+            var bucket = new DateTimeOffset(m.Ts).ToUnixTimeSeconds() / bucketSeconds;
+            if (!buckets.ContainsKey(bucket)) buckets[bucket] = [];
+            buckets[bucket].Add(m);
+        }
+
+        var tickBucket = bucketSeconds * 10_000_000L;
+
+        return buckets.OrderBy(kv => kv.Key).Select(kv =>
+        {
+            var list = kv.Value;
+            var bucketTicks = list[0].Ts.Ticks / tickBucket * tickBucket;
+            var ts = new DateTime(bucketTicks, DateTimeKind.Utc);
+
+            return new ServerMetricsResponse(
+                CpuPct:     list.Avg(m => m.CpuPct),
+                MemPct:     list.Avg(m => m.MemPct),
+                MemUsed:    list.AvgLong(m => m.MemUsed),
+                MemTotal:   list.AvgLong(m => m.MemTotal),
+                DiskPct:    list.Avg(m => m.DiskPct),
+                DiskUsed:   list.AvgLong(m => m.DiskUsed),
+                DiskTotal:  list.AvgLong(m => m.DiskTotal),
+                NetIn:      list.Max(m => m.NetIn),   // 累加计数器取最大
+                NetOut:     list.Max(m => m.NetOut),
+                Load1m:     list.Avg(m => m.Load1m),
+                Load5m:     list.Avg(m => m.Load5m),
+                Load15m:    list.Avg(m => m.Load15m),
+                Ts:         ts
+            );
+        }).ToList();
     }
 
     /// <summary>写入一条服务器指标（由 Worker 采集器调用）</summary>
@@ -44,6 +106,8 @@ public class MonitorService
     public async Task InsertMetricAsync(MonitorServerMetric metric)
     {
         await _db.Insertable(metric).ExecuteCommandAsync();
+        // 写入 Redis 缓存，实时数据即时可用
+        await _cache.SetAsync(CacheKeyMetrics, MapMetric(metric), 60);
     }
 
     // ======== 站点监控 ========
@@ -244,19 +308,27 @@ public class MonitorService
     public async Task<List<AlertEventResponse>> GetAlertEventsAsync(int limit = 50)
     {
         var events = await _db.Queryable<MonitorAlertEvent>()
-            .LeftJoin<MonitorAlertRule>((e, r) => e.RuleId == r.Id)
-            .OrderByDescending((e, r) => e.TriggeredAt)
+            .OrderByDescending(e => e.TriggeredAt)
             .Take(limit)
-            .Select((e, r) => new AlertEventResponse(
+            .ToListAsync();
+
+        var ruleIds = events.Select(e => e.RuleId).Distinct().ToList();
+        var rules = ruleIds.Count > 0
+            ? await _db.Queryable<MonitorAlertRule>().In(r => r.Id, ruleIds).ToListAsync()
+            : [];
+
+        return events.Select(e =>
+        {
+            var rule = rules.FirstOrDefault(r => r.Id == e.RuleId);
+            return new AlertEventResponse(
                 Id: e.Id,
-                RuleName: r.Name,
+                RuleName: rule?.Name,
                 TriggeredAt: e.TriggeredAt,
                 ResolvedAt: e.ResolvedAt,
                 Message: e.Message,
                 Severity: e.Severity
-            ))
-            .ToListAsync();
-        return events;
+            );
+        }).ToList();
     }
 
     /// <summary>写入告警事件（由 Worker 采集器调用）</summary>
@@ -270,7 +342,8 @@ public class MonitorService
 
     private static ServerMetricsResponse MapMetric(MonitorServerMetric m) => new(
         CpuPct: m.CpuPct, MemPct: m.MemPct, MemUsed: m.MemUsed,
-        MemTotal: m.MemTotal, DiskPct: m.DiskPct, NetIn: m.NetIn,
+        MemTotal: m.MemTotal, DiskPct: m.DiskPct, DiskUsed: m.DiskUsed,
+        DiskTotal: m.DiskTotal, NetIn: m.NetIn,
         NetOut: m.NetOut, Load1m: m.Load1m, Load5m: m.Load5m,
         Load15m: m.Load15m, Ts: m.Ts
     );
@@ -287,4 +360,20 @@ public class MonitorService
         DurationSec: r.DurationSec, Enabled: r.Enabled,
         CreatedAt: r.CreatedAt
     );
+}
+
+/// <summary>聚合工具类</summary>
+internal static class AggregationExtensions
+{
+    public static decimal? Avg(this IEnumerable<MonitorServerMetric> list, Func<MonitorServerMetric, decimal?> sel)
+    {
+        var values = list.Select(sel).Where(v => v.HasValue).Select(v => v!.Value).ToList();
+        return values.Count > 0 ? Math.Round(values.Average(), 2) : null;
+    }
+
+    public static long? AvgLong(this IEnumerable<MonitorServerMetric> list, Func<MonitorServerMetric, long?> sel)
+    {
+        var values = list.Select(sel).Where(v => v.HasValue).Select(v => (decimal)v!.Value).ToList();
+        return values.Count > 0 ? (long)Math.Round(values.Average()) : null;
+    }
 }
