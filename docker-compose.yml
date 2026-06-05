@@ -58,7 +58,7 @@ services:
 
   # ---- Auth 鉴权服务 ----
   auth:
-    image: ccr.ccs.tencentyun.com/jason-hub-auth:latest
+    image: ccr.ccs.tencentyun.com/jason-hub/auth:latest
     ports:
       - "127.0.0.1:8100:8100"
     volumes:
@@ -74,13 +74,13 @@ services:
     restart: unless-stopped
 
   monitor-web:
-    image: ccr.ccs.tencentyun.com/jason-hub-monitor-web:latest
+    image: ccr.ccs.tencentyun.com/jason-hub/monitor-web:latest
     ports:
       - "127.0.0.1:8001:80"
     restart: unless-stopped
 
   monitor-api:
-    image: ccr.ccs.tencentyun.com/jason-hub-monitor-api:latest
+    image: ccr.ccs.tencentyun.com/jason-hub/monitor-api:latest
     ports:
       - "127.0.0.1:8051:8051"
     volumes:
