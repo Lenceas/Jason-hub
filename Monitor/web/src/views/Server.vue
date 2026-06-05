@@ -55,8 +55,11 @@ const netData = computed(() => {
     const prev = h[i - 1], curr = h[i]
     const ts = new Date(curr.ts).getTime()
     const sec = (ts - new Date(prev.ts).getTime()) / 1000
-    inValues.push([ts, sec > 0 ? Math.round(((curr.net_in ?? 0) - (prev.net_in ?? 0)) / 1024 / sec * 10) / 10 : 0])
-    outValues.push([ts, sec > 0 ? Math.round(((curr.net_out ?? 0) - (prev.net_out ?? 0)) / 1024 / sec * 10) / 10 : 0])
+    const inDiff = (curr.net_in ?? 0) - (prev.net_in ?? 0)
+    const outDiff = (curr.net_out ?? 0) - (prev.net_out ?? 0)
+    // 计数器归零（容器重启）：跳过此间隔
+    inValues.push([ts, sec > 0 && inDiff >= 0 ? Math.round(inDiff / 1024 / sec * 10) / 10 : 0])
+    outValues.push([ts, sec > 0 && outDiff >= 0 ? Math.round(outDiff / 1024 / sec * 10) / 10 : 0])
   }
   return [
     { name: 'IN',  values: inValues,  color: '#06B6D4' },
