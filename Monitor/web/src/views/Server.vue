@@ -87,6 +87,17 @@ const loadDetail = computed(() => {
   return `负载 ${l1 ?? '—'} / ${l5 ?? '—'} / ${l15 ?? '—'}`
 })
 
+/** 网络速率副标题（KB/s）— 最近两条记录的差值/时间 */
+function calcRate(key: string): string | undefined {
+  const h = store.metricsHistory as any[]
+  if (h.length < 2) return undefined
+  const prev = h[h.length - 2], curr = h[h.length - 1]
+  const diff = (curr[key] ?? 0) - (prev[key] ?? 0)
+  if (diff < 0) return undefined
+  const sec = (new Date(curr.ts).getTime() - new Date(prev.ts).getTime()) / 1000
+  return sec > 0 ? `${formatBytes(Math.round(diff / sec), 1)}/s` : undefined
+}
+
 function thresholdColor(v: number | null | undefined, warn = 60, danger = 80): string {
   if (v == null) return 'var(--color-primary)'
   if (v >= danger) return 'var(--color-danger)'
@@ -100,8 +111,8 @@ function thresholdColor(v: number | null | undefined, warn = 60, danger = 80): s
     <div class="grid-4">
       <MetricsCard label="CPU" :value="store.metrics?.cpu_pct" unit="%" :subtitle="loadDetail" icon="🔲" :color="thresholdColor(store.metrics?.cpu_pct, 60, 80)" />
       <MetricsCard label="内存" :value="store.metrics?.mem_pct" unit="%" :subtitle="memDetail" icon="🧠" :color="thresholdColor(store.metrics?.mem_pct, 60, 80)" />
-      <MetricsCard label="网络 (IN)" :value="formatBytes(store.metrics?.net_in)" icon="📡" />
-      <MetricsCard label="网络 (OUT)" :value="formatBytes(store.metrics?.net_out)" icon="📤" />
+      <MetricsCard label="网络 (IN)" :value="formatBytes(store.metrics?.net_in)" :subtitle="calcRate('net_in')" icon="📡" />
+      <MetricsCard label="网络 (OUT)" :value="formatBytes(store.metrics?.net_out)" :subtitle="calcRate('net_out')" icon="📤" />
       <MetricsCard label="磁盘" :value="store.metrics?.disk_pct" unit="%" :subtitle="diskDetail" icon="💾" :color="thresholdColor(store.metrics?.disk_pct, 70, 85)" />
     </div>
     <div class="range-bar">
