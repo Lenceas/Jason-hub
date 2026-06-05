@@ -23,6 +23,7 @@ export default [
         window: 'readonly',
         document: 'readonly',
         HTMLDivElement: 'readonly',
+        requestAnimationFrame: 'readonly',
         console: 'readonly',
         fetch: 'readonly',
         Promise: 'readonly',
