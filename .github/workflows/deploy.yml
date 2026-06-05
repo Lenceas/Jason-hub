@@ -17,20 +17,13 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: 打包代码
-        run: tar czf deploy.tar.gz $(git ls-files)
-
       - name: 部署到服务器
         run: |
           sudo apt-get install -qq -y sshpass
-          sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -o StrictHostKeyChecking=no deploy.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/tmp/deploy.tar.gz
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
-            sudo rm -rf /opt/lujiesheng/Portfolio /opt/lujiesheng/Auth /opt/lujiesheng/Monitor
-            sudo tar xzf /tmp/deploy.tar.gz -C /opt/lujiesheng
-            sudo rm /tmp/deploy.tar.gz
-            cd /opt/lujiesheng
+            cd /opt/lujiesheng && git pull origin main
             echo "${{ secrets.TCR_PASSWORD }}" | docker login ccr.ccs.tencentyun.com -u 100012562502 --password-stdin 2>/dev/null
-            docker compose pull auth monitor-web monitor-api
+            docker compose pull portfolio auth monitor-web monitor-api
             docker compose up -d portfolio auth monitor-web monitor-api
             docker image prune -f
           '

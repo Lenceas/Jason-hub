@@ -51,7 +51,7 @@ services:
 # 应用层 — 按子项目分组
 # ============================================================
   portfolio:
-    build: ./Portfolio
+    image: ccr.ccs.tencentyun.com/jason-hub/portfolio:latest
     ports:
       - "127.0.0.1:8000:80"
     restart: unless-stopped
