@@ -25,10 +25,13 @@ Jason-hub 统一监控平台 · 子域名 `monitor.lujiesheng.cn`
 Monitor/
 ├── web/          ← Vue 3 前端（开发中）
 │   ├── src/
+│   │   ├── layouts/     ← DashboardLayout
 │   │   ├── views/       ← 7 个页面
-│   │   ├── components/  ← 6 个通用组件
+│   │   ├── components/  ← 8 个通用组件
 │   │   ├── stores/      ← Pinia
 │   │   ├── api/         ← axios 封装
+│   │   ├── styles/      ← CSS 变量
+│   │   ├── utils/       ← 工具函数
 │   │   └── types/       ← TS 类型
 │   ├── Dockerfile
 │   ├── nginx.conf
@@ -53,7 +56,7 @@ cd Monitor/web
 npm install
 npm run dev          # http://localhost:8001
 
-# 后端 → 详见 [api/README.md](./api/README.md)
+# 后端
 cd Monitor/api
 dotnet restore
 dotnet run           # http://localhost:8051
@@ -85,22 +88,26 @@ Real-time monitoring and alerting system for server metrics, Docker containers, 
 
 ```
 Monitor/
-├── web/          ← Vue 3 frontend (planned)
+├── web/          ← Vue 3 frontend
 │   ├── src/
+│   │   ├── layouts/     ← DashboardLayout
 │   │   ├── views/       ← 7 pages
-│   │   ├── components/  ← 6 reusable components
+│   │   ├── components/  ← 8 reusable components
 │   │   ├── stores/      ← Pinia
 │   │   ├── api/         ← axios
+│   │   ├── styles/      ← CSS variables
+│   │   ├── utils/       ← utility functions
 │   │   └── types/       ← TS type definitions
 │   ├── Dockerfile
 │   ├── nginx.conf
 │   └── package.json
-├── api/          ← .NET 10 backend (planned)
-│   ├── Controllers/
-│   ├── Services/
-│   ├── Models/
-│   ├── Data/
-│   └── Worker/         ← Background collection service
+├── api/          ← .NET 10 backend
+│   ├── Endpoints/       ← API endpoints
+│   ├── Services/        ← Business services
+│   ├── Models/          ← DTO + entities
+│   ├── Worker/          ← Background collection service
+│   └── Dockerfile
+├── Shared/       ← Shared library
 ├── PLAN.md       ← Design document (locked after approval)
 ├── CHANGELOG.md  ← Version changelog
 └── README.md     ← Technical guide (this file)

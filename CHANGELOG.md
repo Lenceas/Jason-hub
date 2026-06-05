@@ -2,6 +2,18 @@
 
 ---
 
+## v1.8.1 (2026-06-05)
+
+- **docs**: Monitor/PLAN.md 状态 planning → development
+- **docs**: README.md Monitor 外链纯文本改为可点击链接（中英文表）
+- **docs**: Monitor/README.md 补充 layouts/styles/utils 目录，组件数 6→8
+- **docs**: Monitor/PLAN.md 组件列表/目录结构/部署清单全面更新
+- **docs**: STYLE_GUIDE.md + AGENTS.md status 允许值补全 completed
+- **docs**: Auth/CHANGELOG.md 标题格式统一
+- **docs**: 新建 templates/README.md + scripts/README.md 辅助目录说明
+- **docs**: Monitor/web/README.md 补全 utils/ 目录，组件说明更新
+- **fix**: Monitor/PLAN.md 移除行末多余竖线字符、Web README 目录重复修复
+
 ## v1.8.0 (2026-06-05)
 
 - **feat**: Monitor 项目卡片状态 planning → active，接入真实部署 URL 和截图

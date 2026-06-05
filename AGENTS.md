@@ -60,7 +60,7 @@ Jason-hub/
 - **主站（Portfolio）**：Astro 6 + 原生 CSS，保持轻量，全端响应式
 - **子项目**：Vue 3 + TypeScript
 - **添加新子项目**时，同步更新 `Portfolio/src/data/projects.json` 添加对应项目卡片
-- **项目卡片字段**：`id`、`title`、`tagline`、`description`、`status`（active/planning/archived）、`url`、`thumbnail`、`tags`、`year`
+- **项目卡片字段**：`id`、`title`、`tagline`、`description`、`status`（active/planning/archived/completed）、`url`、`thumbnail`、`tags`、`year`
 
 ## Git 分支规范
 

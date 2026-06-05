@@ -1,4 +1,4 @@
-# Auth 鉴权服务 — 变更日志
+# CHANGELOG.md — Auth 更新日志
 
 ---
 

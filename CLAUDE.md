@@ -13,7 +13,7 @@
 |------|-----|
 | 在线地址 | https://lujiesheng.cn |
 | 服务器 | 81.71.136.3（腾讯云 2C4G / Ubuntu 24.04） |
-| 当前版本 | v1.8.0 |
+| 当前版本 | v1.8.1 |
 | 技术栈 | Astro 6 / Vue 3 + TypeScript / .NET 10 |
 | 数据库 | MySQL 8.4 / Redis 8 / MongoDB 8 |
 | CI/CD | GitHub Actions → SCP → docker compose up |
@@ -46,6 +46,7 @@ Jason-hub/
 - [完成] .NET 后端脚手架 ✅
 - [完成] Monitor v0.2.0 — Redis 缓存 + 时间聚合 + 数据库索引 + 响应式 + 翻牌时钟 + ESLint + 部署配置 ✅
 - [完成] Monitor 项目卡片 planning → active — 接入真实域名和截图，Monitor 正式上线 🎉 ✅
+- [完成] 文档规范审计 — 修复 8 项规范冲突/不一致问题，补全 templates/ + scripts/ README ✅
 
 ---
 

@@ -1,6 +1,6 @@
 # Monitor 监控面板 — 方案设计
 
-> 状态：`planning` · 第一子项目
+> 状态：`development` · 第一子项目
 > 本文档为立项方案，开发前经用户确认，后续实施严格按此执行。
 
 ---
@@ -88,7 +88,7 @@ Jason-hub 第一个子项目，统一监控平台。对服务器、Docker 容器
 | Monitor API | `http://monitor-api:8051/api/v1/health` | Bearer \<service-token\> | 服务存活、MySQL/Redis 连接 |
 | Notification | `http://notification:8110/api/v1/health` | Bearer \<service-token\> | 服务存活、数据库连接 |
 
-> 应用健康检查在内网进行，使用 Monitor 服务的 Client Credentials JWT 调用。与站点监控的公开 `/healthz` 不同，这里是带权限的深度检测。|
+> 应用健康检查在内网进行，使用 Monitor 服务的 Client Credentials JWT 调用。与站点监控的公开 `/healthz` 不同，这里是带权限的深度检测。
 
 #### 依赖服务深度指标
 
@@ -170,7 +170,9 @@ Monitor/web/
 │   │   ├── GaugeChart.vue           ← 仪表盘环图
 │   │   ├── StatusBadge.vue          ← 状态标签（正常/告警/离线）
 │   │   ├── AlertTable.vue           ← 告警列表
-│   │   └── Timeline.vue             ← 时间轴（事件日志）
+│   │   ├── Timeline.vue             ← 时间轴（事件日志）
+│   │   ├── FlipClock.vue            ← 翻牌时钟
+│   │   └── RefreshCounter.vue       ← 刷新计数器
 │   ├── stores/                      ← Pinia
 │   ├── api/                         ← axios 封装
 │   ├── styles/
@@ -377,10 +379,9 @@ Jason-hub/
 │   │   ├── nginx.conf
 │   │   └── package.json
 │   └── api/                    ← .NET 10 + SqlSugar 后端
-│       ├── Controllers/
-│       ├── Services/
-│       ├── Models/
-│       ├── Data/
+│       ├── Endpoints/           ← API 端点
+│       ├── Services/            ← 业务服务
+│       ├── Models/              ← DTO + 实体
 │       ├── Worker/              ← Background Service 采集器
 │       └── Dockerfile
 ├── docker-compose.yml          ← 追加 monitor-web + monitor-api
@@ -389,20 +390,20 @@ Jason-hub/
 
 ---
 
-## 九、部署检查清单
+## 九、部署检查清单（✅ 已完成）
 
-按 [DEPLOY.md](../DEPLOY.md) 规范完成：
+> 以下为 Monitor 首次上线的部署检查项，已全部完成。后续新增部署请参考 [DEPLOY.md](../DEPLOY.md)。
 
-- [ ] 创建 Monitor/web + Monitor/api 项目骨架
-- [ ] 编写前端 Dockerfile + nginx.conf
-- [ ] 编写后端 Dockerfile
-- [ ] `docker-compose.yml` 追加 monitor-web（:8001）+ monitor-api（:8051）
-- [ ] GitHub Actions `deploy.yml` 增加新 service 构建命令
-- [ ] DNS 添加 `monitor.lujiesheng.cn` + `api-monitor.lujiesheng.cn` → `81.71.136.3`
-- [ ] SSL：acme.sh 申请子域名证书
-- [ ] Nginx 添加子域名 server 块
-- [ ] Portfolio `projects.json` 添加 Monitor 卡片
-- [ ] 更新各 MD 文档
+- [x] 创建 Monitor/web + Monitor/api 项目骨架
+- [x] 编写前端 Dockerfile + nginx.conf
+- [x] 编写后端 Dockerfile
+- [x] `docker-compose.yml` 追加 monitor-web（:8001）+ monitor-api（:8051）
+- [x] GitHub Actions `deploy.yml` 增加新 service 构建命令
+- [x] DNS 添加 `monitor.lujiesheng.cn` + `api-monitor.lujiesheng.cn` → `81.71.136.3`
+- [x] SSL：acme.sh 申请子域名证书
+- [x] Nginx 添加子域名 server 块
+- [x] Portfolio `projects.json` 添加 Monitor 卡片
+- [x] 更新各 MD 文档
 
 ---
 

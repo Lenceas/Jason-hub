@@ -313,7 +313,7 @@ public record LoginRequest(
   "title": "项目名称",
   "tagline": "一句话标签",
   "description": "详细描述",
-  "status": "active | planning | archived",
+  "status": "active | planning | archived | completed",
   "url": "https://项目部署地址",
   "thumbnail": "/images/项目封面.svg",
   "tags": ["Vue 3", "TypeScript"],

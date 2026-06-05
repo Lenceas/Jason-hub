@@ -20,7 +20,7 @@
 |------|------|---------|--------|------|
 | Portfolio 主站 | [lujiesheng.cn](https://lujiesheng.cn) | — | Astro 6 | active |
 | Auth 鉴权服务 | [登录页](https://api-auth.lujiesheng.cn/login) | [Scalar 文档](https://api-auth.lujiesheng.cn/scalar/v1) | .NET 10 / Minimal API | active |
-| Monitor 监控面板 | `monitor.lujiesheng.cn` | `api-monitor.lujiesheng.cn` | Vue 3 / .NET 10 | development |
+| Monitor 监控面板 | [监控面板](https://monitor.lujiesheng.cn) | [Scalar 文档](https://api-monitor.lujiesheng.cn/scalar/v1) | Vue 3 / .NET 10 | development |
 | 后续项目 | `<name>.lujiesheng.cn` | `api-<name>.lujiesheng.cn` | Vue 3 / .NET 10 | planning |
 
 ### 结构
@@ -86,7 +86,7 @@ A personal project aggregation site built with [Astro 6](./Portfolio). The main 
 |---------|----------|----------|-------|--------|
 | Portfolio | [lujiesheng.cn](https://lujiesheng.cn) | — | Astro 6 | active |
 | Auth | [Login](https://api-auth.lujiesheng.cn/login) | [Scalar Docs](https://api-auth.lujiesheng.cn/scalar/v1) | .NET 10 / Minimal API | active |
-| Monitor | `monitor.lujiesheng.cn` | `api-monitor.lujiesheng.cn` | Vue 3 / .NET 10 | development |
+| Monitor | [Monitor](https://monitor.lujiesheng.cn) | [Scalar Docs](https://api-monitor.lujiesheng.cn/scalar/v1) | Vue 3 / .NET 10 | development |
 | Upcoming | `<name>.lujiesheng.cn` | `api-<name>.lujiesheng.cn` | Vue 3 / .NET 10 | planning |
 
 ### Structure
