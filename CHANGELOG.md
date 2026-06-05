@@ -2,7 +2,7 @@
 
 ---
 
-## v1.6.1 (2026-06-05)
+## v1.7.0 (2026-06-05)
 
 - **feat**: 集成 Monitor v0.2.0 — Redis 缓存 + 时间聚合 + 索引 + 响应式 + 翻牌时钟 + ESLint + Docker 部署
 - **refactor**: Auth/Monitor 端口统一 8100 + SqlSugar AddScoped + 全局北京时间转换器
