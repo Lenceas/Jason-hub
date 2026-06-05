@@ -157,11 +157,19 @@ app.MapAuthEndpoints();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ISqlSugarClient>();
-    db.CodeFirst.InitTables(
-        typeof(AuthUser),
-        typeof(AuthRefreshToken),
-        typeof(AuthClient)
-    );
+    try
+    {
+        db.CodeFirst.InitTables(
+            typeof(AuthUser),
+            typeof(AuthRefreshToken),
+            typeof(AuthClient)
+        );
+    }
+    catch (Exception ex)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogWarning(ex, "CodeFirst 跳过（表已存在或字段冲突）");
+    }
 
     // ======== 索引迁移 — 补建缺失索引（不丢数据）= ========
     var indexes = new (string table, string name, string cols)[]
