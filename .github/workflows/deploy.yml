@@ -29,6 +29,7 @@ jobs:
             sudo tar xzf /tmp/deploy.tar.gz -C /opt/lujiesheng
             sudo rm /tmp/deploy.tar.gz
             cd /opt/lujiesheng
-            docker compose up --build -d portfolio auth monitor-web monitor-api
+            docker compose pull auth monitor-web monitor-api
+            docker compose up -d portfolio auth monitor-web monitor-api
             docker image prune -f
           '

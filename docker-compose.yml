@@ -58,9 +58,7 @@ services:
 
   # ---- Auth 鉴权服务 ----
   auth:
-    build:
-      context: .
-      dockerfile: Auth/api/Dockerfile
+    image: ghcr.io/lenceas/jason-hub-auth:latest
     ports:
       - "127.0.0.1:8100:8100"
     volumes:
@@ -76,17 +74,13 @@ services:
     restart: unless-stopped
 
   monitor-web:
-    build:
-      context: .
-      dockerfile: Monitor/web/Dockerfile
+    image: ghcr.io/lenceas/jason-hub-monitor-web:latest
     ports:
       - "127.0.0.1:8001:80"
     restart: unless-stopped
 
   monitor-api:
-    build:
-      context: .
-      dockerfile: Monitor/api/Dockerfile
+    image: ghcr.io/lenceas/jason-hub-monitor-api:latest
     ports:
       - "127.0.0.1:8051:8051"
     volumes:
