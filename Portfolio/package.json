@@ -5,8 +5,11 @@
   "description": "Jason's personal portfolio — Astro main site",
   "scripts": {
     "dev": "astro dev --host --port 8000 --open",
-    "build": "astro build",
+    "build": "npm run lint && npm run typecheck && astro build",
     "check": "astro check",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "astro check",
     "preview": "astro preview"
   },
   "dependencies": {
@@ -14,6 +17,9 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
-    "typescript": "^6.0.3"
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.4.1",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.60.1"
   }
 }

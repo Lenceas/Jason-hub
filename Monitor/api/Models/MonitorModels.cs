@@ -27,6 +27,14 @@ public record ServerMetricsResponse(
     [property: JsonPropertyName("disk_pct")]
     decimal? DiskPct,
 
+    [property: Description("已用磁盘（字节）")]
+    [property: JsonPropertyName("disk_used")]
+    long? DiskUsed,
+
+    [property: Description("总磁盘（字节）")]
+    [property: JsonPropertyName("disk_total")]
+    long? DiskTotal,
+
     [property: Description("入网流量（字节）")]
     [property: JsonPropertyName("net_in")]
     long? NetIn,

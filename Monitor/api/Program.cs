@@ -6,8 +6,15 @@ using MonitorApi.Worker;
 using MonitorApi.Worker.Collectors;
 using Scalar.AspNetCore;
 using SqlSugar;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ======== JSON 序列化：UTC → 北京时间 ========
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new DateTimeBjtConverter());
+});
 
 // ======== 服务注册 ========
 
@@ -16,11 +23,12 @@ builder.Services.AddOpenApi(options =>
 {
     options.AddDocumentTransformer((document, context, cancellationToken) =>
     {
-        document.Info.Title = "Monitor API";
+        document.Info.Title = "Jason-hub Monitor API";
         document.Info.Description = """
-            Monitor — Jason-hub 统一监控平台
+            Jason-hub 统一监控平台
 
-            服务器监控、Docker 容器管理、站点可用性检测、应用健康检查、告警通知、CI/CD 流水线追踪。
+            提供服务器指标采集、Docker 容器管理、站点可用性探测、应用健康检查、告警规则管理、CI/CD 流水线追踪。
+            后台 Agent 定时采集，实时数据存 Redis，历史数据存 MySQL。
             """;
         document.Info.Version = $"v0.1.0 (.NET {Environment.Version})";
         return Task.CompletedTask;
@@ -28,11 +36,12 @@ builder.Services.AddOpenApi(options =>
 });
 
 // SqlSugar
-builder.Services.AddSingleton<ISqlSugarClient>(sp =>
+builder.Services.AddScoped<ISqlSugarClient>(sp =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
-    var connStr = config.GetConnectionString("Default")
-        ?? Environment.GetEnvironmentVariable("MONITOR_DB_CONNECTION")
+    var connStr = (string.IsNullOrEmpty(config.GetConnectionString("Default"))
+        ? Environment.GetEnvironmentVariable("MONITOR_DB_CONNECTION")
+        : config.GetConnectionString("Default"))
         ?? throw new InvalidOperationException("缺少数据库连接配置：请设置 MONITOR_DB_CONNECTION 环境变量或 ConnectionStrings:Default");
     return new SqlSugarClient(new ConnectionConfig
     {
@@ -41,6 +50,19 @@ builder.Services.AddSingleton<ISqlSugarClient>(sp =>
         IsAutoCloseConnection = true
     });
 });
+
+// Redis 缓存
+var redisConnStr = builder.Configuration.GetConnectionString("Redis")
+    ?? Environment.GetEnvironmentVariable("MONITOR_REDIS_CONNECTION")
+    ?? "127.0.0.1:6379";
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
+{
+    var opts = ConfigurationOptions.Parse(redisConnStr);
+    opts.AbortOnConnectFail = false; // Redis 不可用时仍可启动
+    return ConnectionMultiplexer.Connect(opts);
+});
+builder.Services.AddSingleton<RedisCacheService>();
 
 // 服务注册
 builder.Services.AddScoped<MonitorService>();
@@ -90,6 +112,7 @@ app.Use(async (context, next) =>
     await next(context);
 });
 
+app.UseStaticFiles();
 app.UseCors();
 
 // ======== 端点 ========
@@ -101,7 +124,7 @@ app.MapGet("/api/v1/docs", () => Results.Redirect("/scalar/v1"))
 app.MapOpenApi();
 app.MapScalarApiReference("scalar/v1", options =>
 {
-    options.WithTitle("Monitor API · API 文档")
+    options.WithTitle("Jason-hub Monitor API · API 文档")
            .WithTheme(ScalarTheme.BluePlanet)
            .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient)
            .WithFavicon("/images/favicon.png");
@@ -110,9 +133,10 @@ app.MapScalarApiReference("scalar/v1", options =>
 app.MapMonitorEndpoints();
 
 // ======== CodeFirst — 自动建表/加列 ========
-try
+// 仅处理新表和新增列，不处理索引（见下方 IndexMigration）
+using (var scope = app.Services.CreateScope())
 {
-    var db = app.Services.GetRequiredService<ISqlSugarClient>();
+    var db = scope.ServiceProvider.GetRequiredService<ISqlSugarClient>();
     db.CodeFirst.InitTables(
         typeof(MonitorServerMetric),
         typeof(MonitorSite),
@@ -122,11 +146,22 @@ try
         typeof(MonitorAlertRule),
         typeof(MonitorAlertEvent)
     );
-}
-catch (Exception ex)
-{
-    var logger = app.Services.GetRequiredService<ILogger<Program>>();
-    logger.LogWarning(ex, "CodeFirst 初始化跳过（开发环境或无数据库连接）");
+
+    // ======== 索引迁移 — 补建缺失索引（不丢数据）= ========
+    var indexes = new (string table, string name, string cols)[]
+    {
+        ("server_metrics",        "idx_ts",              "Ts"),
+        ("container_snapshots",   "idx_ts",              "Ts"),
+        ("uptime_records",        "idx_site_checked",    "SiteId, CheckedAt"),
+        ("health_records",        "idx_service_ts",      "Service, Ts"),
+        ("alert_events",          "idx_ruleid",          "RuleId"),
+        ("alert_events",          "idx_triggered",       "TriggeredAt"),
+    };
+    foreach (var (table, name, cols) in indexes)
+    {
+        try { db.Ado.ExecuteCommand($"CREATE INDEX IF NOT EXISTS {name} ON {table} ({cols})"); }
+        catch { /* 已存在则跳过 */ }
+    }
 }
 
 app.Run();

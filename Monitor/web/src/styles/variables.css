@@ -1,4 +1,7 @@
-/* ======= 继承 Portfolio 全局主题 ======= */
+/* =======
+   继承 Portfolio 全局主题
+   断点: < 768px 手机 | ≥ 768px 平板 | ≥ 1024px 桌面
+   ======= */
 
 :root {
   --color-primary: #3B82F6;
@@ -17,9 +20,9 @@
   --color-info: #06B6D4;
 
   /* 侧边栏 */
-  --sidebar-width: 240px;
-  --sidebar-bg: #0F172A;
-  --sidebar-text: #CBD5E1;
+  --sidebar-width: 200px;
+  --sidebar-bg: #E2E8F0;
+  --sidebar-text: #334155;
   --sidebar-active: #3B82F6;
 
   /* 卡片 */
@@ -28,4 +31,20 @@
 
   /* 字体 */
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* ======= 响应式断点 ======= */
+
+/* 平板及以下：侧边栏宽度收窄 */
+@media (max-width: 1024px) {
+  :root {
+    --sidebar-width: 180px;
+  }
+}
+
+/* 手机：侧边栏隐藏 + 内容区全宽 */
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 0px;
+  }
 }

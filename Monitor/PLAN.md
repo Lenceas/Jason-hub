@@ -135,7 +135,7 @@ GITHUB_REPO=Lenceas/Jason-hub
 | 前端框架 | **Vue 3 + TypeScript** | Composition API，项目统一标准 |
 | 样式方案 | **UnoCSS + Portfolio CSS 变量** | 零运行时按需生成，继承全站蓝白主题 |
 | 状态管理 | **Pinia** | Vue 3 官方推荐 |
-| 路由 | **Vue Router 4** | Hash 路由（纯前端 SPA） |
+| 路由 | **Vue Router 4** | History 路由（干净 URL，Nginx fallback `try_files`） |
 | 图表 | **ECharts** | 监控场景功能最全 |
 | HTTP 客户端 | **axios** | - |
 | 构建 | **Vite** | Vue 3 标配 |

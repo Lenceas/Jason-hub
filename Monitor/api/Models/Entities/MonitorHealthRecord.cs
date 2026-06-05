@@ -4,6 +4,7 @@ namespace MonitorApi.Models.Entities;
 
 /// <summary>健康检查记录表</summary>
 [SugarTable("health_records")]
+[SugarIndex("idx_service_ts", nameof(Service), OrderByType.Asc, nameof(Ts), OrderByType.Desc)]
 public class MonitorHealthRecord
 {
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true, ColumnDescription = "记录ID")]
@@ -15,12 +16,12 @@ public class MonitorHealthRecord
     [SugarColumn(Length = 100, ColumnDescription = "服务名称")]
     public string Service { get; set; } = string.Empty;
 
-    [SugarColumn(Length = 500, ColumnDescription = "检查端点")]
+    [SugarColumn(Length = 500, IsNullable = true, ColumnDescription = "检查端点")]
     public string? Endpoint { get; set; }
 
-    [SugarColumn(Length = 20, ColumnDescription = "状态码/结果")]
+    [SugarColumn(Length = 20, IsNullable = true, ColumnDescription = "状态码/结果")]
     public string? Status { get; set; }
 
-    [SugarColumn(ColumnDescription = "延迟（毫秒）")]
+    [SugarColumn(IsNullable = true, ColumnDescription = "延迟（毫秒）")]
     public int? LatencyMs { get; set; }
 }

@@ -3,6 +3,7 @@ defineProps<{
   label: string
   value?: string | number | null
   unit?: string
+  subtitle?: string
   color?: string
   icon?: string
 }>()
@@ -20,6 +21,7 @@ defineProps<{
       </template>
       <span v-else class="text-muted">—</span>
     </div>
+    <div v-if="subtitle" class="card-subtitle">{{ subtitle }}</div>
   </div>
 </template>
 
@@ -32,6 +34,7 @@ defineProps<{
   padding: 16px 20px;
   box-shadow: var(--card-shadow);
   transition: transform 0.2s, box-shadow 0.2s;
+  text-align: center;
 }
 .metrics-card:hover {
   transform: translateY(-2px);
@@ -40,6 +43,7 @@ defineProps<{
 .card-header {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   margin-bottom: 8px;
 }
@@ -47,5 +51,12 @@ defineProps<{
 .card-label { font-size: 13px; color: var(--color-text-secondary); }
 .card-value { font-size: 28px; font-weight: 700; color: var(--color-text); }
 .card-unit { font-size: 14px; font-weight: 400; color: var(--color-text-secondary); margin-left: 4px; }
+.card-subtitle { font-size: 12px; color: var(--color-text-secondary); margin-top: 4px; }
 .text-muted { color: var(--color-text-secondary); font-size: 24px; }
+
+@media (max-width: 480px) {
+  .metrics-card { padding: 12px 14px; }
+  .card-value { font-size: 22px; }
+  .card-subtitle { font-size: 11px; }
+}
 </style>
