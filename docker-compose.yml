@@ -91,6 +91,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock    # Agent 采集需要
     environment:
+      - ASPNETCORE_URLS=http://+:8051
       - ConnectionStrings__Default=${MONITOR_DB_CONNECTION}
       - ConnectionStrings__Redis=${MONITOR_REDIS_CONNECTION}
     depends_on:
