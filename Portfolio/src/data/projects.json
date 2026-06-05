@@ -16,10 +16,10 @@
     "title": "Monitor 监控面板",
     "tagline": "Vue 3 + .NET 10 · 实时监控与告警",
     "description": "统一监控平台，覆盖服务器指标、Docker 容器、站点可用性、应用健康检查、Nginx 反向代理、CI/CD 流水线六大模块，支持多渠道告警通知。",
-    "status": "planning",
+    "status": "active",
     "featured": false,
-    "url": "https://github.com/Lenceas/Jason-hub",
-    "thumbnail": "/images/placeholder-project.svg",
+    "url": "https://monitor.lujiesheng.cn",
+    "thumbnail": "/images/monitor-server.png",
     "tags": ["Vue 3", ".NET 10", "ECharts", "Redis"],
     "year": 2026
   },

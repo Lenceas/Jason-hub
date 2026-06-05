@@ -2,6 +2,11 @@
 
 ---
 
+## v1.0.22 (2026-06-05)
+
+- **feat**: Monitor 项目卡片更新 — 状态 planning → active，URL 指向真实部署地址，缩略图替换为真实截图
+- **docs**: 截图取自 monitor.lujiesheng.cn/server 页面
+
 ## v1.0.21 (2026-06-02)
 
 - **feat**: 项目卡片更新 — Auth 鉴权服务（已上线）替换 Todo App 占位，新增 Monitor 卡片

@@ -2,6 +2,11 @@
 
 ---
 
+## v1.8.0 (2026-06-05)
+
+- **feat**: Monitor 项目卡片状态 planning → active，接入真实部署 URL 和截图
+- **docs**: Portfolio 项目卡片更新 — Monitor 状态改为 active，已上线可访问
+
 ## v1.7.0 (2026-06-05)
 
 - **feat**: 集成 Monitor v0.2.0 — Redis 缓存 + 时间聚合 + 索引 + 响应式 + 翻牌时钟 + ESLint + Docker 部署
