@@ -3,7 +3,7 @@ WORKDIR /app
 COPY Monitor/web/package*.json ./
 RUN npm ci
 COPY Monitor/web/ ./
-RUN npm run build
+RUN npx vite build
 
 FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
