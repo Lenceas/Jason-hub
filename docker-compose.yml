@@ -67,6 +67,7 @@ services:
       - auth-keys:/app/keys
       - ./ip2region:/app/ip2region
     environment:
+      - TZ=Asia/Shanghai
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__Default=${AUTH_DB_CONNECTION}
       - ip2region__DatabasePath=/app/ip2region/ip2region_v4.xdb
@@ -91,6 +92,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock    # Agent 采集需要
     environment:
+      - TZ=Asia/Shanghai
       - ASPNETCORE_URLS=http://+:8051
       - ConnectionStrings__Default=${MONITOR_DB_CONNECTION}
       - ConnectionStrings__Redis=${MONITOR_REDIS_CONNECTION}
