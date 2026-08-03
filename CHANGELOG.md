@@ -2,6 +2,11 @@
 
 ---
 
+## v1.9.0 (2026-08-03)
+
+- **feat**: 集成 Auth v0.6.0 — 初始化超级管理员 `admin`（启动时经 `AUTH_ADMIN_PASSWORD` 环境变量 + BCrypt 自动创建，幂等，密码不落代码明文）
+- **docs**: Auth README/PLAN 补充初始管理员说明；docker-compose 增加初始密码环境变量注入
+
 ## v1.8.3 (2026-08-03)
 
 - **fix**: CI/CD 补齐 docker push — 镜像构建后未推送 TCR，导致部署拉取到旧镜像（v1.8.2 发布未真正生效）
