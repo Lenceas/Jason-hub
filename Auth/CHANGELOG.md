@@ -4,8 +4,14 @@
 
 ## v0.6.0 (2026-08-03)
 
-- **feat**: 初始化超级管理员 — 启动时若 `admin` 用户不存在且配置了 `AUTH_ADMIN_PASSWORD`（映射 `Auth__InitAdminPassword`），自动创建超级管理员（BCrypt 哈希存储，幂等）
+- **feat**: 初始化超级管理员 — 启动时若 `admin` 用户不存在且配置了 `AUTH_ADMIN_PASSWORD`（映射 `InitAdmin__Password`），自动创建超级管理员（BCrypt 哈希存储，幂等）
 - **security**: 初始密码不落代码明文 — 仅通过环境变量注入，创建完成后可从 `.env` 移除
+
+## v0.6.1 (2026-08-03)
+
+- **fix**: 初始化插入兼容 NOT NULL 表结构 — 全字段写入非空默认值；种子失败不再阻断服务启动
+- **fix**: 实体与表结构对齐（可空字段改为非空默认值），登录成功路径不再写 NULL（修复 500）
+- **fix**: 环境变量名修正 `Auth__InitAdminPassword` → `InitAdmin__Password`
 
 ## v0.5.1 (2026-06-04)
 
