@@ -68,6 +68,7 @@ services:
       - TZ=Asia/Shanghai
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__Default=${AUTH_DB_CONNECTION}
+      - Auth__InitAdminPassword=${AUTH_ADMIN_PASSWORD}
       - ip2region__DatabasePath=/app/ip2region/ip2region_v4.xdb
     depends_on:
       mysql: { condition: service_healthy }

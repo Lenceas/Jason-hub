@@ -104,6 +104,17 @@ docker compose up -d auth
 域名：`api-auth.lujiesheng.cn`
 数据库：`jason_auth`（MySQL 8.4）
 
+### 初始管理员
+
+首次启动时，若 `auth_users` 中不存在 `admin` 且配置了 `AUTH_ADMIN_PASSWORD`，服务会自动创建超级管理员 `admin`（密码仅以 BCrypt 哈希入库，不落代码/文档明文）：
+
+```bash
+# 服务器 .env
+AUTH_ADMIN_PASSWORD=your_secure_password
+```
+
+创建完成后该变量可移除（已有用户不受影响）。
+
 ---
 
 <h2 id="en">English</h2>
@@ -199,3 +210,14 @@ docker compose up -d auth
 Port: 8100
 Domain: `api-auth.lujiesheng.cn`
 Database: `jason_auth` (MySQL 8.4)
+
+### Initial Admin
+
+On first start, if `admin` does not exist in `auth_users` and `AUTH_ADMIN_PASSWORD` is set, the service automatically creates the super admin `admin` (password stored only as a BCrypt hash, never as plaintext in code or docs):
+
+```bash
+# Server .env
+AUTH_ADMIN_PASSWORD=your_secure_password
+```
+
+The variable can be removed after creation (existing users are unaffected).

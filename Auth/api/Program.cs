@@ -183,6 +183,14 @@ using (var scope = app.Services.CreateScope())
         try { db.Ado.ExecuteCommand($"CREATE INDEX IF NOT EXISTS {name} ON {table} ({cols})"); }
         catch { /* 已存在则跳过 */ }
     }
+
+    // ======== 初始化超级管理员 ========
+    // 用户不存在且配置了初始密码（InitAdmin:Password，通常来自环境变量 Auth__InitAdminPassword）时创建。
+    // 幂等：已存在则跳过；密码仅用于 BCrypt 哈希，不落明文。
+    var authService = scope.ServiceProvider.GetRequiredService<AuthService>();
+    await authService.EnsureInitAdminAsync(
+        app.Configuration.GetValue<string>("InitAdmin:Username"),
+        app.Configuration.GetValue<string>("InitAdmin:Password"));
 }
 
 app.Run();

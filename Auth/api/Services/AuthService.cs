@@ -25,6 +25,45 @@ public class AuthService
         _ipGeo = ipGeo;
     }
 
+    /// <summary>
+    /// 初始化超级管理员 — 用户不存在且配置了初始密码时创建（幂等）
+    /// </summary>
+    /// <param name="username">管理员用户名（来自 InitAdmin:Username，默认 admin）</param>
+    /// <param name="password">初始明文密码（仅用于 BCrypt 哈希，来自环境变量，不落库不落码）</param>
+    /// <returns>是否执行了创建</returns>
+    public async Task<bool> EnsureInitAdminAsync(string? username, string? password)
+    {
+        username = username?.Trim();
+        if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+        {
+            _logger.LogInformation("未配置初始管理员密码（InitAdmin:Password），跳过管理员初始化");
+            return false;
+        }
+
+        var exists = await _db.Queryable<AuthUser>().AnyAsync(u => u.Username == username);
+        if (exists)
+        {
+            _logger.LogInformation("初始管理员 {User} 已存在，跳过初始化", username);
+            return false;
+        }
+
+        var now = DateTime.UtcNow;
+        await _db.Insertable(new AuthUser
+        {
+            Username = username,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
+            Role = "admin",
+            Status = "enabled",
+            Nickname = username,
+            FailedAttempts = 0,
+            CreatedAt = now,
+            UpdatedAt = now
+        }).ExecuteCommandAsync();
+
+        _logger.LogInformation("[初始化] 超级管理员 {User} 创建成功（BCrypt 哈希存储，不保存明文）", username);
+        return true;
+    }
+
     /// <summary>用户密码登录 — 返回 null 表示成功以外的失败（用户不存在/锁定/密码错误）</summary>
     public async Task<LoginResponse?> Login(LoginRequest request, string remoteIp, string userAgent)
     {
@@ -181,4 +220,3 @@ public class AuthService
         return new LoginResponse(token, 86400, user.Username, user.Role, newRefresh);
     }
 }
-
