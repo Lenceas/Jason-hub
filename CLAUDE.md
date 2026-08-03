@@ -13,7 +13,7 @@
 |------|-----|
 | 在线地址 | https://lujiesheng.cn |
 | 服务器 | 81.71.136.3（腾讯云 2C4G / Ubuntu 24.04） |
-| 当前版本 | v1.9.0 |
+| 当前版本 | v1.9.1 |
 | 技术栈 | Astro 6 / Vue 3 + TypeScript / .NET 10 |
 | 数据库 | MySQL 8.4 / Redis 8 / MongoDB 8 |
 | CI/CD | GitHub Actions → SCP → docker compose up |
@@ -51,6 +51,7 @@ Jason-hub/
 - [完成] v1.8.2 全量配置修复 ✅ — nginx 跳转、Monitor 版本/lint/构建门禁、CI 镜像构建接管、scaffold 清理、文档同步
 - [完成] v1.8.3 CI 推送修复 ✅ — 补齐 docker push + 服务器端 login + set -e
 - [完成] Auth v0.6.0 初始化超级管理员 ✅ — admin 经环境变量 + BCrypt 自动创建，密码不落代码明文
+- [完成] Auth v0.6.1 表结构与登录修复 ✅ — 兼容 NOT NULL 表结构、登录 500 修复、种子容错
 
 ---
 
@@ -111,6 +112,7 @@ Jason-hub/
 | 2026-08-03 | 发布/立项等技能同步至 `.codex/skills/`（Codex 自然语言触发） | `.codex/skills/` |
 | 2026-08-03 | CI 构建后显式 docker push；部署脚本加 set -e，pull 失败不再静默通过 | `.github/workflows/deploy.yml` |
 | 2026-08-03 | Auth 启动时经 `AUTH_ADMIN_PASSWORD` 环境变量初始化超级管理员（BCrypt 哈希，幂等，不落明文） | `Auth/api/Program.cs` |
+| 2026-08-03 | Auth 实体对齐 NOT NULL 表结构（可空字段改非空默认值）；登录成功写 `UnixEpoch` 代替 NULL | `Auth/api/Models/Entities/AuthUser.cs` |
 
 ---
 
