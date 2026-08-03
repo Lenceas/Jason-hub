@@ -2,6 +2,17 @@
 
 ---
 
+## v1.8.2 (2026-08-03)
+
+- **fix**: nginx api-auth HTTP→HTTPS 跳转修复 — Location 缺域名（`return 301 https://$host$request_uri;`，服务器端已生效）
+- **fix**: Monitor web lint 存量问题修复 + package.json 版本号同步 v0.2.0
+- **fix**: Monitor web Dockerfile 恢复 lint/typecheck 构建门禁（`npx vite build` → `npm run build`）
+- **fix**: Monitor API 新增 appsettings 配置 + Redis 连接串空值兜底 + OpenAPI 版本号同步
+- **chore**: CI/CD 接管镜像构建并推送 TCR，服务器端改为 pull + up（新增 concurrency/timeout）
+- **chore**: scaffold-dotnet.sh 复制模板时清理 bin/obj 构建产物
+- **chore**: 发布/立项等 5 个技能同步至 `.codex/skills/`
+- **docs**: AGENTS（组件数）/ Monitor PLAN（六大模块）/ CLAUDE / RELEASE / DEPLOY / README 文档同步
+
 ## v1.8.1 (2026-06-05)
 
 - **docs**: Monitor/PLAN.md 状态 planning → development

@@ -3,15 +3,36 @@ on:
   push:
     branches: [main]
 
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      TCR_REGISTRY: ccr.ccs.tencentyun.com/jason-hub
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
+
+      - name: 登录腾讯云 TCR
+        run: echo "${{ secrets.TCR_PASSWORD }}" | docker login ccr.ccs.tencentyun.com -u 100012562502 --password-stdin
+
+      - name: 构建并推送 Portfolio
+        run: docker build -f Portfolio/Dockerfile -t ${{ env.TCR_REGISTRY }}/portfolio:latest .
+
+      - name: 构建并推送 Auth
+        run: docker build -f Auth/api/Dockerfile -t ${{ env.TCR_REGISTRY }}/auth:latest .
+
+      - name: 构建并推送 Monitor Web
+        run: docker build -f Monitor/web/Dockerfile -t ${{ env.TCR_REGISTRY }}/monitor-web:latest .
+
+      - name: 构建并推送 Monitor API
+        run: docker build -f Monitor/api/Dockerfile -t ${{ env.TCR_REGISTRY }}/monitor-api:latest .
 
       - name: 部署到服务器
         run: |
@@ -19,7 +40,6 @@ jobs:
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/opt/lujiesheng/docker-compose.yml
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
             cd /opt/lujiesheng
-            echo "${{ secrets.TCR_PASSWORD }}" | docker login ccr.ccs.tencentyun.com -u 100012562502 --password-stdin 2>/dev/null
             docker compose pull portfolio auth monitor-web monitor-api
             docker compose up -d portfolio auth monitor-web monitor-api
             docker image prune -f
