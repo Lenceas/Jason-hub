@@ -185,12 +185,20 @@ using (var scope = app.Services.CreateScope())
     }
 
     // ======== 初始化超级管理员 ========
-    // 用户不存在且配置了初始密码（InitAdmin:Password，通常来自环境变量 Auth__InitAdminPassword）时创建。
+    // 用户不存在且配置了初始密码（InitAdmin:Password，通常来自环境变量 InitAdmin__Password）时创建。
     // 幂等：已存在则跳过；密码仅用于 BCrypt 哈希，不落明文。
     var authService = scope.ServiceProvider.GetRequiredService<AuthService>();
-    await authService.EnsureInitAdminAsync(
-        app.Configuration.GetValue<string>("InitAdmin:Username"),
-        app.Configuration.GetValue<string>("InitAdmin:Password"));
+    try
+    {
+        await authService.EnsureInitAdminAsync(
+            app.Configuration.GetValue<string>("InitAdmin:Username"),
+            app.Configuration.GetValue<string>("InitAdmin:Password"));
+    }
+    catch (Exception ex)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "初始化超级管理员失败（不影响服务启动）");
+    }
 }
 
 app.Run();

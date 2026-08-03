@@ -31,53 +31,53 @@ public class AuthUser
 
     /// <summary>昵称（显示名，为空时回退到 username）</summary>
     [SugarColumn(ColumnName = "nickname")]
-    public string? Nickname { get; set; }
+    public string Nickname { get; set; } = "";
 
     /// <summary>邮箱地址</summary>
     [SugarColumn(ColumnName = "email")]
-    public string? Email { get; set; }
+    public string Email { get; set; } = "";
 
     /// <summary>手机号</summary>
     [SugarColumn(ColumnName = "phone")]
-    public string? Phone { get; set; }
+    public string Phone { get; set; } = "";
 
     /// <summary>头像 URL</summary>
     [SugarColumn(ColumnName = "avatar_url")]
-    public string? AvatarUrl { get; set; }
+    public string AvatarUrl { get; set; } = "";
 
     /// <summary>个人简介</summary>
     [SugarColumn(ColumnName = "bio")]
-    public string? Bio { get; set; }
+    public string Bio { get; set; } = "";
 
     /// <summary>账户状态（enabled / disabled）</summary>
     [SugarColumn(ColumnName = "status")]
     public string Status { get; set; } = "enabled";
 
-    /// <summary>最后登录时间</summary>
+    /// <summary>最后登录时间（UnixEpoch 表示从未登录）</summary>
     [SugarColumn(ColumnName = "last_login_at", ColumnDataType = "DATETIME(3)")]
-    public DateTime? LastLoginAt { get; set; }
+    public DateTime LastLoginAt { get; set; } = DateTime.UnixEpoch;
 
     /// <summary>最后登录 IP</summary>
     [SugarColumn(ColumnName = "last_login_ip")]
-    public string? LastLoginIp { get; set; }
+    public string LastLoginIp { get; set; } = "";
 
     /// <summary>最后登录城市</summary>
     [SugarColumn(ColumnName = "last_login_city")]
-    public string? LastLoginCity { get; set; }
+    public string LastLoginCity { get; set; } = "";
 
     /// <summary>连续登录失败次数（达到阈值后触发锁定）</summary>
     [SugarColumn(ColumnName = "failed_attempts")]
     public int FailedAttempts { get; set; }
 
-    /// <summary>锁定截止时间（null 表示未锁定；未到期时禁止登录）</summary>
+    /// <summary>锁定截止时间（UnixEpoch 表示未锁定；未到期时禁止登录）</summary>
     [SugarColumn(ColumnName = "locked_until", ColumnDataType = "DATETIME(3)")]
-    public DateTime? LockedUntil { get; set; }
+    public DateTime LockedUntil { get; set; } = DateTime.UnixEpoch;
 
     /// <summary>账户创建时间</summary>
     [SugarColumn(ColumnName = "created_at", ColumnDataType = "DATETIME(3)")]
     public DateTime CreatedAt { get; set; }
 
-    /// <summary>记录更新时间</summary>
+    /// <summary>记录更新时间（UnixEpoch 表示从未更新）</summary>
     [SugarColumn(ColumnName = "updated_at", ColumnDataType = "DATETIME(3)")]
-    public DateTime? UpdatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; } = DateTime.UnixEpoch;
 }

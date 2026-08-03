@@ -55,7 +55,15 @@ public class AuthService
             Role = "admin",
             Status = "enabled",
             Nickname = username,
+            Email = "",
+            Phone = "",
+            AvatarUrl = "",
+            Bio = "",
+            LastLoginAt = now,
+            LastLoginIp = "",
+            LastLoginCity = "",
             FailedAttempts = 0,
+            LockedUntil = DateTime.UnixEpoch,
             CreatedAt = now,
             UpdatedAt = now
         }).ExecuteCommandAsync();
@@ -88,10 +96,10 @@ public class AuthService
             return null; // 统一返回，不暴露用户是否存在
         }
 
-        // 检查是否锁定
-        if (user.LockedUntil.HasValue && user.LockedUntil > DateTime.UtcNow)
+        // 检查是否锁定（UnixEpoch 表示未锁定）
+        if (user.LockedUntil > DateTime.UtcNow)
         {
-            var remainingSec = (int)(user.LockedUntil.Value - DateTime.UtcNow).TotalSeconds;
+            var remainingSec = (int)(user.LockedUntil - DateTime.UtcNow).TotalSeconds;
             _logger.LogWarning("[审计] 账户已锁定 [IP: {IP}] [UA: {UA}] [User: {User}] 剩余: {Sec}s", remoteIp, userAgent, request.Username, remainingSec);
             return new LoginResponse("", 0, "", "", null, 10 - user.FailedAttempts, remainingSec);
         }
@@ -132,10 +140,10 @@ public class AuthService
             .SetColumns(u => new AuthUser
             {
                 FailedAttempts = 0,
-                LockedUntil = null,
+                LockedUntil = DateTime.UnixEpoch,
                 LastLoginAt = DateTime.UtcNow,
                 LastLoginIp = remoteIp,
-                LastLoginCity = city,
+                LastLoginCity = city ?? "",
                 UpdatedAt = DateTime.UtcNow
             })
             .Where(u => u.Id == user.Id)
