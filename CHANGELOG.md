@@ -2,6 +2,11 @@
 
 ---
 
+## v1.8.3 (2026-08-03)
+
+- **fix**: CI/CD 补齐 docker push — 镜像构建后未推送 TCR，导致部署拉取到旧镜像（v1.8.2 发布未真正生效）
+- **fix**: 部署步骤恢复服务器端 docker login + `set -e`，避免 pull 失败被静默吞掉
+
 ## v1.8.2 (2026-08-03)
 
 - **fix**: nginx api-auth HTTP→HTTPS 跳转修复 — Location 缺域名（`return 301 https://$host$request_uri;`，服务器端已生效）

@@ -13,7 +13,7 @@
 |------|-----|
 | 在线地址 | https://lujiesheng.cn |
 | 服务器 | 81.71.136.3（腾讯云 2C4G / Ubuntu 24.04） |
-| 当前版本 | v1.8.2 |
+| 当前版本 | v1.8.3 |
 | 技术栈 | Astro 6 / Vue 3 + TypeScript / .NET 10 |
 | 数据库 | MySQL 8.4 / Redis 8 / MongoDB 8 |
 | CI/CD | GitHub Actions → SCP → docker compose up |
@@ -49,6 +49,7 @@ Jason-hub/
 - [完成] Monitor 项目卡片 planning → active — 接入真实域名和截图，Monitor 正式上线 🎉 ✅
 - [完成] 文档规范审计 — 修复 8 项规范冲突/不一致问题，补全 templates/ + scripts/ README ✅
 - [完成] v1.8.2 全量配置修复 ✅ — nginx 跳转、Monitor 版本/lint/构建门禁、CI 镜像构建接管、scaffold 清理、文档同步
+- [完成] v1.8.3 CI 推送修复 ✅ — 补齐 docker push + 服务器端 login + set -e
 
 ---
 
@@ -107,6 +108,7 @@ Jason-hub/
 | 2026-06-02 | CI/CD 仅从 main 触发部署（去重），往 sub-branch 合并不再触发 | `.github/workflows/deploy.yml` |
 | 2026-08-03 | CI/CD 接管镜像构建与 TCR 推送，服务器端改为 pull + up；废弃 tar 上传/服务器构建 | `.github/workflows/deploy.yml` |
 | 2026-08-03 | 发布/立项等技能同步至 `.codex/skills/`（Codex 自然语言触发） | `.codex/skills/` |
+| 2026-08-03 | CI 构建后显式 docker push；部署脚本加 set -e，pull 失败不再静默通过 | `.github/workflows/deploy.yml` |
 
 ---
 

@@ -23,23 +23,33 @@ jobs:
         run: echo "${{ secrets.TCR_PASSWORD }}" | docker login ccr.ccs.tencentyun.com -u 100012562502 --password-stdin
 
       - name: 构建并推送 Portfolio
-        run: docker build -f Portfolio/Dockerfile -t ${{ env.TCR_REGISTRY }}/portfolio:latest .
+        run: |
+          docker build -f Portfolio/Dockerfile -t ${{ env.TCR_REGISTRY }}/portfolio:latest .
+          docker push ${{ env.TCR_REGISTRY }}/portfolio:latest
 
       - name: 构建并推送 Auth
-        run: docker build -f Auth/api/Dockerfile -t ${{ env.TCR_REGISTRY }}/auth:latest .
+        run: |
+          docker build -f Auth/api/Dockerfile -t ${{ env.TCR_REGISTRY }}/auth:latest .
+          docker push ${{ env.TCR_REGISTRY }}/auth:latest
 
       - name: 构建并推送 Monitor Web
-        run: docker build -f Monitor/web/Dockerfile -t ${{ env.TCR_REGISTRY }}/monitor-web:latest .
+        run: |
+          docker build -f Monitor/web/Dockerfile -t ${{ env.TCR_REGISTRY }}/monitor-web:latest .
+          docker push ${{ env.TCR_REGISTRY }}/monitor-web:latest
 
       - name: 构建并推送 Monitor API
-        run: docker build -f Monitor/api/Dockerfile -t ${{ env.TCR_REGISTRY }}/monitor-api:latest .
+        run: |
+          docker build -f Monitor/api/Dockerfile -t ${{ env.TCR_REGISTRY }}/monitor-api:latest .
+          docker push ${{ env.TCR_REGISTRY }}/monitor-api:latest
 
       - name: 部署到服务器
         run: |
           sudo apt-get install -qq -y sshpass
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/opt/lujiesheng/docker-compose.yml
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
+            set -e
             cd /opt/lujiesheng
+            echo "${{ secrets.TCR_PASSWORD }}" | docker login ccr.ccs.tencentyun.com -u 100012562502 --password-stdin
             docker compose pull portfolio auth monitor-web monitor-api
             docker compose up -d portfolio auth monitor-web monitor-api
             docker image prune -f
