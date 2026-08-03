@@ -393,7 +393,9 @@ jobs:
           sudo apt-get install -qq -y sshpass
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/opt/lujiesheng/docker-compose.yml
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
+            set -e
             cd /opt/lujiesheng
+            echo "${{ secrets.TCR_PASSWORD }}" | docker login ccr.ccs.tencentyun.com -u 100012562502 --password-stdin
             docker compose pull portfolio auth monitor-web monitor-api
             docker compose up -d portfolio auth monitor-web monitor-api
             docker image prune -f
