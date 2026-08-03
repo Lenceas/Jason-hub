@@ -2,6 +2,11 @@
 
 ---
 
+## v0.6.0 (2026-08-03)
+
+- **feat**: 初始化超级管理员 — 启动时若 `admin` 用户不存在且配置了 `AUTH_ADMIN_PASSWORD`（映射 `Auth__InitAdminPassword`），自动创建超级管理员（BCrypt 哈希存储，幂等）
+- **security**: 初始密码不落代码明文 — 仅通过环境变量注入，创建完成后可从 `.env` 移除
+
 ## v0.5.1 (2026-06-04)
 
 - **docs**: Auth README 重构为中英双语格式

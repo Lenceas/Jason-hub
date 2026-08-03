@@ -73,6 +73,8 @@ Auth/
 | `auth_clients` | id / client_id / client_secret_hash / name / scopes / is_active / created_at | 服务间调用凭证 |
 | `auth_refresh_tokens` | id / user_id / token_hash / expires_at / revoked | 刷新令牌 |
 
+**初始管理员**：首次启动时若 `auth_users` 中不存在 `admin`，且配置了 `AUTH_ADMIN_PASSWORD` 环境变量，服务自动创建超级管理员（BCrypt 哈希存储，幂等；密码不落代码明文）。
+
 ## 五、认证流程
 
 ```
