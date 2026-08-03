@@ -88,9 +88,8 @@ const loadDetail = computed(() => {
 })
 
 /** 网络速率副标题（KB/s）— 最近两条记录的差值/时间 */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function calcRate(key: string): string | undefined {
-  const h = store.metricsHistory as any[]
+function calcRate(key: 'net_in' | 'net_out'): string | undefined {
+  const h = store.metricsHistory
   if (h.length < 2) return undefined
   const prev = h[h.length - 2], curr = h[h.length - 1]
   const diff = (curr[key] ?? 0) - (prev[key] ?? 0)

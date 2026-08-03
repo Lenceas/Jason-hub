@@ -26,7 +26,7 @@ Jason-hub/
 │   ├── src/
 │   │   ├── pages/          ← 页面路由（单页：index.astro）
 │   │   ├── layouts/        ← 布局模板（BaseLayout）
-│   │   ├── components/     ← 10 个组件
+│   │   ├── components/     ← 8 个组件
 │   │   ├── data/           ← 项目数据（JSON）
 │   │   └── styles/         ← 全局样式（CSS 变量 + Reset + 响应式）
 │   ├── PLAN.md             ← 方案设计

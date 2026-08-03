@@ -32,6 +32,8 @@ echo "=== 创建 $NAME 后端项目 ==="
 
 # 1. 复制模板
 cp -r "$TEMPLATE" "$TARGET"
+# 清理模板构建产物（bin/obj 不复制进新项目）
+find "$TARGET" -type d \( -name bin -o -name obj \) -prune -exec rm -rf {} +
 echo "✅ 模板复制完成"
 
 # 2. 按项目名重命名文件（含 __ProjectName__ 占位符的文件名）

@@ -35,6 +35,7 @@ Jason-hub/
 ├── scripts/             ← 辅助脚本
 │   └── scaffold-dotnet.sh ← .NET 后端子项目生成器
 ├── .github/workflows/   ← GitHub Actions CI/CD
+├── .codex/skills/       ← Codex 技能（发布/立项/脚手架）
 ├── docker-compose.yml   ← Docker 容器编排
 ├── .env.example         ← 环境变量模板
 ├── PLAN.md              ← Monorepo 总体规划
@@ -101,6 +102,7 @@ Jason-hub/
 ├── scripts/             ← Utility scripts
 │   └── scaffold-dotnet.sh ← .NET backend sub-project generator
 ├── .github/workflows/   ← GitHub Actions CI/CD
+├── .codex/skills/       ← Codex skills (release / init / scaffold)
 ├── docker-compose.yml   ← Docker container orchestration
 ├── .env.example         ← Environment variable template
 ├── PLAN.md              ← Monorepo master plan

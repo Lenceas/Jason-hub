@@ -1,6 +1,6 @@
 # RELEASE.md — 发布工作流（速查）
 
-> Jason-hub 发布流程总览。**详细步骤已封装为 Claude Code 技能**，执行时直接调用对应命令即可。
+> Jason-hub 发布流程总览。**详细步骤已封装为技能**（`.claude/skills/` 与 `.codex/skills/` 同步维护），执行时直接调用对应命令或说对应口令即可。
 >
 > 🎯 **快捷命令**（无需预加载上下文）：
 >   - `/release` — 主仓库发布流
@@ -8,6 +8,8 @@
 >   - `/project-init` — 子项目立项流
 >   - `/scaffold-dotnet` — 创建 .NET 后端子项目
 >   - `/load-project` — 加载项目全景
+>
+> Codex 中无需斜杠命令，直接说口令（如"提交代码"）即可触发。
 
 ---
 

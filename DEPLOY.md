@@ -368,24 +368,34 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
-      - name: 打包代码
-        run: tar czf deploy.tar.gz $(git ls-files)
+      - name: 登录腾讯云 TCR
+        run: echo "${{ secrets.TCR_PASSWORD }}" | docker login ccr.ccs.tencentyun.com -u 100012562502 --password-stdin
+
+      - name: 构建并推送镜像（Portfolio / Auth / Monitor Web / Monitor API）
+        run: |
+          docker build -f Portfolio/Dockerfile -t ccr.ccs.tencentyun.com/jason-hub/portfolio:latest .
+          docker build -f Auth/api/Dockerfile -t ccr.ccs.tencentyun.com/jason-hub/auth:latest .
+          docker build -f Monitor/web/Dockerfile -t ccr.ccs.tencentyun.com/jason-hub/monitor-web:latest .
+          docker build -f Monitor/api/Dockerfile -t ccr.ccs.tencentyun.com/jason-hub/monitor-api:latest .
+          docker push ccr.ccs.tencentyun.com/jason-hub/portfolio:latest
+          docker push ccr.ccs.tencentyun.com/jason-hub/auth:latest
+          docker push ccr.ccs.tencentyun.com/jason-hub/monitor-web:latest
+          docker push ccr.ccs.tencentyun.com/jason-hub/monitor-api:latest
 
       - name: 部署到服务器
         run: |
           sudo apt-get install -qq -y sshpass
-          sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -o StrictHostKeyChecking=no deploy.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/tmp/deploy.tar.gz
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/opt/lujiesheng/docker-compose.yml
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
-            sudo rm -rf /opt/lujiesheng/Portfolio
-            sudo tar xzf /tmp/deploy.tar.gz -C /opt/lujiesheng
-            sudo rm /tmp/deploy.tar.gz
             cd /opt/lujiesheng
-            docker compose up --build -d portfolio
+            docker compose pull portfolio auth monitor-web monitor-api
+            docker compose up -d portfolio auth monitor-web monitor-api
             docker image prune -f
           '
 ```
@@ -397,8 +407,9 @@ GitHub Secrets 配置：
 | `SERVER_HOST` | 服务器 IP |
 | `SERVER_USER` | SSH 用户名 |
 | `SERVER_PASSWORD` | SSH 密码 |
+| `TCR_PASSWORD` | 腾讯云 TCR 镜像仓库密码 |
 
-> 新增子项目时，deploy.yml 中 `docker compose up` 需追加新 service 名称。
+> 新增子项目时：在构建步骤追加 `docker build/push` 新镜像，并在服务器端 `docker compose pull/up` 中追加新 service 名称。
 
 ---
 
@@ -440,12 +451,13 @@ GitHub Secrets 配置：
 
 ```
 git push → GitHub Actions 触发
-         → tar 打包代码（仅 git 追踪文件）
-         → scp 上传到服务器 /tmp
-         → SSH 解压覆盖 /opt/lujiesheng
-         → docker compose up --build -d （构建+启动新容器）
+         → 构建 4 个应用镜像并推送 TCR
+         → scp 上传 docker-compose.yml
+         → SSH: docker compose pull && up -d（仅应用层 4 服务）
          → docker image prune -f （清理旧镜像）
 ```
+
+> 镜像构建在 CI 中完成（`docker build` + `docker push`），服务器端只拉取和启动，不再在服务器上构建。
 
 ---
 

@@ -1,5 +1,14 @@
 # CHANGELOG.md — Monitor 更新日志
 
+## v0.2.1 (2026-08-03)
+
+- **fix**: Server.vue lint 修复 — calcRate 的 any 改为 `'net_in' | 'net_out'` 联合类型（移除 eslint-disable）
+- **fix**: package.json 版本同步 0.1.0 → 0.2.0
+- **fix**: Dockerfile 恢复构建门禁 — `npx vite build` → `npm run build`（lint + typecheck）
+- **fix**: Redis 连接串空值兜底 — appsettings 空串不再导致启动异常
+- **feat**: 新增 appsettings.json / appsettings.Development.json（与 Auth 规范一致）
+- **docs**: OpenAPI 版本号 v0.1.0 → v0.2.0
+
 ## v0.2.0 (2026-06-05)
 
 - **feat**: Redis 缓存 — 实时指标缓存优先（60s TTL），Worker 写入时同步更新

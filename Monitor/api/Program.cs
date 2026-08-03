@@ -30,7 +30,7 @@ builder.Services.AddOpenApi(options =>
             提供服务器指标采集、Docker 容器管理、站点可用性探测、应用健康检查、告警规则管理、CI/CD 流水线追踪。
             后台 Agent 定时采集，实时数据存 Redis，历史数据存 MySQL。
             """;
-        document.Info.Version = $"v0.1.0 (.NET {Environment.Version})";
+        document.Info.Version = $"v0.2.0 (.NET {Environment.Version})";
         return Task.CompletedTask;
     });
 });
@@ -52,8 +52,9 @@ builder.Services.AddScoped<ISqlSugarClient>(sp =>
 });
 
 // Redis 缓存
-var redisConnStr = builder.Configuration.GetConnectionString("Redis")
-    ?? Environment.GetEnvironmentVariable("MONITOR_REDIS_CONNECTION")
+var redisConnStr = (string.IsNullOrEmpty(builder.Configuration.GetConnectionString("Redis"))
+    ? Environment.GetEnvironmentVariable("MONITOR_REDIS_CONNECTION")
+    : builder.Configuration.GetConnectionString("Redis"))
     ?? "127.0.0.1:6379";
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
