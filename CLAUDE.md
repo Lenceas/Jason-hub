@@ -13,7 +13,7 @@
 |------|-----|
 | 在线地址 | https://lujiesheng.cn |
 | 服务器 | 81.71.136.3（腾讯云 2C4G / Ubuntu 24.04） |
-| 当前版本 | v1.9.3 |
+| 当前版本 | v1.10.0 |
 | 技术栈 | Astro 6 / Vue 3 + TypeScript / .NET 10 |
 | 数据库 | MySQL 8.4 / Redis 8 / MongoDB 8 |
 | CI/CD | GitHub Actions 构建镜像 → TCR → 服务器 pull + up |
@@ -53,6 +53,7 @@ Jason-hub/
 - [完成] Auth v0.6.1 表结构与登录修复 ✅ — 兼容 NOT NULL 表结构、登录 500 修复、种子容错
 - [完成] v1.9.2 技能目录迁移 ✅ — `.claude/skills/` + `.codex/skills/` 双副本合并为 `.dsh/skills/` 单一技能目录，DSH 原生发现
 - [完成] v1.9.3 CI/CD 文档口径修正 ✅ — 4 份文档的旧"服务器构建"描述统一为"Actions 构建 → TCR → 服务器 pull + up"
+- [完成] v1.10.0 CI 路径过滤 ✅ — 纯文档推送不再触发镜像重建与生产部署
 
 ---
 
@@ -63,6 +64,7 @@ Jason-hub/
 - 根目录和每个子项目各自包含标准 MD 文档：根 `PLAN.md`（总体规划）/ 子项目 `PLAN.md`（方案设计）、`CHANGELOG.md`（日志）、`README.md`（技术说明）
 - 样式使用 UnoCSS + Portfolio CSS 变量（监控面板）
 - ORM 使用 SqlSugar（支持多数据库/多租户/MongoDB）
+- **交互规范**：需要用户确认/选择/补充信息时，**一律调用 `ask_user_question` 弹窗**，禁止正文"回复 ok"式等待（推荐项排第一并标注"（推荐）"；纯告知性内容仍用正文，详见 `AGENTS.md`「交互规范」）
 
 ### 发布流程
 - 子项目动工前必须先出方案文档 → 用户确认（`/project-init`）
@@ -71,7 +73,7 @@ Jason-hub/
 - CHANGELOG.md 和 CLAUDE.md 每次必更
 
 ### 分支策略
-- `main` — 始终可部署，合并即发布
+- `main` — 始终可部署，合并即发布（**例外**：纯文档推送经 `paths-ignore` 跳过部署，只进版本库不动生产，见 `DEPLOY.md`「触发条件」）
 - `project/<name>` — 子项目开发分支，子项目代码（Auth/、Monitor/ 等）必须在此分支开发，再合并到 main
 - `feat/<描述>` / `fix/<描述>` — 小功能/修复，完成后删除
 - 语义化版本：`v主版本.次版本.修订`
@@ -116,6 +118,8 @@ Jason-hub/
 | 2026-08-03 | Auth 实体对齐 NOT NULL 表结构（可空字段改非空默认值）；登录成功写 `UnixEpoch` 代替 NULL | `Auth/api/Models/Entities/AuthUser.cs` |
 | 2026-09-10 | 技能目录收敛为 DSH 原生单一来源 `.dsh/skills/` — 废弃 `.claude/skills/` 与 `.codex/skills/` 双副本（DSH 只扫描 `.dsh/skills/` 与 `.agents/skills/`） | `.dsh/skills/` |
 | 2026-09-10 | CI/CD 构建位置口径统一：镜像在 GitHub Actions runner 构建，服务器只 pull + up，腾讯云 TCR 仅作镜像仓库（未启用 TCR 自动构建）；修正 4 份文档的旧流程描述 | `.github/workflows/deploy.yml` |
+| 2026-09-10 | `deploy.yml` 新增 `paths-ignore`：纯文档变更不触发部署（镜像内容与文档无关，"合并即发布"改为"代码变更即发布"） | `.github/workflows/deploy.yml` |
+| 2026-09-10 | 确立交互规范：确认/选择类交互一律走 `ask_user_question` 弹窗，禁止正文等待回复；已写入 `AGENTS.md`、`CLAUDE.md`、发布类技能 | `AGENTS.md` |
 
 ---
 

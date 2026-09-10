@@ -2,6 +2,16 @@ name: Deploy
 on:
   push:
     branches: [main]
+    # 纯文档/规范变更不触发部署：镜像内容完全由代码与 Dockerfile 决定，
+    # 文档改动重建出来的镜像与线上一致，却要把 4 个镜像重新构建推送、
+    # 并在生产环境滚动重启一轮。
+    # 注意是"全部路径都命中才跳过"——只要本次推送含一个代码/配置文件
+    # （.vue/.ts/.cs/Dockerfile/docker-compose.yml/package.json 等），照常部署。
+    paths-ignore:
+      - '**.md'
+      - '.dsh/**'
+      - '.gitignore'
+      - 'LICENSE'
 
 concurrency:
   group: deploy

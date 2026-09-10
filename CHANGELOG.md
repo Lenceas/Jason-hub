@@ -2,6 +2,14 @@
 
 ---
 
+## v1.10.0 (2026-09-10)
+
+- **chore**: CI/CD 新增 `paths-ignore` 路径过滤 — 纯文档变更（`**.md` / `.dsh/**` / `.gitignore` / `LICENSE`）不再触发部署，避免"改几个 Markdown 就重建 4 个镜像 + 生产滚动重启"；含任一代码/配置文件的推送仍照常部署
+- **docs**: `DEPLOY.md` workflow 示例与实际配置对齐 — 修正 3 处偏差：补 `paths-ignore` 与 `concurrency`、补 `env.TCR_REGISTRY` 变量（原文直接硬编码 TCR 全路径）、4 个服务构建步骤从"合并一步"改为"每服务独立步骤"（与线上一致，便于失败定位）
+- **docs**: `DEPLOY.md` 新增「触发条件（paths-ignore）」小节 — 列出跳过/触发的路径对照表与"全部路径命中才跳过"语义说明
+- **docs**: `CLAUDE.md` 分支策略补充"合并即发布"的例外说明 — 纯文档推送只进版本库、不动生产
+- **docs**: 新增「交互规范」— 需要用户确认/选择/补充信息时一律调用 `ask_user_question` 弹窗，禁止正文"回复 ok"式等待；落地到 `AGENTS.md`（项目级规范）、`CLAUDE.md`（关键约定）、`.dsh/skills/release|project-release/SKILL.md`（步骤③镜像构建判断、步骤⑥摘要确认均改为强制弹窗）
+
 ## v1.9.3 (2026-09-10)
 
 - **docs**: 修正四处与实际 CI/CD 配置不符的部署流程描述 — `AGENTS.md`（原"SCP 上传代码 → `docker compose up --build -d`"）、`ARCHITECTURE.md`（原"SCP → docker compose up --build"）、`CLAUDE.md` 项目速览（原"GitHub Actions → SCP → docker compose up"）、`PLAN.md` 技术选型表（原"SCP → docker compose"），统一为"GitHub Actions 构建 4 镜像并推送 TCR → 服务器 pull + up"

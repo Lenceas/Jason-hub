@@ -364,11 +364,22 @@ name: Deploy
 on:
   push:
     branches: [main]
+    paths-ignore:          # 纯文档变更不触发部署，见下方「触发条件」
+      - '**.md'
+      - '.dsh/**'
+      - '.gitignore'
+      - 'LICENSE'
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false   # 连续推送时排队串行，不互相取消
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    env:
+      TCR_REGISTRY: ccr.ccs.tencentyun.com/jason-hub
     steps:
       - uses: actions/checkout@v4
         with:
@@ -377,16 +388,25 @@ jobs:
       - name: 登录腾讯云 TCR
         run: echo "${{ secrets.TCR_PASSWORD }}" | docker login ccr.ccs.tencentyun.com -u 100012562502 --password-stdin
 
-      - name: 构建并推送镜像（Portfolio / Auth / Monitor Web / Monitor API）
+      - name: 构建并推送 Portfolio
         run: |
-          docker build -f Portfolio/Dockerfile -t ccr.ccs.tencentyun.com/jason-hub/portfolio:latest .
-          docker build -f Auth/api/Dockerfile -t ccr.ccs.tencentyun.com/jason-hub/auth:latest .
-          docker build -f Monitor/web/Dockerfile -t ccr.ccs.tencentyun.com/jason-hub/monitor-web:latest .
-          docker build -f Monitor/api/Dockerfile -t ccr.ccs.tencentyun.com/jason-hub/monitor-api:latest .
-          docker push ccr.ccs.tencentyun.com/jason-hub/portfolio:latest
-          docker push ccr.ccs.tencentyun.com/jason-hub/auth:latest
-          docker push ccr.ccs.tencentyun.com/jason-hub/monitor-web:latest
-          docker push ccr.ccs.tencentyun.com/jason-hub/monitor-api:latest
+          docker build -f Portfolio/Dockerfile -t ${{ env.TCR_REGISTRY }}/portfolio:latest .
+          docker push ${{ env.TCR_REGISTRY }}/portfolio:latest
+
+      - name: 构建并推送 Auth
+        run: |
+          docker build -f Auth/api/Dockerfile -t ${{ env.TCR_REGISTRY }}/auth:latest .
+          docker push ${{ env.TCR_REGISTRY }}/auth:latest
+
+      - name: 构建并推送 Monitor Web
+        run: |
+          docker build -f Monitor/web/Dockerfile -t ${{ env.TCR_REGISTRY }}/monitor-web:latest .
+          docker push ${{ env.TCR_REGISTRY }}/monitor-web:latest
+
+      - name: 构建并推送 Monitor API
+        run: |
+          docker build -f Monitor/api/Dockerfile -t ${{ env.TCR_REGISTRY }}/monitor-api:latest .
+          docker push ${{ env.TCR_REGISTRY }}/monitor-api:latest
 
       - name: 部署到服务器
         run: |
@@ -401,6 +421,9 @@ jobs:
             docker image prune -f
           '
 ```
+
+> 每个服务一个独立构建步骤（而非合并成一步），这样某个服务构建失败时，日志和失败定位都停在对应的那一步。
+> 新增子项目时：复制一个构建步骤 + 在服务器端 `pull`/`up -d` 追加服务名 + 追加 `TCR_REGISTRY` 下的镜像名。
 
 GitHub Secrets 配置：
 
@@ -460,6 +483,20 @@ git push → GitHub Actions 触发
 ```
 
 > 镜像构建在 CI 中完成（`docker build` + `docker push`），服务器端只拉取和启动，不再在服务器上构建。
+
+### 触发条件（`paths-ignore`）
+
+`deploy.yml` 的 `on.push` 配置了路径过滤，**纯文档变更不会触发部署**：
+
+| 路径 | 是否触发部署 |
+|------|-------------|
+| `**.md`（含根文档、各子项目文档、`.dsh/skills/**/SKILL.md`） | ❌ 跳过 |
+| `.dsh/**`、`.gitignore`、`LICENSE` | ❌ 跳过 |
+| `Portfolio/**`、`Auth/**`、`Monitor/**`、`templates/**`、`scripts/**` | ✅ 触发 |
+| `docker-compose.yml`、`.github/workflows/deploy.yml` | ✅ 触发 |
+
+> 语义是"本次推送的**全部**变更路径都命中忽略规则才跳过"。所以"改文档 + 改代码"混在同一个提交里时仍会正常部署，不会漏发布。
+> 代价：`main` 分支不再是"任何推送都上线"，纯文档推送只进版本库、不动生产。
 
 ---
 
