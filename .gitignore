@@ -31,3 +31,6 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+
+# ======== AI 工具产物 ========
+.codex/tmp/
