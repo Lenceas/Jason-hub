@@ -119,7 +119,7 @@
 | 服务器 | 腾讯云 2C4G / 70GB SSD / 6Mbps | Ubuntu 24.04 |
 | 反向代理 | Nginx | — |
 | SSL | acme.sh + Let's Encrypt | DNS-01 |
-| CI/CD | GitHub Actions | SCP → docker compose |
+| CI/CD | GitHub Actions | 构建镜像 → TCR → 服务器 pull + up |
 | 版本控制 | Git + GitHub Flow | — |
 
 ---

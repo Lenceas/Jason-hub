@@ -2,6 +2,11 @@
 
 ---
 
+## v1.9.3 (2026-09-10)
+
+- **docs**: 修正四处与实际 CI/CD 配置不符的部署流程描述 — `AGENTS.md`（原"SCP 上传代码 → `docker compose up --build -d`"）、`ARCHITECTURE.md`（原"SCP → docker compose up --build"）、`CLAUDE.md` 项目速览（原"GitHub Actions → SCP → docker compose up"）、`PLAN.md` 技术选型表（原"SCP → docker compose"），统一为"GitHub Actions 构建 4 镜像并推送 TCR → 服务器 pull + up"
+- **docs**: 明确构建位置归属 — 镜像在 GitHub Actions 的 `ubuntu-latest` runner 上构建，服务器（2C4G）只拉取运行不构建，腾讯云 TCR 仅作镜像仓库、未启用其自动构建能力（消除"腾讯云是否负责构建"的歧义）
+
 ## v1.9.2 (2026-09-10)
 
 - **chore**: 技能目录迁移至 DSH 原生路径 — `.claude/skills/` + `.codex/skills/`（两份重复副本）→ `.dsh/skills/`，5 个技能统一为 `<name>/SKILL.md` 目录包形式，由 DSH 自动发现并支持斜杠命令 / 自然语言双触发

@@ -13,10 +13,10 @@
 |------|-----|
 | 在线地址 | https://lujiesheng.cn |
 | 服务器 | 81.71.136.3（腾讯云 2C4G / Ubuntu 24.04） |
-| 当前版本 | v1.9.2 |
+| 当前版本 | v1.9.3 |
 | 技术栈 | Astro 6 / Vue 3 + TypeScript / .NET 10 |
 | 数据库 | MySQL 8.4 / Redis 8 / MongoDB 8 |
-| CI/CD | GitHub Actions → SCP → docker compose up |
+| CI/CD | GitHub Actions 构建镜像 → TCR → 服务器 pull + up |
 
 ## 仓库结构
 
@@ -52,6 +52,7 @@ Jason-hub/
 - [完成] Auth v0.6.0 初始化超级管理员 ✅ — admin 经环境变量 + BCrypt 自动创建，密码不落代码明文
 - [完成] Auth v0.6.1 表结构与登录修复 ✅ — 兼容 NOT NULL 表结构、登录 500 修复、种子容错
 - [完成] v1.9.2 技能目录迁移 ✅ — `.claude/skills/` + `.codex/skills/` 双副本合并为 `.dsh/skills/` 单一技能目录，DSH 原生发现
+- [完成] v1.9.3 CI/CD 文档口径修正 ✅ — 4 份文档的旧"服务器构建"描述统一为"Actions 构建 → TCR → 服务器 pull + up"
 
 ---
 
@@ -114,6 +115,7 @@ Jason-hub/
 | 2026-08-03 | Auth 启动时经 `AUTH_ADMIN_PASSWORD` 环境变量初始化超级管理员（BCrypt 哈希，幂等，不落明文） | `Auth/api/Program.cs` |
 | 2026-08-03 | Auth 实体对齐 NOT NULL 表结构（可空字段改非空默认值）；登录成功写 `UnixEpoch` 代替 NULL | `Auth/api/Models/Entities/AuthUser.cs` |
 | 2026-09-10 | 技能目录收敛为 DSH 原生单一来源 `.dsh/skills/` — 废弃 `.claude/skills/` 与 `.codex/skills/` 双副本（DSH 只扫描 `.dsh/skills/` 与 `.agents/skills/`） | `.dsh/skills/` |
+| 2026-09-10 | CI/CD 构建位置口径统一：镜像在 GitHub Actions runner 构建，服务器只 pull + up，腾讯云 TCR 仅作镜像仓库（未启用 TCR 自动构建）；修正 4 份文档的旧流程描述 | `.github/workflows/deploy.yml` |
 
 ---
 
