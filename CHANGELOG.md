@@ -2,6 +2,13 @@
 
 ---
 
+## v1.9.2 (2026-09-10)
+
+- **chore**: 技能目录迁移至 DSH 原生路径 — `.claude/skills/` + `.codex/skills/`（两份重复副本）→ `.dsh/skills/`，5 个技能统一为 `<name>/SKILL.md` 目录包形式，由 DSH 自动发现并支持斜杠命令 / 自然语言双触发
+- **docs**: 技能路径引用同步 — `CLAUDE.md`（仓库结构 + 快捷技能命令 + 关键决策记录 3 处）、`README.md`（中英双语结构图）、`RELEASE.md` 全部指向 `.dsh/skills/`
+- **docs**: `RELEASE.md` 触发环境说明修正（原写"Codex 中无需斜杠命令"）— DSH 会话既支持斜杠命令也支持直接说口令
+- **chore**: `.gitignore` 移除随迁移失效的 `.codex/tmp/` 规则
+
 ## v1.9.1 (2026-08-03)
 
 - **fix**: Auth v0.6.1 — 初始化管理员兼容 NOT NULL 表结构（全字段非空默认值）、登录成功路径不再写 NULL（修复 500）、种子失败不阻断启动

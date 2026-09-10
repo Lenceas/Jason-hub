@@ -1,6 +1,6 @@
 # Jason-hub Monorepo
 
-> 本文件由 Claude Code 自动维护，每次开发阶段完成或发布版本时更新。
+> 本文件由 AI 编程助手在每次开发阶段完成或发布版本时更新。
 > 换电脑后 `git pull`，新会话自动加载最新进度。
 
 ---
@@ -13,7 +13,7 @@
 |------|-----|
 | 在线地址 | https://lujiesheng.cn |
 | 服务器 | 81.71.136.3（腾讯云 2C4G / Ubuntu 24.04） |
-| 当前版本 | v1.9.1 |
+| 当前版本 | v1.9.2 |
 | 技术栈 | Astro 6 / Vue 3 + TypeScript / .NET 10 |
 | 数据库 | MySQL 8.4 / Redis 8 / MongoDB 8 |
 | CI/CD | GitHub Actions → SCP → docker compose up |
@@ -27,8 +27,7 @@ Jason-hub/
 ├── Monitor/           ← 监控面板（Vue 3 + .NET 10，开发中）
 ├── templates/         ← 脚手架模板（dotnet-service）
 ├── scripts/           ← 工具脚本（scaffold-dotnet.sh 等）
-├── .claude/skills/    ← Claude Code 技能命令
-├── .codex/skills/     ← Codex 技能（与 .claude 同步）
+├── .dsh/skills/       ← DSH 技能（发布/立项/脚手架）
 ├── .github/           ← CI/CD 工作流
 └── 根文档             ← PLAN / ARCHITECTURE / DEPLOY / AGENTS / STYLE_GUIDE / README / CHANGELOG / RELEASE / CLAUDE
 ```
@@ -52,6 +51,7 @@ Jason-hub/
 - [完成] v1.8.3 CI 推送修复 ✅ — 补齐 docker push + 服务器端 login + set -e
 - [完成] Auth v0.6.0 初始化超级管理员 ✅ — admin 经环境变量 + BCrypt 自动创建，密码不落代码明文
 - [完成] Auth v0.6.1 表结构与登录修复 ✅ — 兼容 NOT NULL 表结构、登录 500 修复、种子容错
+- [完成] v1.9.2 技能目录迁移 ✅ — `.claude/skills/` + `.codex/skills/` 双副本合并为 `.dsh/skills/` 单一技能目录，DSH 原生发现
 
 ---
 
@@ -98,7 +98,7 @@ Jason-hub/
 
 | 日期 | 决策 | 参考文档 |
 |------|------|---------|
-| 2026-06-01 | 主发布流新增步骤⑧：根仓库规范变更自动同步到子项目分支（`--ff-only`） | `.claude/skills/release.md` |
+| 2026-06-01 | 主发布流新增步骤⑧：根仓库规范变更自动同步到子项目分支（`--ff-only`） | `.dsh/skills/release/SKILL.md` |
 | 2026-06-01 | Auth 登录密码 RSA-OAEP 前端加密（Web Crypto API + JwtService 解密） | `Auth/Program.cs` |
 | 2026-06-01 | Auth 安全响应头 + ForwardedHeaders 真实 IP + 审计日志 [IP] [UA] | `Auth/Program.cs` |
 | 2026-06-02 | Auth v0.3.1 — 移除登录成功跳转 URL 中的 `?token=`，Token 仅通过 HttpOnly Cookie 传递 | `Auth/Program.cs` |
@@ -106,13 +106,14 @@ Jason-hub/
 | 2026-06-02 | OpenAPI 端点采用链式调用风格 `.WithTags() .WithSummary() .WithDescription() .Produces<T>()` | `AuthEndpoints.cs` |
 | 2026-06-02 | IP 城市解析方案：ip2region 国产离线库（11MB），CI/CD 自动下载 + 服务器 cron 每月更新 | `Ip2RegionService.cs` |
 | 2026-06-02 | Portfolio 移除 UserAuth — Portfolio 纯公开展示，子项目各自负责鉴权检测 | — |
-| 2026-06-02 | .NET 后端脚手架：`templates/dotnet-service/` + `scripts/scaffold-dotnet.sh` | `.claude/skills/scaffold-dotnet.md` |
+| 2026-06-02 | .NET 后端脚手架：`templates/dotnet-service/` + `scripts/scaffold-dotnet.sh` | `.dsh/skills/scaffold-dotnet/SKILL.md` |
 | 2026-06-02 | CI/CD 仅从 main 触发部署（去重），往 sub-branch 合并不再触发 | `.github/workflows/deploy.yml` |
 | 2026-08-03 | CI/CD 接管镜像构建与 TCR 推送，服务器端改为 pull + up；废弃 tar 上传/服务器构建 | `.github/workflows/deploy.yml` |
-| 2026-08-03 | 发布/立项等技能同步至 `.codex/skills/`（Codex 自然语言触发） | `.codex/skills/` |
+| 2026-08-03 | 发布/立项等技能统一存放于 `.dsh/skills/`（DSH 会话自然语言触发） | `.dsh/skills/` |
 | 2026-08-03 | CI 构建后显式 docker push；部署脚本加 set -e，pull 失败不再静默通过 | `.github/workflows/deploy.yml` |
 | 2026-08-03 | Auth 启动时经 `AUTH_ADMIN_PASSWORD` 环境变量初始化超级管理员（BCrypt 哈希，幂等，不落明文） | `Auth/api/Program.cs` |
 | 2026-08-03 | Auth 实体对齐 NOT NULL 表结构（可空字段改非空默认值）；登录成功写 `UnixEpoch` 代替 NULL | `Auth/api/Models/Entities/AuthUser.cs` |
+| 2026-09-10 | 技能目录收敛为 DSH 原生单一来源 `.dsh/skills/` — 废弃 `.claude/skills/` 与 `.codex/skills/` 双副本（DSH 只扫描 `.dsh/skills/` 与 `.agents/skills/`） | `.dsh/skills/` |
 
 ---
 
@@ -120,7 +121,7 @@ Jason-hub/
 
 | 命令 | 说明 | 对应口头指令 |
 |------|------|-------------|
-| `/release` | 主仓库发布流（7 步） | "提交代码" |
+| `/release` | 主仓库发布流（7 步 + 子项目分支同步） | "提交代码" |
 | `/project-release` | 子项目发布流（8 步） | "发布子项目" |
 | `/project-init` | 子项目立项流程（4 步） | "规划子项目" |
 | `/scaffold-dotnet` | 从模板创建 .NET 后端项目 | "创建 {项目名} 后端" |
@@ -128,4 +129,4 @@ Jason-hub/
 
 > 说 **"加载项目"** 或调用 `/load-project` 可读取全部文档并输出项目全景摘要。
 >
-> 技能已同步至 `.codex/skills/`，Codex 会话中直接说口令（如"提交代码"）即可触发。
+> 技能位于 `.dsh/skills/`，DSH 会话中直接说口令（如"提交代码"）即可触发。

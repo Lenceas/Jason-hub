@@ -68,7 +68,7 @@ git log --oneline -5         # 最近 5 条 commit
   ├── Monitor/      — 监控面板（Vue 3 + .NET 10，开发中）
   ├── templates/    — 脚手架模板
   ├── scripts/      — 工具脚本
-  └── .claude/skills/ — 技能命令
+  └── .dsh/skills/  — 技能命令
 
 ⚡ 可用技能
   /release          — 主仓库发布（说"提交代码"）

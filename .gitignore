@@ -33,4 +33,4 @@ Thumbs.db
 *.swo
 
 # ======== AI 工具产物 ========
-.codex/tmp/
+.dsh/tmp/

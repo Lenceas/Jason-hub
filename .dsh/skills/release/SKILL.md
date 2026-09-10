@@ -233,7 +233,7 @@ cd Portfolio && npm version {versionBump} --no-git-tag-version
 cd ..
 
 # 2. 暂存所有变更（根据步骤③的影响范围选择对应路径）
-#    文档变更：git add *.md .claude/ 等
+#    文档变更/技能：git add *.md .dsh/ 等
 #    CI/CD：git add .github/ 等
 git add <本次变更涉及的路径>
 git add Portfolio/package.json Portfolio/package-lock.json
