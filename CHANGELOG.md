@@ -2,6 +2,16 @@
 
 ---
 
+## v1.10.1 (2026-09-12)
+
+- **fix**: CI/CD 构建阶段拆分为 4 个并行矩阵 job — 原先 4 个 `docker build` 串行跑在同一 job 里共用一个 40 分钟总超时，Auth 镜像构建劣化后（8/3 尚为 5m38s，9/10 起超 39 分钟）撞穿超时，整条流水线被杀、"部署到服务器"从未执行，生产静默停在旧镜像；现每个镜像独立 job + 60 分钟独立超时，`fail-fast: false` 互不取消，`deploy` 经 `needs: build` 汇聚
+- **feat**: CI 新增 GHA 层缓存（改用 `docker/build-push-action@v6` + Buildx）— `cache-from/to: type=gha` 使基础镜像层、`npm ci`、`dotnet restore` 跨次复用，消除每次全新 runner 冷构建重拉约 1.7GB .NET SDK 镜像的开销；`mode=max` 为显式指定（默认 `min` 只缓存末级图层，而耗时步骤全在中间的 build 阶段）
+- **chore**: 部署条件收紧 — `deploy` job 依赖 4 个镜像全部构建成功，避免"3 个新镜像 + 1 个旧镜像"的半吊子状态推上生产
+- **chore**: 新增根目录 `.dockerignore`（此前完全缺失）— 排除 `node_modules`（约 350MB）、`bin/obj`、`.git`、`ip2region/`（10.6MB）、`.env*`、`**/*.pem|key`、`**/*.md`，构建上下文约 460MB → 约 10MB；同时避免宿主机 `node_modules` 覆盖容器内 `npm ci` 刚装好的依赖，并堵住密钥误入镜像的路径
+- **chore**: 腾讯云 TCR 账号 ID 从 3 处硬编码收敛为单一 `env.TCR_USERNAME`；`FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` 提升为 workflow 级 env
+- **docs**: `DEPLOY.md` 同步新 workflow 全文副本，并新增「为什么拆成两个 job」「GHA 层缓存（含 10GB/仓库上限与 LRU 淘汰说明）」「构建上下文（`.dockerignore`）」三节；`docker-compose.yml` 文档行同步新 job 结构
+- **docs**: `DEPLOY.md` 明确 CI/CD **全程不使用 SSH 密钥** — `actions/checkout` 走 GitHub 自动注入的 `GITHUB_TOKEN`，部署到服务器走 `sshpass` 密码认证（`SERVER_PASSWORD`），本机 SSH key 增删与流水线无关
+
 ## v1.10.0 (2026-09-10)
 
 - **chore**: CI/CD 新增 `paths-ignore` 路径过滤 — 纯文档变更（`**.md` / `.dsh/**` / `.gitignore` / `LICENSE`）不再触发部署，避免"改几个 Markdown 就重建 4 个镜像 + 生产滚动重启"；含任一代码/配置文件的推送仍照常部署

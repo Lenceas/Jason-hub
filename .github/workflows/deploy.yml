@@ -17,40 +17,83 @@ concurrency:
   group: deploy
   cancel-in-progress: false
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  TCR_REGISTRY: ccr.ccs.tencentyun.com/jason-hub
+  TCR_USERNAME: '100012562502'
+
 jobs:
-  deploy:
+  # ---- 构建层：4 个镜像并行构建，互不阻塞 ----
+  # 拆成并行 job 的原因：原先 4 个 docker build 串行跑在同一个 job 里，
+  # 任一镜像构建变慢都会挤占后续镜像的时间，最终撞穿 40 分钟总超时，
+  # 整条流水线被杀、"部署到服务器"根本没机会执行（生产环境停在旧镜像）。
+  # 现在每个镜像独立 job + 独立超时，最慢的一个也只会拖到自己。
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-      TCR_REGISTRY: ccr.ccs.tencentyun.com/jason-hub
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false            # 某个镜像失败不取消其他镜像的构建
+      matrix:
+        include:
+          - service: portfolio
+            dockerfile: Portfolio/Dockerfile
+          - service: auth
+            dockerfile: Auth/api/Dockerfile
+          - service: monitor-web
+            dockerfile: Monitor/web/Dockerfile
+          - service: monitor-api
+            dockerfile: Monitor/api/Dockerfile
+    name: build ${{ matrix.service }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
+      - name: 配置 Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: 登录腾讯云 TCR
-        run: echo "${{ secrets.TCR_PASSWORD }}" | docker login ccr.ccs.tencentyun.com -u 100012562502 --password-stdin
+        uses: docker/login-action@v3
+        with:
+          registry: ccr.ccs.tencentyun.com
+          username: ${{ env.TCR_USERNAME }}
+          password: ${{ secrets.TCR_PASSWORD }}
 
-      - name: 构建并推送 Portfolio
-        run: |
-          docker build -f Portfolio/Dockerfile -t ${{ env.TCR_REGISTRY }}/portfolio:latest .
-          docker push ${{ env.TCR_REGISTRY }}/portfolio:latest
+      - name: 构建并推送 ${{ matrix.service }}
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ env.TCR_REGISTRY }}/${{ matrix.service }}:latest
+          # GHA 层缓存：基础镜像层、npm ci / dotnet restore 层跨次复用。
+          # 没有它时每次都是全新 runner 冷构建——要重新拉 1.7GB 的 .NET SDK
+          # 镜像、重跑 NuGet restore，这正是 Auth 构建从 5m38s 劣化到撞超时的原因。
+          # mode=max 必须显式指定：默认的 min 只缓存最后一级，而耗时的
+          # restore / publish / npm ci 全在中间的 build 阶段。
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
 
-      - name: 构建并推送 Auth
+      - name: 构建结果摘要
+        if: always()
         run: |
-          docker build -f Auth/api/Dockerfile -t ${{ env.TCR_REGISTRY }}/auth:latest .
-          docker push ${{ env.TCR_REGISTRY }}/auth:latest
+          echo "### ${{ matrix.service }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Dockerfile: \`${{ matrix.dockerfile }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- 镜像: \`${{ env.TCR_REGISTRY }}/${{ matrix.service }}:latest\`" >> $GITHUB_STEP_SUMMARY
+          echo "- 结果: ${{ steps.build.outcome }}" >> $GITHUB_STEP_SUMMARY
 
-      - name: 构建并推送 Monitor Web
-        run: |
-          docker build -f Monitor/web/Dockerfile -t ${{ env.TCR_REGISTRY }}/monitor-web:latest .
-          docker push ${{ env.TCR_REGISTRY }}/monitor-web:latest
-
-      - name: 构建并推送 Monitor API
-        run: |
-          docker build -f Monitor/api/Dockerfile -t ${{ env.TCR_REGISTRY }}/monitor-api:latest .
-          docker push ${{ env.TCR_REGISTRY }}/monitor-api:latest
+  # ---- 部署层：4 个镜像全部构建成功后才执行 ----
+  # needs 保证矩阵里任一镜像失败都不会部署——避免"3 个新镜像 + 1 个旧镜像"
+  # 的半吊子状态被推上生产。
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: 部署到服务器
         run: |
@@ -59,7 +102,7 @@ jobs:
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
             set -e
             cd /opt/lujiesheng
-            echo "${{ secrets.TCR_PASSWORD }}" | docker login ccr.ccs.tencentyun.com -u 100012562502 --password-stdin
+            echo "${{ secrets.TCR_PASSWORD }}" | docker login ccr.ccs.tencentyun.com -u ${{ env.TCR_USERNAME }} --password-stdin
             docker compose pull portfolio auth monitor-web monitor-api
             docker compose up -d portfolio auth monitor-web monitor-api
             docker image prune -f

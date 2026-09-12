@@ -1,0 +1,29 @@
+# ======== 依赖与构建产物（容器内重新安装/编译） ========
+# node_modules 是构建上下文里最大的一块（约 350MB），排除后上下文从 ~460MB 降到 ~10MB，
+# 同时避免宿主机的 node_modules 覆盖容器内 npm ci 刚装好的依赖。
+**/node_modules
+**/dist
+**/bin
+**/obj
+
+# ======== 版本库与工具目录 ========
+.git
+.gitignore
+.github
+.dsh
+.dockerignore
+
+# ======== 环境配置与密钥（绝不进镜像） ========
+.env
+.env.*
+!.env.example
+dev-keys/
+ip2region/
+**/*.pem
+**/*.key
+**/*.pfx
+**/*.p12
+
+# ======== 文档 ========
+**/*.md
+LICENSE

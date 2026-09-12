@@ -37,6 +37,7 @@ Jason-hub/
 ├── .github/workflows/   ← GitHub Actions CI/CD
 ├── .dsh/skills/         ← DSH 技能（发布/立项/脚手架）
 ├── docker-compose.yml   ← Docker 容器编排
+├── .dockerignore        ← 构建上下文忽略规则（node_modules / 密钥等）
 ├── .env.example         ← 环境变量模板
 ├── PLAN.md              ← Monorepo 总体规划
 ├── CHANGELOG.md         ← 主仓库变更日志
@@ -104,6 +105,7 @@ Jason-hub/
 ├── .github/workflows/   ← GitHub Actions CI/CD
 ├── .dsh/skills/         ← DSH skills (release / init / scaffold)
 ├── docker-compose.yml   ← Docker container orchestration
+├── .dockerignore        ← Build context ignore rules (node_modules / keys)
 ├── .env.example         ← Environment variable template
 ├── PLAN.md              ← Monorepo master plan
 ├── CHANGELOG.md         ← Main repo changelog

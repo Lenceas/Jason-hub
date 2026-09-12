@@ -149,7 +149,7 @@ Tag: v1.0.0    v1.1.0    v1.1.1
 | 采集代理 | .NET 10 Background Worker，内置于 API 容器中，采集服务器/Docker/站点指标 |
 | 基础设施 (数据层) | MySQL / Redis / MongoDB，所有子项目共用，仅 Docker 内网互联 |
 | SSL | acme.sh + Let's Encrypt + 腾讯云 DNS API，一个域名一张免费证书 |
-| CI/CD | GitHub Actions 推送到 main → 构建 4 镜像并推送 TCR → SCP `docker-compose.yml` → 服务器 `docker compose pull` + `up -d` |
+| CI/CD | GitHub Actions 推送到 main → 4 镜像**并行**构建并推送 TCR → SCP `docker-compose.yml` → 服务器 `docker compose pull` + `up -d` |
 
 详见 [DEPLOY.md](./DEPLOY.md)
 

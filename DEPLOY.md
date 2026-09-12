@@ -374,39 +374,65 @@ concurrency:
   group: deploy
   cancel-in-progress: false   # 连续推送时排队串行，不互相取消
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  TCR_REGISTRY: ccr.ccs.tencentyun.com/jason-hub
+  TCR_USERNAME: '100012562502'
+
 jobs:
-  deploy:
+  # ---- 构建层：4 个镜像并行构建，互不阻塞 ----
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
-    env:
-      TCR_REGISTRY: ccr.ccs.tencentyun.com/jason-hub
+    timeout-minutes: 60
+    name: build ${{ matrix.service }}
+    strategy:
+      fail-fast: false          # 某个镜像失败不取消其他镜像的构建
+      matrix:
+        include:
+          - service: portfolio
+            dockerfile: Portfolio/Dockerfile
+          - service: auth
+            dockerfile: Auth/api/Dockerfile
+          - service: monitor-web
+            dockerfile: Monitor/web/Dockerfile
+          - service: monitor-api
+            dockerfile: Monitor/api/Dockerfile
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
+      - name: 配置 Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: 登录腾讯云 TCR
-        run: echo "${{ secrets.TCR_PASSWORD }}" | docker login ccr.ccs.tencentyun.com -u 100012562502 --password-stdin
+        uses: docker/login-action@v3
+        with:
+          registry: ccr.ccs.tencentyun.com
+          username: ${{ env.TCR_USERNAME }}
+          password: ${{ secrets.TCR_PASSWORD }}
 
-      - name: 构建并推送 Portfolio
-        run: |
-          docker build -f Portfolio/Dockerfile -t ${{ env.TCR_REGISTRY }}/portfolio:latest .
-          docker push ${{ env.TCR_REGISTRY }}/portfolio:latest
+      - name: 构建并推送 ${{ matrix.service }}
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ env.TCR_REGISTRY }}/${{ matrix.service }}:latest
+          # GHA 层缓存：基础镜像层、npm ci / dotnet restore 层跨次复用
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
 
-      - name: 构建并推送 Auth
-        run: |
-          docker build -f Auth/api/Dockerfile -t ${{ env.TCR_REGISTRY }}/auth:latest .
-          docker push ${{ env.TCR_REGISTRY }}/auth:latest
-
-      - name: 构建并推送 Monitor Web
-        run: |
-          docker build -f Monitor/web/Dockerfile -t ${{ env.TCR_REGISTRY }}/monitor-web:latest .
-          docker push ${{ env.TCR_REGISTRY }}/monitor-web:latest
-
-      - name: 构建并推送 Monitor API
-        run: |
-          docker build -f Monitor/api/Dockerfile -t ${{ env.TCR_REGISTRY }}/monitor-api:latest .
-          docker push ${{ env.TCR_REGISTRY }}/monitor-api:latest
+  # ---- 部署层：4 个镜像全部构建成功后才执行 ----
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: 部署到服务器
         run: |
@@ -415,15 +441,22 @@ jobs:
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
             set -e
             cd /opt/lujiesheng
-            echo "${{ secrets.TCR_PASSWORD }}" | docker login ccr.ccs.tencentyun.com -u 100012562502 --password-stdin
+            echo "${{ secrets.TCR_PASSWORD }}" | docker login ccr.ccs.tencentyun.com -u ${{ env.TCR_USERNAME }} --password-stdin
             docker compose pull portfolio auth monitor-web monitor-api
             docker compose up -d portfolio auth monitor-web monitor-api
             docker image prune -f
           '
 ```
 
-> 每个服务一个独立构建步骤（而非合并成一步），这样某个服务构建失败时，日志和失败定位都停在对应的那一步。
-> 新增子项目时：复制一个构建步骤 + 在服务器端 `pull`/`up -d` 追加服务名 + 追加 `TCR_REGISTRY` 下的镜像名。
+**为什么拆成两个 job：** 4 个 `docker build` 原先串行跑在同一个 job 里共用一个 40 分钟总超时，任一镜像构建变慢都会挤占后续镜像的时间，最终整条流水线被杀、"部署到服务器"根本没机会执行——生产环境静默停在旧镜像上。现在每个镜像独立 job + 独立超时（60 分钟），最慢的一个只拖累自己；`deploy` 通过 `needs: build` 汇聚，4 个镜像全部成功才部署，避免"3 个新镜像 + 1 个旧镜像"的半吊子状态上生产。
+
+**GHA 层缓存（`type=gha`）：** 原先每次都是全新 runner 冷构建——重新拉 `mcr.microsoft.com/dotnet/sdk:10.0`（约 1.7GB）、重跑 NuGet restore。缓存后基础镜像层、`npm ci`、`dotnet restore` 跨次复用。`mode=max` 必须显式指定，默认的 `min` 只缓存最后一级，而耗时的 restore / publish / npm ci 全在中间的 build 阶段。
+
+> ⚠️ GHA 缓存有 **10GB / 仓库**上限，超限按 LRU 淘汰。4 个 service 各自 `scope` 独立，两个 .NET 镜像的 SDK 层占大头，接近上限时最早的缓存会被挤掉、退回冷构建（只是变慢，不会失败）。
+
+**构建上下文（`.dockerignore`）：** 仓库根目录的 `.dockerignore` 排除 `node_modules`（约 350MB）、`bin/obj`、`.git`、`ip2region/`（10.6MB，服务器 bind mount）、`.env*`、`**/*.pem|key`，构建上下文从约 460MB 降到约 10MB；同时避免宿主机 `node_modules` 覆盖容器内 `npm ci` 刚装好的依赖，并堵住密钥误入镜像的路径。
+
+> 新增子项目时：在 `matrix.include` 追加一行 `service` + `dockerfile`，并在服务器端 `docker compose pull/up` 中追加新 service 名称。
 
 GitHub Secrets 配置：
 
@@ -434,7 +467,7 @@ GitHub Secrets 配置：
 | `SERVER_PASSWORD` | SSH 密码 |
 | `TCR_PASSWORD` | 腾讯云 TCR 镜像仓库密码 |
 
-> 新增子项目时：在构建步骤追加 `docker build/push` 新镜像，并在服务器端 `docker compose pull/up` 中追加新 service 名称。
+> ⚠️ CI/CD 全程**不使用 SSH 密钥**：`actions/checkout` 走 GitHub 自动注入的 `GITHUB_TOKEN`，部署到服务器走 `sshpass` **密码认证**（`SERVER_PASSWORD`）。因此本机 SSH key 的增删与流水线无关，只影响开发者本地 `git push`。
 
 ---
 
@@ -476,13 +509,14 @@ GitHub Secrets 配置：
 
 ```
 git push → GitHub Actions 触发
-         → 构建 4 个应用镜像并推送 TCR
-         → scp 上传 docker-compose.yml
+         → 4 个镜像【并行】构建（矩阵 job）并推送 TCR
+         → 4 个镜像全部成功后，scp 上传 docker-compose.yml
          → SSH: docker compose pull && up -d（仅应用层 4 服务）
          → docker image prune -f （清理旧镜像）
 ```
 
 > 镜像构建在 CI 中完成（`docker build` + `docker push`），服务器端只拉取和启动，不再在服务器上构建。
+> 构建阶段是 4 个并行 job（`fail-fast: false`，互不取消）；任一个失败则整条部署中止（`deploy` 依赖 `needs: build`），不会出现新旧镜像混跑。
 
 ### 触发条件（`paths-ignore`）
 
@@ -493,7 +527,7 @@ git push → GitHub Actions 触发
 | `**.md`（含根文档、各子项目文档、`.dsh/skills/**/SKILL.md`） | ❌ 跳过 |
 | `.dsh/**`、`.gitignore`、`LICENSE` | ❌ 跳过 |
 | `Portfolio/**`、`Auth/**`、`Monitor/**`、`templates/**`、`scripts/**` | ✅ 触发 |
-| `docker-compose.yml`、`.github/workflows/deploy.yml` | ✅ 触发 |
+| `docker-compose.yml`、`.github/workflows/deploy.yml`、`.dockerignore` | ✅ 触发 |
 
 > 语义是"本次推送的**全部**变更路径都命中忽略规则才跳过"。所以"改文档 + 改代码"混在同一个提交里时仍会正常部署，不会漏发布。
 > 代价：`main` 分支不再是"任何推送都上线"，纯文档推送只进版本库、不动生产。
@@ -544,7 +578,7 @@ git push → GitHub Actions 触发
 - [ ] 创建子项目（Vue 3 / .NET 等）
 - [ ] 编写 `Dockerfile` + 容器内 `nginx.conf`（前端项目）
 - [ ] `docker-compose.yml` 追加 service（端口只绑 `127.0.0.1`）
-- [ ] GitHub Actions `deploy.yml` 增加新 service 构建命令
+- [ ] GitHub Actions `deploy.yml` 的 `matrix.include` 追加一行 `service` + `dockerfile`
 - [ ] DNS 添加 A 记录（`<name>.lujiesheng.cn` / `api-<name>.lujiesheng.cn` → `81.71.136.3`）
 - [ ] **SSL**：使用 acme.sh 申请子域名证书（`<name>.lujiesheng.cn`），见上方 "新增子项目 SSL 流程"
 - [ ] Nginx 添加子域名 `server` 块 → `nginx -t` → `systemctl reload nginx`

@@ -42,6 +42,7 @@ Jason-hub/
 │   └── README.md           ← 技术说明（中英双语）
 ├── .github/workflows/      ← GitHub Actions CI/CD
 ├── docker-compose.yml      ← Docker 容器编排
+├── .dockerignore           ← 构建上下文忽略规则（node_modules / 密钥等）
 ├── .env.example            ← 环境变量模板
 ├── PLAN.md                 ← Monorepo 总体规划
 ├── CHANGELOG.md            ← 主仓库变更日志
@@ -134,8 +135,9 @@ MySQL 8.4 / Redis 8 / MongoDB 8 三数据库作为全局基础设施，所有子
 | 子项目 API | `api-<name>.lujiesheng.cn` | 子项目后端 |
 
 - SSL 证书：acme.sh + Let's Encrypt + 腾讯云 DNS API，一个域名一张免费证书
-- 部署：GitHub Actions（ubuntu-latest runner）构建 4 个镜像并推送 TCR → SCP 上传 `docker-compose.yml` → 服务器 `docker compose pull` + `up -d`
+- 部署：GitHub Actions（ubuntu-latest runner）4 个镜像**并行**构建（矩阵 job）并推送 TCR → 4 个镜像全部成功后 SCP 上传 `docker-compose.yml` → 服务器 `docker compose pull` + `up -d`
 - 构建位置：镜像在 **GitHub Actions 的机器上**构建（`docker build` + `docker push`），服务器不构建、只拉取运行；腾讯云 TCR 仅作镜像仓库，未启用其自动构建
+- 认证方式：CI/CD **全程不使用 SSH 密钥** — `actions/checkout` 走 GitHub 自动注入的 `GITHUB_TOKEN`，部署到服务器走 `sshpass` 密码认证（`SERVER_PASSWORD`）；本机 SSH key 的增删与流水线无关，只影响开发者本地 `git push`
 - Nginx：主机 80/443 → 反代到 `127.0.0.1:<port>`
 - 详情见 [DEPLOY.md](./DEPLOY.md)
 
