@@ -137,7 +137,8 @@ MySQL 8.4 / Redis 8 / MongoDB 8 三数据库作为全局基础设施，所有子
 - SSL 证书：acme.sh + Let's Encrypt + 腾讯云 DNS API，一个域名一张免费证书
 - 部署：GitHub Actions（ubuntu-latest runner）4 个镜像**并行**构建（矩阵 job）并推送 TCR → 4 个镜像全部成功后 SCP 上传 `docker-compose.yml` → 服务器 `docker compose pull` + `up -d`
 - 构建位置：镜像在 **GitHub Actions 的机器上**构建（`docker build` + `docker push`），服务器不构建、只拉取运行；腾讯云 TCR 仅作镜像仓库，未启用其自动构建
-- 认证方式：CI/CD **全程不使用 SSH 密钥** — `actions/checkout` 走 GitHub 自动注入的 `GITHUB_TOKEN`，部署到服务器走 `sshpass` 密码认证（`SERVER_PASSWORD`）；本机 SSH key 的增删与流水线无关，只影响开发者本地 `git push`
+- 认证方式：CI/CD 使用**专用 CI 部署密钥**（非开发者个人密钥）— `actions/checkout` 走 GitHub 自动注入的 `GITHUB_TOKEN`；部署到服务器走 ed25519 专用密钥（存于 `SERVER_SSH_KEY` Secret，服务器侧该公钥带 `no-port-forwarding,no-agent-forwarding,no-X11-forwarding` 限制），已弃用 `sshpass` 密码认证
+- 主机校验：部署时固定服务器主机公钥（写死在 `deploy.yml` 的 `known_hosts` 块），不再使用 `StrictHostKeyChecking=no`；服务器重装导致主机密钥变更时需同步更新指纹
 - Nginx：主机 80/443 → 反代到 `127.0.0.1:<port>`
 - 详情见 [DEPLOY.md](./DEPLOY.md)
 

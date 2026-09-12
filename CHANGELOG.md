@@ -2,6 +2,14 @@
 
 ---
 
+## v1.10.2 (2026-09-12)
+
+- **fix**: 修复 v1.10.1 流水线的部署失败 — `#121` 中 4 个镜像全部构建成功（portfolio 104s / auth 1013s / monitor-api 1138s / monitor-web 97s），仅「部署到服务器」步骤失败且耗时仅 3 秒；根因是步骤首行的 `apt-get install sshpass` 失败（bash `-e` 下立即中止，后续 scp/ssh 从未执行）
+- **chore**: CI 部署改用 **SSH 密钥认证**，弃用 `sshpass` 密码认证 — 新增专用 ed25519 部署密钥（`SERVER_SSH_KEY` Secret），与开发者个人 `ubuntu.pem` 分离，可单独吊销而不影响个人登录；服务器侧该公钥带 `no-port-forwarding,no-agent-forwarding,no-X11-forwarding` 限制。移除 `apt-get install sshpass` 依赖，上述失败点随之消失
+- **security**: 密码不再出现在 runner 的进程命令行 — `sshpass -p` 会把密码写进 `ps aux` 可见的命令行，共享 runner 上任何进程均可读取
+- **security**: 主机校验由 `StrictHostKeyChecking=no` 改为**固定服务器主机公钥** — 原配置完全放弃主机校验，中间人可冒充服务器截获部署流量与 TCR 凭据；现在 `deploy.yml` 内固定 ed25519 / rsa / ecdsa 三条主机公钥（公开信息，非机密）
+- **docs**: `DEPLOY.md` 同步新部署步骤、Secrets 表（`SERVER_PASSWORD` → `SERVER_SSH_KEY`）与主机校验说明；`AGENTS.md` 更新「认证方式」「主机校验」两条
+
 ## v1.10.1 (2026-09-12)
 
 - **fix**: CI/CD 构建阶段拆分为 4 个并行矩阵 job — 原先 4 个 `docker build` 串行跑在同一 job 里共用一个 40 分钟总超时，Auth 镜像构建劣化后（8/3 尚为 5m38s，9/10 起超 39 分钟）撞穿超时，整条流水线被杀、"部署到服务器"从未执行，生产静默停在旧镜像；现每个镜像独立 job + 60 分钟独立超时，`fail-fast: false` 互不取消，`deploy` 经 `needs: build` 汇聚

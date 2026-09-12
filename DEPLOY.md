@@ -434,11 +434,26 @@ jobs:
         with:
           fetch-depth: 1
 
+      # 专用 CI 部署密钥（ed25519），与开发者个人 ubuntu.pem 分离
+      - name: 配置 SSH 私钥
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+      # 固定服务器主机公钥（公开信息），替代原先放弃校验的
+      # StrictHostKeyChecking=no
+      - name: 固定服务器主机公钥
+        run: |
+          cat >> ~/.ssh/known_hosts <<'KNOWN_HOSTS'
+          81.71.136.3 ssh-ed25519 AAAA...（完整指纹见仓库 deploy.yml）
+          KNOWN_HOSTS
+          chmod 600 ~/.ssh/known_hosts
+
       - name: 部署到服务器
         run: |
-          sudo apt-get install -qq -y sshpass
-          sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/opt/lujiesheng/docker-compose.yml
-          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
+          scp -i ~/.ssh/deploy_key docker-compose.yml ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/opt/lujiesheng/docker-compose.yml
+          ssh -i ~/.ssh/deploy_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
             set -e
             cd /opt/lujiesheng
             echo "${{ secrets.TCR_PASSWORD }}" | docker login ccr.ccs.tencentyun.com -u ${{ env.TCR_USERNAME }} --password-stdin
@@ -462,12 +477,14 @@ GitHub Secrets 配置：
 
 | Secret | 说明 |
 |--------|------|
-| `SERVER_HOST` | 服务器 IP |
-| `SERVER_USER` | SSH 用户名 |
-| `SERVER_PASSWORD` | SSH 密码 |
+| `SERVER_HOST` | 服务器 IP，**必须为 `81.71.136.3`**（`known_hosts` 按 IP 录入，用域名会校验失败） |
+| `SERVER_USER` | SSH 用户名（`ubuntu`） |
+| `SERVER_SSH_KEY` | **专用 CI 部署私钥**（ed25519，OpenSSH 格式全文） |
 | `TCR_PASSWORD` | 腾讯云 TCR 镜像仓库密码 |
 
-> ⚠️ CI/CD 全程**不使用 SSH 密钥**：`actions/checkout` 走 GitHub 自动注入的 `GITHUB_TOKEN`，部署到服务器走 `sshpass` **密码认证**（`SERVER_PASSWORD`）。因此本机 SSH key 的增删与流水线无关，只影响开发者本地 `git push`。
+> ⚠️ CI/CD 使用**专用部署密钥**，不再是开发者个人密钥：`actions/checkout` 走 GitHub 自动注入的 `GITHUB_TOKEN`，部署到服务器走 `SERVER_SSH_KEY`（ed25519，服务器侧该公钥带 `no-port-forwarding,no-agent-forwarding,no-X11-forwarding` 限制）。
+> 已弃用 `sshpass -p` 密码认证——密码会出现在 runner 的**进程命令行**中（`ps aux` 可读），且 `apt-get install sshpass` 本身是脆弱依赖（v1.10.1 流水线 `#121` 的部署失败点即在它）。
+> 主机校验采用**固定公钥**而非 `StrictHostKeyChecking=no`（后者等于放弃主机校验，中间人可截获部署流量与 TCR 凭据）。服务器重装后主机密钥变更，需更新 `deploy.yml` 中的 `known_hosts` 块；报 `Host key verification failed` 即此原因。
 
 ---
 

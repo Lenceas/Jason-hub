@@ -13,7 +13,7 @@
 |------|-----|
 | 在线地址 | https://lujiesheng.cn |
 | 服务器 | 81.71.136.3（腾讯云 2C4G / Ubuntu 24.04） |
-| 当前版本 | v1.10.1 |
+| 当前版本 | v1.10.2 |
 | 技术栈 | Astro 6 / Vue 3 + TypeScript / .NET 10 |
 | 数据库 | MySQL 8.4 / Redis 8 / MongoDB 8 |
 | CI/CD | GitHub Actions 构建镜像 → TCR → 服务器 pull + up |
@@ -55,6 +55,7 @@ Jason-hub/
 - [完成] v1.9.3 CI/CD 文档口径修正 ✅ — 4 份文档的旧"服务器构建"描述统一为"Actions 构建 → TCR → 服务器 pull + up"
 - [完成] v1.10.0 CI 路径过滤 ✅ — 纯文档推送不再触发镜像重建与生产部署
 - [完成] v1.10.1 CI 构建提速与超时修复 ✅ — 4 镜像拆为并行矩阵 job + GHA 层缓存 + 新增 `.dockerignore`；修复 Auth 构建撞穿 40 分钟总超时导致整条流水线被杀、部署步骤从未执行的问题
+- [完成] v1.10.2 CI 部署改 SSH 密钥认证 ✅ — 专用 ed25519 部署密钥替代 `sshpass` 密码认证，修复 `#121` 部署失败（`apt-get install sshpass` 3 秒即挂）；主机校验由 `StrictHostKeyChecking=no` 改为固定服务器主机公钥
 
 ---
 
@@ -123,6 +124,8 @@ Jason-hub/
 | 2026-09-10 | 确立交互规范：确认/选择类交互一律走 `ask_user_question` 弹窗，禁止正文等待回复；已写入 `AGENTS.md`、`CLAUDE.md`、发布类技能 | `AGENTS.md` |
 | 2026-09-12 | CI/CD 构建阶段拆为 4 个并行矩阵 job（`fail-fast: false` + 独立 60 分钟超时），`deploy` 经 `needs: build` 汇聚后才部署；根治单 job 串行共用一个 40 分钟超时被 Auth 构建拖死的问题 | `.github/workflows/deploy.yml` |
 | 2026-09-12 | CI 引入 GHA 层缓存（`docker/build-push-action@v6` + Buildx + `type=gha,mode=max`），基础镜像/npm ci/dotnet restore 层跨次复用；新增根目录 `.dockerignore` 使构建上下文 460MB → 10MB | `.github/workflows/deploy.yml`、`.dockerignore` |
+| 2026-09-12 | CI 部署弃用 `sshpass` 密码认证，改用**专用 ed25519 部署密钥**（`SERVER_SSH_KEY`）— 与开发者个人 `ubuntu.pem` 分离、可单独吊销；服务器侧公钥带 `no-port-forwarding,no-agent-forwarding,no-X11-forwarding` 限制 | `.github/workflows/deploy.yml` |
+| 2026-09-12 | 部署主机校验由 `StrictHostKeyChecking=no` 改为**固定服务器主机公钥**（ed25519/rsa/ecdsa 三条写死在 `known_hosts` 块）；原配置放弃主机校验，存在中间人风险 | `.github/workflows/deploy.yml` |
 
 ---
 

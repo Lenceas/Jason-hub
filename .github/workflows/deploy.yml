@@ -95,11 +95,36 @@ jobs:
         with:
           fetch-depth: 1
 
+      # 专用 CI 部署密钥（ed25519 私钥，存于 SERVER_SSH_KEY Secret）。
+      # 与开发者个人的 ubuntu.pem 分离：CI 密钥泄露/轮换不影响个人登录，
+      # 且服务器侧该公钥带 no-port-forwarding 等限制。
+      - name: 配置 SSH 私钥
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+      # 固定服务器主机公钥（公开信息，非机密）。
+      # 相比旧的 StrictHostKeyChecking=no —— 那等于完全放弃主机校验，
+      # 中间人可冒充服务器截获部署流量与 TCR 凭据；固定公钥能真正挡住。
+      # ⚠️ 服务器重装或重置后主机密钥会变，届时更新下方指纹并同步 DEPLOY.md；
+      #    部署报 "Host key verification failed" 即是此原因。
+      # ⚠️ 下面按 IP 录入，故 SERVER_HOST Secret 必须是 81.71.136.3（非域名）。
+      - name: 固定服务器主机公钥
+        run: |
+          cat >> ~/.ssh/known_hosts <<'KNOWN_HOSTS'
+          81.71.136.3 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKict0paStds5pTxFIoCPMaWWJD6y2x/wU9UJYfxGosD
+          81.71.136.3 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCsdXeSkwMEVgEes7w5I/dkgApGzJlBufJAtMuTFkxfjc1We99HLJflGgiIqod8mCy/GBg5MMK2wkxIHQrXZnGx3MVMCGptshAKJtEJKkOLuT/zaAaU0znG+gwCmCAtzIlWf07qadwW5HpeEdFz1eS3pHLDWXCDb8pQ+oOsLEYa3L9oNowybLWNmtZGXjHYr5oiy+za+Jm8sKdT/mcxfuNqMq44oLLRYL4iFTqw/o/0QaQIyu6xUo4wuxj+zSRpHFV2UdKcAJrSxatydhw54uMRI7XWyAADURJbaiEg7XXi5pbh/MNmI/hjBZnuQC/s5DAMFRoDqhsomqlJ5HwLYQCsb6DAHxh8e1e8AVoRRLeSJW3pTktr1Gk7W28y1XdL0dyIeabfNOsv8RBR43QTwF8ZCPzrmFbDt+wLHNuIlsgrJfsDZxpxV134UudZHPF/OIOCilzDjlfzH8qQPZPuN12mWUrseRivJXhSnnaJ2tHLmAdmgbQUjnt9M8yGFTaVwT0=
+          81.71.136.3 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBL+EVgp5GAZZbT7sPXa65RvQ13KL0IrmJdqwshacPPCY0unuSBMygLDdOvqgOJ4HHVsBPsZOnetYwJS/hV8pqpI=
+          KNOWN_HOSTS
+          chmod 600 ~/.ssh/known_hosts
+
+      # 密钥认证取代了原先的 sshpass 密码认证，顺带移除了
+      # `apt-get install sshpass` 这个脆弱依赖（#121 的部署失败点即在它）。
       - name: 部署到服务器
         run: |
-          sudo apt-get install -qq -y sshpass
-          sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/opt/lujiesheng/docker-compose.yml
-          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
+          scp -i ~/.ssh/deploy_key docker-compose.yml ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/opt/lujiesheng/docker-compose.yml
+          ssh -i ~/.ssh/deploy_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
             set -e
             cd /opt/lujiesheng
             echo "${{ secrets.TCR_PASSWORD }}" | docker login ccr.ccs.tencentyun.com -u ${{ env.TCR_USERNAME }} --password-stdin
