@@ -2,6 +2,13 @@
 
 ---
 
+## v1.10.3 (2026-09-12)
+
+- **fix**: 生产环境三个子域名 SSL 证书已过期（`monitor.lujiesheng.cn` 过期 9 天、`api-auth.lujiesheng.cn` 过期 14 天、`api-monitor.lujiesheng.cn` 随 monitor 软链）— 根因是这些域名**只跑过 `--issue` 从未跑 `--install-cert`**：acme.sh 每天照常续期（`--list` 显示 Created 9/11、Renew 9/17，一切正常），但续期后没有任何机制把新证书拷进 `/etc/nginx/ssl/` 并重载 nginx，nginx 一直抱着 6/05 / 5/31 的旧证书。已补跑 `--install-cert`（monitor + api-auth）并登记 `Le_ReloadCmd`；4 个域名证书链现均 `Verify return code: 0 (ok)`、外网 HTTP 200，下次 cron 续期将自动安装
+- **docs**: `DEPLOY.md` SSL 章节新增「⚠️ `--install-cert` 是必需的，只跑 `--issue` 会导致证书静默过期」— 记录本次故障的逐域名状态对照，并点明危险之处：`acme.sh --list` 正常、cron 无报错、`nginx -t` 通过，**只有真正访问站点才暴露**，而 Portfolio 首页卡片正指向这些子域名
+- **docs**: `DEPLOY.md` 新增「证书健康检查」4 步命令（acme.sh 侧续期状态 → nginx 侧实际证书有效期 → 端到端证书链验证 → 确认 `Le_ReloadCmd` 已登记），含"已续期但文件日期很旧 = 只 issue 未 install"的排查要点
+- **docs**: `DEPLOY.md` 证书清单补全 `monitor` / `api-monitor`（含软链关系）；补充排查细节 — ECC 证书配置在 `~/.acme.sh/<domain>_ecc/`（非 `<domain>/`）、`Le_ReloadCmd` 值经 base64 存储属正常行为、带 SAN 的子域名只需为主证书跑一次 install
+
 ## v1.10.2 (2026-09-12)
 
 - **fix**: 修复 v1.10.1 流水线的部署失败 — `#121` 中 4 个镜像全部构建成功（portfolio 104s / auth 1013s / monitor-api 1138s / monitor-web 97s），仅「部署到服务器」步骤失败且耗时仅 3 秒；根因是步骤首行的 `apt-get install sshpass` 失败（bash `-e` 下立即中止，后续 scp/ssh 从未执行）

@@ -55,8 +55,9 @@
 | 域名 | 证书文件 | 类型 |
 |------|---------|------|
 | `lujiesheng.cn` + `www.lujiesheng.cn` | `lujiesheng.cn.pem` / `.key` | 双域名 ECC |
+| `monitor.lujiesheng.cn` + `api-monitor.lujiesheng.cn` | `monitor.lujiesheng.cn.pem` / `.key` | 双域名 ECC（`api-monitor.*` 为指向该文件的**软链**） |
 | `api-auth.lujiesheng.cn` | `api-auth.lujiesheng.cn.pem` / `.key` | ECC |
-| `api-notification.lujiesheng.cn` | `api-notification.lujiesheng.cn.pem` / `.key` | ECC |
+| `api-notification.lujiesheng.cn` | `api-notification.lujiesheng.cn.pem` / `.key` | ECC（服务未上线） |
 
 ### 主站申请流程
 
@@ -87,6 +88,47 @@
 - 剩余 ≤ 7 天时自动续期（`Le_RenewalDays=7`）
 - 续期后自动拷贝到 `/etc/nginx/ssl/` 并 `systemctl reload nginx`
 - 腾讯云 DNS API 凭证保存在 `~/.acme.sh/account.conf`（仅服务器本地）
+
+### ⚠️ `--install-cert` 是必需的，只跑 `--issue` 会导致证书静默过期
+
+> **这是 2026-09-12 实际发生过的生产故障，务必理解。**
+
+`--issue` 只把证书签发进 acme.sh 的仓库（`~/.acme.sh/<domain>_ecc/`），**不会**放进 nginx 使用的位置，**也不会**登记"续期后自动安装"这个动作。**只有执行过 `--install-cert` 的域名**，acme.sh 才会在每次续期后自动拷贝证书 + 重载 nginx。
+
+故障当时的状态：
+
+| 域名 | 是否跑过 `--install-cert` | 结果 |
+|------|--------------------------|------|
+| `lujiesheng.cn` | ✅ 跑过 | 续期后自动安装，正常 |
+| `monitor.lujiesheng.cn` | ❌ 只跑了 `--issue` | acme.sh 显示已续期（Created 9/11），但 `/etc/nginx/ssl/` 里仍是 6/05 的旧证书 → **过期 9 天** |
+| `api-auth.lujiesheng.cn` | ❌ 只跑了 `--issue` | 同上 → **过期 14 天** |
+
+危险之处在于**故障完全静默**：`acme.sh --list` 的 `Renew` 时间正常、cron 每天无报错、`nginx -t` 也通过，只有真的访问站点才会看到证书警告。而 Portfolio 首页的项目卡片正指向这些子域名。
+
+### 证书健康检查（建议每月执行一次）
+
+```bash
+# 1. acme.sh 侧：证书是否在正常续期
+~/.acme.sh/acme.sh --list
+
+# 2. nginx 侧：实际部署的证书有效期
+for f in /etc/nginx/ssl/*.pem; do
+  case "$f" in *.pre-*) continue;; esac
+  echo "--- $(basename $f) ---"; sudo openssl x509 -in "$f" -noout -dates
+done
+
+# 3. 端到端：证书链是否有效（0 = ok，10 = 已过期）
+for d in lujiesheng.cn monitor.lujiesheng.cn api-monitor.lujiesheng.cn api-auth.lujiesheng.cn; do
+  echo "$d -> $(echo | openssl s_client -connect 127.0.0.1:443 -servername $d 2>/dev/null | grep '^Verify return code' | head -1)"
+done
+
+# 4. 确认续期后会自动安装（应列出各域名的 conf）
+sudo grep -l "Le_ReloadCmd" ~/.acme.sh/*_ecc/*.conf
+```
+
+> **排查要点**：若第 1 步显示已续期、但第 2 步的文件日期很旧，就是"只 issue 未 install"问题——对缺失的域名补跑一次 `--install-cert`（命令见上节），即可同时修复当前证书**并**登记后续自动续期。
+> 证书为 **ECC**，配置存放在 `~/.acme.sh/<domain>_ecc/<domain>.conf`（**不是** `<domain>/`）；`Le_ReloadCmd` 的值以 base64 存储，这是 acme.sh 的正常行为，不要误判为损坏。
+> 子域名带 SAN 时（如 `monitor.lujiesheng.cn` 含 `api-monitor.lujiesheng.cn`），只需为**主证书**跑 `--install-cert`，另一条域名用软链指向同一组文件即可。
 
 ### 前置依赖
 
