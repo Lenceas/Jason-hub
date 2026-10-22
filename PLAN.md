@@ -416,7 +416,7 @@ app.MapPost("/api/v1/notify", () => { ... })
 - [ ] 创建 `Auth/Shared/` 共享中间件库（作为 NuGet 本地包或项目引用）
 - [ ] 编写 Dockerfile
 - [ ] `docker-compose.yml` 追加 auth 服务（`:8100`）
-- [ ] DNS 添加 `api-auth.lujiesheng.cn` → `81.71.136.3`
+- [ ] DNS 添加 `api-auth.lujiesheng.cn` → `81.71.72.106`
 - [ ] SSL：acme.sh 申请 `api-auth.lujiesheng.cn` 证书
 - [ ] Nginx 添加子域名 server 块
 - [ ] GitHub Actions `deploy.yml` 增加 auth 构建命令

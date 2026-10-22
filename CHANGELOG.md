@@ -2,6 +2,17 @@
 
 ---
 
+## v1.10.4 (2026-10-22)
+
+- **chore**: 生产服务器迁移 — 旧机 `81.71.136.3`（Ubuntu 24.04，即将到期）→ 新机 `81.71.72.106`（Ubuntu 26.04 LTS）；域名、端口、镜像名、compose 结构全部不变
+- **chore**: 迁移实质数据 — `.env`（8 个变量）、MySQL `jason_monitor`（`server_metrics` 119 万行 / `health_records` 79.6 万行）+ `jason_auth`、Auth RSA 密钥卷 `lujiesheng_auth-keys`（保住现有登录态）、ip2region 离线库与月更脚本、Nginx 两站点配置 + `/etc/nginx/ssl` 4 域名证书、acme.sh 整目录（含腾讯云 DNS 凭证与 `Le_ReloadCmd`）、ubuntu/root 两类 cron、`/etc/docker/daemon.json`、`~/.docker/config.json`、`authorized_keys`（含 CI 专用部署密钥）；**不迁**镜像/构建缓存（CI 重新拉取）、Mongo 卷（仅系统库、无业务数据）、Redis（纯缓存）
+- **chore**: 新机基础环境 — nginx 1.28.3 + Docker CE 29.9.2 / Compose v5.6.1；`ubuntu` 加入 docker 组（CI 免 sudo 跑 compose）；registry mirror 剔除已不可达的 `docker.hub.cn.com`
+- **chore**: CI 部署目标切换 — `deploy.yml` 的 `known_hosts` 新增新机 ed25519/rsa/ecdsa 三条公钥，旧机三条**过渡期保留**用于 DNS 回滚；GitHub Secret `SERVER_HOST` → `81.71.72.106`（`SERVER_SSH_KEY` / `SERVER_USER` / `TCR_PASSWORD` 不变）
+- **fix**: Ubuntu 26.04 适配 — Docker 官方 apt 源系统代号由 `noble` 改为 `resolute`（`DEPLOY.md` 快速入门同步），并补齐 `usermod -aG docker ubuntu`、`SERVER_PASSWORD` → `SERVER_SSH_KEY` 两处过期描述
+- **docs**: `DEPLOY.md` 新增「服务器迁移 / 主机密钥轮换」章节（必须迁移的数据清单、换机 7 步、26.04 + MongoDB 内核 ≥6.19 启动限制说明）；服务器信息表、DNS 目标、known_hosts 示例、`SERVER_HOST` 说明全部切换为新 IP
+- **docs**: `CLAUDE.md` 服务器与版本信息更新、进度与决策记录补充；`RELEASE.md` / `PLAN.md` 的 DNS 模板 IP 同步
+- **note**: MongoDB 8.0.x 在内核 ≥6.19（26.04 默认 7.0）上会硬性拒绝启动（[SERVER-121912](https://jira.mongodb.org/browse/SERVER-121912)），加 `GLIBC_TUNABLES=glibc.pthread.rseq=0` 亦无法绕过；`docker-compose.yml` 的 mongo 镜像升级为 **`mongo:8.2`**（8.2.12 已移除该启动检查），容器恢复 healthy；Mongo 本无业务数据，Auth/Monitor 全程未受影响
+
 ## v1.10.3 (2026-09-12)
 
 - **fix**: 生产环境三个子域名 SSL 证书已过期（`monitor.lujiesheng.cn` 过期 9 天、`api-auth.lujiesheng.cn` 过期 14 天、`api-monitor.lujiesheng.cn` 随 monitor 软链）— 根因是这些域名**只跑过 `--issue` 从未跑 `--install-cert`**：acme.sh 每天照常续期（`--list` 显示 Created 9/11、Renew 9/17，一切正常），但续期后没有任何机制把新证书拷进 `/etc/nginx/ssl/` 并重载 nginx，nginx 一直抱着 6/05 / 5/31 的旧证书。已补跑 `--install-cert`（monitor + api-auth）并登记 `Le_ReloadCmd`；4 个域名证书链现均 `Verify return code: 0 (ok)`、外网 HTTP 200，下次 cron 续期将自动安装

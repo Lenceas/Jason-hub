@@ -40,7 +40,7 @@
 | 子项目前端 | `<name>.lujiesheng.cn` | `127.0.0.1:<80xx>` | 子项目 SPA 页面 |
 | 子项目 API | `api-<name>.lujiesheng.cn` | `127.0.0.1:<80xx+50>` | 子项目后端 API |
 
-**DNS 解析**：所有域名 A 记录指向 `81.71.136.3`。
+**DNS 解析**：所有域名 A 记录指向 `81.71.72.106`。
 
 ---
 
@@ -485,10 +485,11 @@ jobs:
 
       # 固定服务器主机公钥（公开信息），替代原先放弃校验的
       # StrictHostKeyChecking=no
+      # 过渡期同时固定旧机与新机两套公钥（见下方「服务器迁移」）
       - name: 固定服务器主机公钥
         run: |
           cat >> ~/.ssh/known_hosts <<'KNOWN_HOSTS'
-          81.71.136.3 ssh-ed25519 AAAA...（完整指纹见仓库 deploy.yml）
+          81.71.72.106 ssh-ed25519 AAAA...（完整指纹见仓库 deploy.yml）
           KNOWN_HOSTS
           chmod 600 ~/.ssh/known_hosts
 
@@ -519,7 +520,7 @@ GitHub Secrets 配置：
 
 | Secret | 说明 |
 |--------|------|
-| `SERVER_HOST` | 服务器 IP，**必须为 `81.71.136.3`**（`known_hosts` 按 IP 录入，用域名会校验失败） |
+| `SERVER_HOST` | 服务器 IP，**当前为 `81.71.72.106`**（`known_hosts` 按 IP 录入，用域名会校验失败） |
 | `SERVER_USER` | SSH 用户名（`ubuntu`） |
 | `SERVER_SSH_KEY` | **专用 CI 部署私钥**（ed25519，OpenSSH 格式全文） |
 | `TCR_PASSWORD` | 腾讯云 TCR 镜像仓库密码 |
@@ -534,12 +535,12 @@ GitHub Secrets 配置：
 
 | 项目 | 值 |
 |------|----|
-| IP | `81.71.136.3` |
-| 系统 | Ubuntu 24.04 LTS |
-| 配置 | 2C4G / 70GB SSD / 6Mbps |
+| IP | `81.71.72.106` |
+| 系统 | Ubuntu 26.04 LTS（`resolute`） |
+| 配置 | 2C4G / 59GB SSD |
 | 项目路径 | `/opt/lujiesheng/` |
-| Docker Engine | 29.5.2 |
-| Docker Compose | v5.1.4 |
+| Docker Engine | 29.9.2 |
+| Docker Compose | v5.6.1 |
 | SSL | acme.sh + Let's Encrypt (自动续期) |
 
 ### 目录结构
@@ -561,6 +562,40 @@ GitHub Secrets 配置：
 │       └── ...
 └── ...
 ```
+
+---
+
+## 服务器迁移 / 主机密钥轮换
+
+> 2026-10-22 从 `81.71.136.3`（Ubuntu 24.04）迁移到 `81.71.72.106`（Ubuntu 26.04）时固化的流程。
+> 换机、重装系统、重置实例都会让主机密钥变化，按本流程可避免 CI 报 `Host key verification failed`。
+
+### 必须迁移的实质数据
+
+| 项目 | 位置 | 说明 |
+|------|------|------|
+| `.env` | `/opt/lujiesheng/.env` | 8 个环境变量（数据库/Redis/管理员口令），**唯一真源，CI 不携带** |
+| Auth RSA 密钥 | 卷 `lujiesheng_auth-keys` | 不迁会让所有已签发 token 失效；容器内路径 `/app/keys` |
+| MySQL | 卷 `lujiesheng_mysql-data` | `mysqldump --single-transaction --quick --routines --triggers --databases jason_monitor jason_auth` |
+| ip2region | `/opt/lujiesheng/ip2region/` + `update-ip2region.sh` | 另需 root cron `0 3 1 * *` |
+| Nginx | `/etc/nginx/sites-available/*`、`/etc/nginx/ssl/` | 证书软链 `api-monitor.* → monitor.*` 要一并重建 |
+| acme.sh | `~/.acme.sh/` 整目录 | 含 `account.conf` 的腾讯云 DNS 凭证与各域名 `Le_ReloadCmd` |
+| cron | ubuntu（acme 续期）+ root（ip2region） | 两个用户的 crontab 都要搬 |
+| Docker | `/etc/docker/daemon.json`、`~/.docker/config.json` | 镜像加速 + TCR 登录（后者仅首次手动 pull 用） |
+| SSH | `/home/ubuntu/.ssh/authorized_keys` | 含 CI 专用部署密钥，**漏掉 CI 就进不来** |
+
+**不迁移**：镜像/构建缓存（CI 重新拉取）、Mongo 卷（无业务数据）、Redis（纯缓存）。
+
+### 换机步骤
+
+1. 新机装 nginx + Docker CE（注意系统代号，26.04 = `resolute`），`usermod -aG docker ubuntu`。
+2. 按上表搬运文件；`/opt/lujiesheng` 属主 `ubuntu`，`.env` 600。
+3. `docker compose up -d mysql redis mongo` → 恢复 dump → 导入 auth-keys 卷
+   （**卷名必须与 compose 生成的一致**：`docker volume create lujiesheng_auth-keys`）。
+4. `docker compose up -d` 四个应用容器，新机本地验收：`curl --resolve <域名>:443:<新IP> https://<域名>/`。
+5. 更新 `deploy.yml` 的 `known_hosts`（新旧两套并存），更新 GitHub Secret `SERVER_HOST`，push 触发一次部署验证。
+6. 切换 DNS 后停用旧机 acme cron；旧机保留 24h 供回滚，确认无误再退订。
+7. 旧机退订后：删除 `deploy.yml` 中旧机三条主机公钥，更新本节与「服务器实际信息」。
 
 ---
 
@@ -638,7 +673,7 @@ git push → GitHub Actions 触发
 - [ ] 编写 `Dockerfile` + 容器内 `nginx.conf`（前端项目）
 - [ ] `docker-compose.yml` 追加 service（端口只绑 `127.0.0.1`）
 - [ ] GitHub Actions `deploy.yml` 的 `matrix.include` 追加一行 `service` + `dockerfile`
-- [ ] DNS 添加 A 记录（`<name>.lujiesheng.cn` / `api-<name>.lujiesheng.cn` → `81.71.136.3`）
+- [ ] DNS 添加 A 记录（`<name>.lujiesheng.cn` / `api-<name>.lujiesheng.cn` → `81.71.72.106`）
 - [ ] **SSL**：使用 acme.sh 申请子域名证书（`<name>.lujiesheng.cn`），见上方 "新增子项目 SSL 流程"
 - [ ] Nginx 添加子域名 `server` 块 → `nginx -t` → `systemctl reload nginx`
 - [ ] Portfolio `projects.json` 添加项目卡片
@@ -652,9 +687,11 @@ git push → GitHub Actions 触发
 # 1. 服务器环境准备
 apt install nginx
 # Docker 从官方源安装（非 apt 自带）
+# Ubuntu 26.04 的代号是 resolute（24.04 为 noble，务必按实际系统填）
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker.gpg
-echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu noble stable" > /etc/apt/sources.list.d/docker.list
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu resolute stable" > /etc/apt/sources.list.d/docker.list
 apt update && apt install docker-ce docker-compose-plugin
+usermod -aG docker ubuntu   # CI 以 ubuntu 身份执行 docker compose，必须在 docker 组
 
 # 2. 拉取项目
 git clone https://github.com/Lenceas/Jason-hub.git /opt/lujiesheng
@@ -676,8 +713,14 @@ docker compose up -d
 cp .env.example .env && vim .env
 
 # 7. GitHub Actions 自动部署后续更新
-# 在 GitHub Secrets 中配置 SERVER_HOST / SERVER_USER / SERVER_PASSWORD
+# 在 GitHub Secrets 中配置 SERVER_HOST / SERVER_USER / SERVER_SSH_KEY / TCR_PASSWORD
 ```
+
+> ⚠️ **Ubuntu 26.04 + MongoDB**：MongoDB 8.0.x 在 Linux 内核 ≥ 6.19 上会**直接拒绝启动**
+> （`MongoDB cannot start: Linux kernel versions 6.19 and newer has a known incompatibility`，
+> 见 [SERVER-121912](https://jira.mongodb.org/browse/SERVER-121912)），即使加 `GLIBC_TUNABLES=glibc.pthread.rseq=0`
+> 也过不了这道启动检查。26.04 默认内核为 7.0，compose 里 mongo 镜像固定为 **`mongo:8.2`**（8.2.12 已移除检查），
+> **不要回退到 `mongo:8`**。当前 Mongo 无业务数据，Auth / Monitor 不依赖它。
 
 ---
 

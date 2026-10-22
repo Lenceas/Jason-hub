@@ -32,7 +32,9 @@ services:
     restart: unless-stopped
 
   mongo:
-    image: mongo:8
+    # 8.0.x 在 Linux 内核 ≥6.19（Ubuntu 26.04 为 7.0）上会硬性拒绝启动
+    # （SERVER-121912），8.2 起移除该启动检查；不要回退到 mongo:8
+    image: mongo:8.2
     ports:
       - "127.0.0.1:27017:27017"
     volumes:
