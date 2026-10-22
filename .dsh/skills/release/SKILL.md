@@ -293,7 +293,7 @@ git checkout main
 | B | 更新端口分配表 | `AGENTS.md` | 分配前端端口 + API 端口 |
 | C | 更新部署架构图 | `ARCHITECTURE.md` | 子项目体系 + 部署拓扑 |
 | D | 追加 docker-compose service | `DEPLOY.md` + `docker-compose.yml` | 容器编排 + Dockerfile（端口绑 `127.0.0.1`） |
-| E | 添加 DNS 解析 | 腾讯云 DNS | `<name>.lujiesheng.cn` + `api-<name>.lujiesheng.cn` A → `81.71.136.3` |
+| E | 添加 DNS 解析 | 腾讯云 DNS | `<name>.lujiesheng.cn` + `api-<name>.lujiesheng.cn` A → `81.71.72.106` |
 | F | 申请 SSL 证书 | 服务器 acme.sh | 独立子域名证书（一个域名一张） |
 | G | 追加 Nginx server 块 | `DEPLOY.md` + `/etc/nginx/sites-available/` | 子域名反代 → `127.0.0.1:<port>` |
 | H | 更新 CI/CD deploy.yml | `.github/workflows/deploy.yml` | 追加新 service 构建命令 |

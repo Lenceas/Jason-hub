@@ -13,7 +13,7 @@
 |------|-----|
 | 在线地址 | https://lujiesheng.cn |
 | 服务器 | 81.71.72.106（腾讯云 2C4G / Ubuntu 26.04） |
-| 当前版本 | v1.10.4 |
+| 当前版本 | v1.10.5 |
 | 技术栈 | Astro 6 / Vue 3 + TypeScript / .NET 10 |
 | 数据库 | MySQL 8.4 / Redis 8 / MongoDB 8 |
 | CI/CD | GitHub Actions 构建镜像 → TCR → 服务器 pull + up |
@@ -58,6 +58,7 @@ Jason-hub/
 - [完成] v1.10.2 CI 部署改 SSH 密钥认证 ✅ — 专用 ed25519 部署密钥替代 `sshpass` 密码认证，修复 `#121` 部署失败（`apt-get install sshpass` 3 秒即挂）；主机校验由 `StrictHostKeyChecking=no` 改为固定服务器主机公钥
 - [完成] v1.10.3 三个子域名过期证书修复 ✅ — `monitor` / `api-monitor` / `api-auth` 因**只跑 `--issue` 未跑 `--install-cert`**，acme.sh 续期成功但新证书从未装进 `/etc/nginx/ssl/`，静默过期 9~14 天；已补跑 install + 登记 `Le_ReloadCmd`，4 域名链路恢复 `Verify return code: 0`
 - [完成] v1.10.4 服务器迁移 ✅ — 旧机 `81.71.136.3`（Ubuntu 24.04）→ 新机 `81.71.72.106`（Ubuntu 26.04）；迁移 `.env`、MySQL（`jason_monitor` / `jason_auth`）、Auth RSA 密钥卷、ip2region、Nginx/SSL、acme.sh、两类 cron；`deploy.yml` known_hosts 双机并存过渡，GitHub Secret `SERVER_HOST` 切新 IP；沉淀 26.04 适配（Docker `resolute` 源、MongoDB 8 内核 ≥6.19 启动检查）
+- [完成] v1.10.5 旧机退订收尾 ✅ — DNS 切流验证通过（4 域名 200/302、证书链 0、Auth 公钥一致）；旧机最终全量备份留档、停用其 acme 续期 cron；`deploy.yml` 删除旧机三条主机公钥，`known_hosts` 仅保留新机；旧机实例退订
 
 ---
 
@@ -130,7 +131,7 @@ Jason-hub/
 | 2026-09-12 | 部署主机校验由 `StrictHostKeyChecking=no` 改为**固定服务器主机公钥**（ed25519/rsa/ecdsa 三条写死在 `known_hosts` 块）；原配置放弃主机校验，存在中间人风险 | `.github/workflows/deploy.yml` |
 | 2026-09-12 | SSL 证书：**`--install-cert` 为必需步骤**，只跑 `--issue` 会导致续期成功但证书永不安装（静默过期）；已为 monitor / api-auth 补登记 `Le_ReloadCmd`，并在 `DEPLOY.md` 固化月度 4 步证书健康检查 | `DEPLOY.md` |
 | 2026-10-22 | 生产服务器迁移：`81.71.136.3`（Ubuntu 24.04）→ `81.71.72.106`（Ubuntu 26.04）；迁移 MySQL / Auth RSA 密钥卷 / acme.sh / Nginx+SSL / cron / ip2region，保证登录态与证书续期不断 | `DEPLOY.md`「服务器迁移」 |
-| 2026-10-22 | `deploy.yml` known_hosts **新旧两套主机公钥并存**（过渡期），Secret `SERVER_HOST` 切换后即可部署到新机；旧机退订后再删旧条目，避免 DNS 回滚窗口内 CI 无法部署 | `.github/workflows/deploy.yml` |
+| 2026-10-22 | `deploy.yml` known_hosts 迁移期新旧两套公钥并存以便回滚；DNS 切流验证通过、旧机退订后已删除旧机条目，`known_hosts` 仅保留生产机 `81.71.72.106` | `.github/workflows/deploy.yml` |
 | 2026-10-22 | Ubuntu 26.04 适配：Docker 官方源系统代号为 `resolute`（非 24.04 的 `noble`）；MongoDB 8.0.x 在内核 ≥6.19 上硬性拒绝启动（SERVER-121912），compose 的 mongo 镜像升级为 `mongo:8.2`（8.2.12 已移除该检查） | `docker-compose.yml`、`DEPLOY.md` |
 
 ---

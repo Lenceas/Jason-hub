@@ -110,15 +110,12 @@ jobs:
       # ⚠️ 服务器重装或重置后主机密钥会变，届时更新下方指纹并同步 DEPLOY.md；
       #    部署报 "Host key verification failed" 即是此原因。
       # ⚠️ 下面按 IP 录入，故 SERVER_HOST Secret 必须是 IP（不能是域名）。
-      # ⚠️ 2026-10-22 服务器迁移：新增 81.71.72.106（新机）三条公钥；旧机
-      #    81.71.136.3 三条暂时保留，用于 DNS 切换回滚。旧机退订后删除旧条目，
-      #    并把 DEPLOY.md 中的示例同步为只剩新机。
+      # ⚠️ 2026-10-22 服务器迁移完成：旧机 81.71.136.3 已退订，其三条主机公钥
+      #    已删除，仅保留新机 81.71.72.106。换机/重装时按 DEPLOY.md
+      #    「服务器迁移 / 主机密钥轮换」更新本节。
       - name: 固定服务器主机公钥
         run: |
           cat >> ~/.ssh/known_hosts <<'KNOWN_HOSTS'
-          81.71.136.3 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKict0paStds5pTxFIoCPMaWWJD6y2x/wU9UJYfxGosD
-          81.71.136.3 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCsdXeSkwMEVgEes7w5I/dkgApGzJlBufJAtMuTFkxfjc1We99HLJflGgiIqod8mCy/GBg5MMK2wkxIHQrXZnGx3MVMCGptshAKJtEJKkOLuT/zaAaU0znG+gwCmCAtzIlWf07qadwW5HpeEdFz1eS3pHLDWXCDb8pQ+oOsLEYa3L9oNowybLWNmtZGXjHYr5oiy+za+Jm8sKdT/mcxfuNqMq44oLLRYL4iFTqw/o/0QaQIyu6xUo4wuxj+zSRpHFV2UdKcAJrSxatydhw54uMRI7XWyAADURJbaiEg7XXi5pbh/MNmI/hjBZnuQC/s5DAMFRoDqhsomqlJ5HwLYQCsb6DAHxh8e1e8AVoRRLeSJW3pTktr1Gk7W28y1XdL0dyIeabfNOsv8RBR43QTwF8ZCPzrmFbDt+wLHNuIlsgrJfsDZxpxV134UudZHPF/OIOCilzDjlfzH8qQPZPuN12mWUrseRivJXhSnnaJ2tHLmAdmgbQUjnt9M8yGFTaVwT0=
-          81.71.136.3 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBL+EVgp5GAZZbT7sPXa65RvQ13KL0IrmJdqwshacPPCY0unuSBMygLDdOvqgOJ4HHVsBPsZOnetYwJS/hV8pqpI=
           81.71.72.106 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFUHXWLt1VyyM4cgSzUc8S5ixazLraGxZXUednqACZVT
           81.71.72.106 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDH1iKRnPn1+zL4UufMRITfw9VK1vtX8fvFPC8MOMRG/kDHmp6bPlSy53dKa6bZkHx0NOiUePkq9o3gljgeBuWs4Crx7Xh0SOCnnkdMiLUQBzRQy884NHmoV/HP+3D/Uwifn1S/FriX3yIszHI7v4YeXqF7abB0m/MPppx7BsVSZmDrRxy5m+JLRPDrUY/ywlU4MFRkjN23zQYGx0kvo6tWJpsxqGucU9Es5CJu2MJweX+QfKgyyPiON9MV0j8WHPR63oLruOOtxSSckqpkfjuJn2FeJvwsThpiRmTCtOhBC4z51OG+qDYRth9C7GgxVKDYrW5N837NVRih89/avJxu0egemgJJZJQIruzpFlqN12tnIi7zHV5PTcbgEJ8BLL3/C83OazNfVYrDL9f1qOexeOVZ5gJQyQnDH1v3nHQ8DNcwQO3MbZmDNOmRzE3eo8bNZ5YrRXFYoBAgI7IFmotGigaD+RUZ57Ze8u7uQWrvmUTKhxtyWRO1snOZivaugiU=
           81.71.72.106 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBOT4dVpo+eKU93742VI/fxfRvLX322q5HkyKGn8sNfrYW2e1Cgr4mXtQLEAm2T7IUvDyVcnB0Y0+Ra0oJRyWivM=

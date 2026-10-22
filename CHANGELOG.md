@@ -2,6 +2,14 @@
 
 ---
 
+## v1.10.5 (2026-10-22)
+
+- **chore**: 旧服务器 `81.71.136.3` 退订收尾 — DNS 切流后完成终态核查：6 条 A 记录（本机/阿里/Google 三处解析一致）、5 个域名 200/302 且证书链 `Verify return code: 0`、Auth 公钥 SHA256 与旧机一致、监控数据每分钟连续写入、容器 `RestartCount` 全 0
+- **chore**: 退订前对旧机做**最终全量备份**（文件包 + `mysqldump` + auth-keys + acme.sh，SHA256 双向核对），留档于 `C:\Projects\migration-backup\20261022-1652\`（仓库外）
+- **chore**: 停用旧机 acme 续期 cron（原内容备份于旧机 `/tmp/ubuntu-crontab-before-disable.txt`），避免两台同时续期；旧机证书有效期至 2027-01，回滚窗口内不受影响
+- **chore**: `deploy.yml` 的 `known_hosts` **删除旧机三条主机公钥**，仅保留生产机 `81.71.72.106`；`DEPLOY.md` 示例与「服务器迁移」步骤同步为最终状态
+- **docs**: `CLAUDE.md` 版本 v1.10.5、进度与决策记录同步；旧机退订后无残留依赖（DNS / CI Secret / Nginx / cron / acme 均已切到新机）
+
 ## v1.10.4 (2026-10-22)
 
 - **chore**: 生产服务器迁移 — 旧机 `81.71.136.3`（Ubuntu 24.04，即将到期）→ 新机 `81.71.72.106`（Ubuntu 26.04 LTS）；域名、端口、镜像名、compose 结构全部不变

@@ -51,7 +51,7 @@ git log --oneline -5         # 最近 5 条 commit
 
 📌 基本信息
   在线地址: https://lujiesheng.cn
-  服务器:   81.71.136.3（腾讯云 2C4G / Ubuntu 24.04）
+  服务器:   81.71.72.106（腾讯云 2C4G / Ubuntu 26.04）
   当前版本: v{version}
   技术栈:   Astro 6 / Vue 3 + TypeScript / .NET 10 + SqlSugar
   数据库:   MySQL 8.4 / Redis 8 / MongoDB 8

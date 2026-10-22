@@ -485,7 +485,7 @@ jobs:
 
       # 固定服务器主机公钥（公开信息），替代原先放弃校验的
       # StrictHostKeyChecking=no
-      # 过渡期同时固定旧机与新机两套公钥（见下方「服务器迁移」）
+      # 当前仅固定生产机 81.71.72.106 一台（旧机已退订，见下方「服务器迁移」）
       - name: 固定服务器主机公钥
         run: |
           cat >> ~/.ssh/known_hosts <<'KNOWN_HOSTS'
@@ -595,7 +595,8 @@ GitHub Secrets 配置：
 4. `docker compose up -d` 四个应用容器，新机本地验收：`curl --resolve <域名>:443:<新IP> https://<域名>/`。
 5. 更新 `deploy.yml` 的 `known_hosts`（新旧两套并存），更新 GitHub Secret `SERVER_HOST`，push 触发一次部署验证。
 6. 切换 DNS 后停用旧机 acme cron；旧机保留 24h 供回滚，确认无误再退订。
-7. 旧机退订后：删除 `deploy.yml` 中旧机三条主机公钥，更新本节与「服务器实际信息」。
+7. 旧机退订：**2026-10-22 已完成** —— 退订前对旧机做了最终全量备份（DB dump + 文件包，存本地仓库外），
+   并从 `deploy.yml` 删除旧机三条主机公钥，`known_hosts` 现只保留新机；旧机已停机退订。
 
 ---
 
