@@ -2,6 +2,14 @@
 
 ---
 
+## v1.10.6 (2026-10-25)
+
+- **fix**: `.env.example` 连接串主机名由 `127.0.0.1` 改为 compose 服务名 — `AUTH_DB_CONNECTION` / `MONITOR_DB_CONNECTION` 改为 `Server=mysql`，`MONITOR_REDIS_CONNECTION` 改为 `redis:6379`。这些变量经 `docker-compose.yml` 注入容器内使用，容器里的 `127.0.0.1` 指向容器自身，照模板 `cp .env.example .env` 部署会连不上 MySQL / Redis；并在变量前加注释说明主机名必须写服务名
+- **fix**: 同步去掉 `MONITOR_*` 上方的「（待开发）」过期注释（Monitor 已上线）
+- **fix**: `DEPLOY.md` 端口规则校正 — 数据库一行由「仅容器内互联，不暴露」改为「绑定宿主机 `127.0.0.1`，不对公网暴露；容器间用服务名互联」，与 `docker-compose.yml` 实际端口映射一致；示例表「项目 2 容器内 3307」改为 3306 共享实例，消除与 `AGENTS.md` 端口规则的冲突
+- **chore**: `deploy.yml` 的 `paths-ignore` 补 `.env.example` — 模板文件不参与镜像构建，避免纯模板改动触发 4 个镜像重建与生产滚动重启
+- **docs**: `CLAUDE.md` 版本、进度与关键决策记录同步
+
 ## v1.10.5 (2026-10-22)
 
 - **chore**: 旧服务器 `81.71.136.3` 退订收尾 — DNS 切流后完成终态核查：6 条 A 记录（本机/阿里/Google 三处解析一致）、5 个域名 200/302 且证书链 `Verify return code: 0`、Auth 公钥 SHA256 与旧机一致、监控数据每分钟连续写入、容器 `RestartCount` 全 0

@@ -13,7 +13,7 @@
 |------|-----|
 | 在线地址 | https://lujiesheng.cn |
 | 服务器 | 81.71.72.106（腾讯云 2C4G / Ubuntu 26.04） |
-| 当前版本 | v1.10.5 |
+| 当前版本 | v1.10.6 |
 | 技术栈 | Astro 6 / Vue 3 + TypeScript / .NET 10 |
 | 数据库 | MySQL 8.4 / Redis 8 / MongoDB 8 |
 | CI/CD | GitHub Actions 构建镜像 → TCR → 服务器 pull + up |
@@ -59,6 +59,7 @@ Jason-hub/
 - [完成] v1.10.3 三个子域名过期证书修复 ✅ — `monitor` / `api-monitor` / `api-auth` 因**只跑 `--issue` 未跑 `--install-cert`**，acme.sh 续期成功但新证书从未装进 `/etc/nginx/ssl/`，静默过期 9~14 天；已补跑 install + 登记 `Le_ReloadCmd`，4 域名链路恢复 `Verify return code: 0`
 - [完成] v1.10.4 服务器迁移 ✅ — 旧机 `81.71.136.3`（Ubuntu 24.04）→ 新机 `81.71.72.106`（Ubuntu 26.04）；迁移 `.env`、MySQL（`jason_monitor` / `jason_auth`）、Auth RSA 密钥卷、ip2region、Nginx/SSL、acme.sh、两类 cron；`deploy.yml` known_hosts 双机并存过渡，GitHub Secret `SERVER_HOST` 切新 IP；沉淀 26.04 适配（Docker `resolute` 源、MongoDB 8 内核 ≥6.19 启动检查）
 - [完成] v1.10.5 旧机退订收尾 ✅ — DNS 切流验证通过（4 域名 200/302、证书链 0、Auth 公钥一致）；旧机最终全量备份留档、停用其 acme 续期 cron；`deploy.yml` 删除旧机三条主机公钥，`known_hosts` 仅保留新机；旧机实例退订
+- [完成] v1.10.6 环境变量模板连接串修复 ✅ — `.env.example` 的 DB/Redis 主机名由 `127.0.0.1` 改为 compose 服务名（容器内回环指向自身，照模板部署连不上库）；`DEPLOY.md` 数据库暴露口径与 3307 示例校正；`deploy.yml` 的 `paths-ignore` 补 `.env.example`
 
 ---
 
@@ -133,6 +134,8 @@ Jason-hub/
 | 2026-10-22 | 生产服务器迁移：`81.71.136.3`（Ubuntu 24.04）→ `81.71.72.106`（Ubuntu 26.04）；迁移 MySQL / Auth RSA 密钥卷 / acme.sh / Nginx+SSL / cron / ip2region，保证登录态与证书续期不断 | `DEPLOY.md`「服务器迁移」 |
 | 2026-10-22 | `deploy.yml` known_hosts 迁移期新旧两套公钥并存以便回滚；DNS 切流验证通过、旧机退订后已删除旧机条目，`known_hosts` 仅保留生产机 `81.71.72.106` | `.github/workflows/deploy.yml` |
 | 2026-10-22 | Ubuntu 26.04 适配：Docker 官方源系统代号为 `resolute`（非 24.04 的 `noble`）；MongoDB 8.0.x 在内核 ≥6.19 上硬性拒绝启动（SERVER-121912），compose 的 mongo 镜像升级为 `mongo:8.2`（8.2.12 已移除该检查） | `docker-compose.yml`、`DEPLOY.md` |
+| 2026-10-25 | `.env.example` 中经 compose 注入容器的连接串一律写**服务名**（`Server=mysql`、`redis:6379`），不写 `127.0.0.1` — 容器内回环指向自身，模板照抄会导致新部署连不上库 | `.env.example` |
+| 2026-10-25 | `deploy.yml` 的 `paths-ignore` 补 `.env.example`：模板文件不进镜像，纯模板改动不再触发 4 镜像重建与生产滚动重启 | `.github/workflows/deploy.yml` |
 
 ---
 

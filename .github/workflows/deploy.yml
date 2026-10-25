@@ -11,6 +11,7 @@ on:
       - '**.md'
       - '.dsh/**'
       - '.gitignore'
+      - '.env.example'
       - 'LICENSE'
 
 concurrency:

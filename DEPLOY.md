@@ -652,7 +652,7 @@ git push → GitHub Actions 触发
 | 前端容器 | 8000–8049 | 按项目依次递增，Docker 仅绑定 `127.0.0.1` |
 | 子项目 API | 8050–8099 | API 端口 = 前端端口 + 50 |
 | 基础设施服务 | 8100–8149 | Auth 鉴权 / 通知 / 任务调度 / 消息队列，依次递增 |
-| 数据库 | 3306+ | 仅容器内互联，不暴露 |
+| 数据库 | 3306+ | 绑定宿主机 `127.0.0.1`，不对公网暴露；容器间用服务名互联 |
 
 示例：
 
@@ -662,7 +662,7 @@ git push → GitHub Actions 触发
 | Monitor | 8001 | 8051 | `monitor.lujiesheng.cn` + `api-monitor.lujiesheng.cn` | 容器内 3306 |
 | Auth | — | 8100 | `api-auth.lujiesheng.cn` | 容器内 3306 |
 | Notification | — | 8110 | `api-notification.lujiesheng.cn` | 容器内 3306 |
-| 项目 2 | 8002 | 8052 | `<name>.lujiesheng.cn` + `api-<name>.lujiesheng.cn` | 容器内 3307 |
+| 项目 2 | 8002 | 8052 | `<name>.lujiesheng.cn` + `api-<name>.lujiesheng.cn` | 容器内 3306（共享实例） |
 
 ---
 
@@ -716,6 +716,9 @@ cp .env.example .env && vim .env
 # 7. GitHub Actions 自动部署后续更新
 # 在 GitHub Secrets 中配置 SERVER_HOST / SERVER_USER / SERVER_SSH_KEY / TCR_PASSWORD
 ```
+
+> ⚠️ **`.env` 里的连接串要写 compose 服务名**：`AUTH_DB_CONNECTION` / `MONITOR_DB_CONNECTION` 的 `Server` 写 `mysql`，`MONITOR_REDIS_CONNECTION` 写 `redis:6379`。
+> 这些变量由 `docker-compose.yml` 注入**容器内**使用，写 `127.0.0.1` 指向的是容器自身，服务会连不上库且只在启动日志里报错。
 
 > ⚠️ **Ubuntu 26.04 + MongoDB**：MongoDB 8.0.x 在 Linux 内核 ≥ 6.19 上会**直接拒绝启动**
 > （`MongoDB cannot start: Linux kernel versions 6.19 and newer has a known incompatibility`，
