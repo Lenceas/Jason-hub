@@ -2,6 +2,13 @@
 
 ---
 
+## v1.10.7 (2026-10-25)
+
+- **docs**: `DEPLOY.md` 新增「部署会触发「境外异常登录」告警（正常现象）」小节 — CI 的 deploy job 以 `ubuntu` 身份 SSH 登录生产机，GitHub 托管 runner 出口在境外，腾讯云主机安全几乎每次都会报「中危异常登录」；固化三步判定法（时间对齐 deploy job / 用 `api.github.com/meta` 校验来源 IP 是否属 `actions` 网段 / 会话十几秒内断开且只跑 compose 命令）、误判与真入侵的分流处置、加固项（关闭密码登录、收敛 authorized_keys）
+- **docs**: 同一小节附 2026-10-25 实际案例 — 来源 `20.169.63.129` 属 GitHub `20.169.0.0/17`，对应 v1.10.6 的 deploy job（18:01:08–18:01:26），排除入侵
+- **docs**: `DEPLOY.md` 的 `paths-ignore` 对照表补 `.env.example`（v1.10.6 遗漏），并补充说明：版本号 bump 会改 `package.json`，因此**发版仍会触发部署**，路径过滤只对未动版本号的纯文档推送生效
+- **docs**: `CLAUDE.md` 版本、进度与关键决策记录同步
+
 ## v1.10.6 (2026-10-25)
 
 - **fix**: `.env.example` 连接串主机名由 `127.0.0.1` 改为 compose 服务名 — `AUTH_DB_CONNECTION` / `MONITOR_DB_CONNECTION` 改为 `Server=mysql`，`MONITOR_REDIS_CONNECTION` 改为 `redis:6379`。这些变量经 `docker-compose.yml` 注入容器内使用，容器里的 `127.0.0.1` 指向容器自身，照模板 `cp .env.example .env` 部署会连不上 MySQL / Redis；并在变量前加注释说明主机名必须写服务名

@@ -620,12 +620,42 @@ git push → GitHub Actions 触发
 | 路径 | 是否触发部署 |
 |------|-------------|
 | `**.md`（含根文档、各子项目文档、`.dsh/skills/**/SKILL.md`） | ❌ 跳过 |
-| `.dsh/**`、`.gitignore`、`LICENSE` | ❌ 跳过 |
+| `.dsh/**`、`.gitignore`、`.env.example`、`LICENSE` | ❌ 跳过 |
 | `Portfolio/**`、`Auth/**`、`Monitor/**`、`templates/**`、`scripts/**` | ✅ 触发 |
 | `docker-compose.yml`、`.github/workflows/deploy.yml`、`.dockerignore` | ✅ 触发 |
 
 > 语义是"本次推送的**全部**变更路径都命中忽略规则才跳过"。所以"改文档 + 改代码"混在同一个提交里时仍会正常部署，不会漏发布。
 > 代价：`main` 分支不再是"任何推送都上线"，纯文档推送只进版本库、不动生产。
+> 注意：版本号 bump 会改 `Portfolio/package.json`，它不在忽略列表里 —— 所以**每次发版仍会部署**，`paths-ignore` 只对"没动版本号的纯文档推送"生效。
+
+### 部署会触发「境外异常登录」告警（正常现象）
+
+每次推送 `main` 触发部署，GitHub Actions runner 都会以 `ubuntu` 身份 SSH 到生产机。托管 runner 跑在 Azure 上、出口 IP 在境外，因此腾讯云主机安全经常发来一封这样的通知：
+
+```
+【主机安全】异常登录通知
+服务器: [内]10.0.0.13 [外]81.71.72.106   登录用户名: ubuntu
+来源IP: 20.169.63.129（美国）            风险等级: 中危
+```
+
+**别急着改密码，先用三步确认是不是自己人**（三条都符合才是 CI）：
+
+1. **时间对得上** — GitHub Actions 页面 → 该次 run → `deploy` job 的起止时间，SSH 登录应落在 job 生命周期的十几秒内。
+2. **IP 落在 GitHub 官方网段** — 在服务器上跑（Ubuntu 自带 python3，无需装 jq）：
+   ```bash
+   curl -s https://api.github.com/meta | python3 -c "
+   import json,sys,ipaddress
+   ip=ipaddress.ip_address('20.169.63.129')
+   print('GitHub Actions 网段' if any(ip in ipaddress.ip_network(r) for r in json.load(sys.stdin)['actions']) else '非 GitHub 网段 —— 按入侵处理')"
+   ```
+3. **会话极短且无交互** — `sudo grep <告警IP> /var/log/auth.log | tail -5`、`sudo journalctl -u ssh --since "today HH:MM"`，CI 登录通常十几秒内断开，只跑 `docker compose pull/up`、`docker image prune`。
+
+三条符合 → 是 CI，忽略告警即可（可在主机安全控制台加忽略规则）。**任一条不符**（时间对不上、不在 `actions` 网段、会话持续数分钟以上）→ 按入侵处理：轮换全部密钥、审查 `~/.ssh/authorized_keys`、`last -i`、检查是否有新增用户或计划任务。
+
+加固项：
+- `PasswordAuthentication no` —— CI 和人都走密钥，密码纯属多余攻击面
+- `~/.ssh/authorized_keys` 只保留 CI 部署公钥（带 `no-port-forwarding,no-agent-forwarding,no-X11-forwarding` 限制）和本人密钥
+- 已发生案例：2026-10-25 18:01:30 告警，来源 `20.169.63.129` 属 GitHub `20.169.0.0/17` 段，对应 v1.10.6 部署的 `deploy` job（18:01:08–18:01:26），流水线 success、生产站点正常
 
 ---
 
