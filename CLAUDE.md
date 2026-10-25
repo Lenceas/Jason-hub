@@ -13,7 +13,7 @@
 |------|-----|
 | 在线地址 | https://lujiesheng.cn |
 | 服务器 | 81.71.72.106（腾讯云 2C4G / Ubuntu 26.04） |
-| 当前版本 | v1.10.7 |
+| 当前版本 | v1.10.8 |
 | 技术栈 | Astro 6 / Vue 3 + TypeScript / .NET 10 |
 | 数据库 | MySQL 8.4 / Redis 8 / MongoDB 8 |
 | CI/CD | GitHub Actions 构建镜像 → TCR → 服务器 pull + up |
@@ -61,6 +61,7 @@ Jason-hub/
 - [完成] v1.10.5 旧机退订收尾 ✅ — DNS 切流验证通过（4 域名 200/302、证书链 0、Auth 公钥一致）；旧机最终全量备份留档、停用其 acme 续期 cron；`deploy.yml` 删除旧机三条主机公钥，`known_hosts` 仅保留新机；旧机实例退订
 - [完成] v1.10.6 环境变量模板连接串修复 ✅ — `.env.example` 的 DB/Redis 主机名由 `127.0.0.1` 改为 compose 服务名（容器内回环指向自身，照模板部署连不上库）；`DEPLOY.md` 数据库暴露口径与 3307 示例校正；`deploy.yml` 的 `paths-ignore` 补 `.env.example`
 - [完成] v1.10.7 境外登录告警判定固化 ✅ — `DEPLOY.md` 新增「部署会触发境外异常登录告警（正常现象）」：GitHub runner 以 `ubuntu` SSH 登录被腾讯云判中危，固化三步判定（时间对齐 deploy job / `api.github.com/meta` 校验 `actions` 网段 / 会话极短）与真入侵分流处置；补 `paths-ignore` 表的 `.env.example` 行并澄清"发版仍会部署"
+- [完成] v1.10.8 生产 SSH 加固 ✅ — 关闭密码登录 + 禁止 root SSH（`00-hardening.conf`，因 sshd 取先读到的值，必须排在 `50-cloud-init.conf` 之前）、`authorized_keys` 6→3 把（个人 / 腾讯云 `skey-*` / 带限制的 CI 密钥）、fail2ban 1.1.0 `sshd` jail（nftables，5 次/10 分封 1 小时）；审计确认无入侵：成功登录全部来自个人密钥与 CI 密钥，root 登录 0 次
 
 ---
 
@@ -138,6 +139,7 @@ Jason-hub/
 | 2026-10-25 | `.env.example` 中经 compose 注入容器的连接串一律写**服务名**（`Server=mysql`、`redis:6379`），不写 `127.0.0.1` — 容器内回环指向自身，模板照抄会导致新部署连不上库 | `.env.example` |
 | 2026-10-25 | `deploy.yml` 的 `paths-ignore` 补 `.env.example`：模板文件不进镜像，纯模板改动不再触发 4 镜像重建与生产滚动重启 | `.github/workflows/deploy.yml` |
 | 2026-10-25 | CI 部署会触发腾讯云「境外异常登录」告警属正常现象（GitHub runner 出口在境外、以 `ubuntu` 密钥登录）；判定三步与真入侵分流处置已写入 `DEPLOY.md`，不再按入侵处理 | `DEPLOY.md`「境外异常登录告警」 |
+| 2026-10-25 | 生产 SSH 加固：关闭密码登录、禁止 root 直接登录、`authorized_keys` 只留 3 把、fail2ban `sshd` jail 上线；加固配置必须命名为 `00-hardening.conf`（sshd 取先读到的值，`50-cloud-init.conf` 会把 `PasswordAuthentication` 设回 `yes`） | `DEPLOY.md`「SSH 加固」 |
 
 ---
 

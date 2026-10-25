@@ -673,6 +673,84 @@ git push → GitHub Actions 触发
 
 ---
 
+## SSH 加固
+
+2026-10-25 已在生产机实施（起因：`auth.log` 里 127 次 `Failed password` 扫描，而密码登录当时是开着的）。当前生效配置：
+
+| 项 | 值 | 说明 |
+|----|-----|------|
+| `PasswordAuthentication` | `no` | 关掉密码登录，CI 与人一律密钥 |
+| `PermitRootLogin` | `no` | 禁止 root 直接 SSH |
+| `KbdInteractiveAuthentication` | `no` | 随密码认证一并关闭 |
+| `PubkeyAuthentication` | `yes` | 保留密钥登录 |
+| fail2ban | 1.1.0，`sshd` jail，`nftables` 封禁 | 10 分钟内失败 5 次封 1 小时，开机自启 |
+
+### ⚠️ 配置文件名必须是 `00-` 开头
+
+```ini
+# /etc/ssh/sshd_config.d/00-hardening.conf
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+PermitRootLogin no
+PubkeyAuthentication yes
+```
+
+**坑在这**：sshd 对同名关键字取「**先读到的值**」，而 `/etc/ssh/sshd_config` 第 24 行的 `Include /etc/ssh/sshd_config.d/*.conf` 会按文件名字典序先读 `50-cloud-init.conf`——镜像里那个文件写着 `PasswordAuthentication yes`。所以新配置若命名成 `99-hardening.conf` 会被静默压掉，`sshd -T` 里依旧是 `yes`。`00-` 前缀保证它先被读到。
+
+应用与校验：
+
+```bash
+sudo sshd -t && sudo systemctl reload ssh    # reload 不断开现有会话；不要用 restart
+sudo sshd -T | grep -iE 'passwordauthentication|permitrootlogin'
+```
+
+### authorized_keys 收敛
+
+只保留三把，其余一律删除：
+
+| 密钥 | 用途 |
+|------|------|
+| 个人 `ed25519`（`*.@qq.com`） | 开发者本人登录 |
+| `skey-*`（RSA） | 腾讯云控制台密钥对，Xshell / 控制台登录用 |
+| `github-actions-deploy@jason-hub`（带 `no-port-forwarding,no-agent-forwarding,no-X11-forwarding`） | CI 部署 |
+
+**删密钥前先确认 CI 那一把在保留列表里**，否则下次部署会失联，只能走控制台 VNC 救。
+
+### fail2ban
+
+```bash
+sudo apt-get install -y fail2ban
+sudo tee /etc/fail2ban/jail.d/sshd.local >/dev/null <<'EOF'
+[sshd]
+enabled = true
+backend = systemd
+maxretry = 5
+findtime = 10m
+bantime = 1h
+EOF
+sudo fail2ban-client -t && sudo systemctl enable --now fail2ban
+sudo fail2ban-client status sshd
+```
+
+### 回滚
+
+```bash
+# sshd（备份在 /root/ssh-backup-<时间戳>/，含 sshd_config 与 sshd_config.d 原样）
+sudo rm /etc/ssh/sshd_config.d/00-hardening.conf && sudo sshd -t && sudo systemctl reload ssh
+# 公钥
+cp ~/.ssh/authorized_keys.bak-<时间戳> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys
+# fail2ban
+sudo systemctl disable --now fail2ban && sudo apt-get remove -y fail2ban
+```
+
+### 注意事项
+
+- 腾讯云控制台的 **VNC 登录**不经过 sshd，是改坏配置后的保底通道
+- fail2ban 误封 CI 出口 IP 时（部署报 `Permission denied` 但密钥无误）：`sudo fail2ban-client status sshd` 确认，`sudo fail2ban-client set sshd unbanip <IP>` 解封。正常部署是密钥认证成功，不计入失败次数
+- 本次实施留档：`/root/ssh-backup-20261025-181450/`、`~/.ssh/authorized_keys.bak-20261025-181503`
+
+---
+
 ## 端口规则
 
 参考 [AGENTS.md](./AGENTS.md) 端口分配表：

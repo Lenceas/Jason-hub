@@ -2,6 +2,13 @@
 
 ---
 
+## v1.10.8 (2026-10-25)
+
+- **chore**: 生产服务器 SSH 加固上线 — 关闭密码登录（`PasswordAuthentication no` + `KbdInteractiveAuthentication no`）、禁止 root 直接 SSH（`PermitRootLogin no`）、`authorized_keys` 由 6 把收敛到 3 把（仅保留个人 ed25519 / 腾讯云 `skey-*` / 带限制的 CI 部署密钥）；配置备份 `/root/ssh-backup-20261025-181450/`、公钥备份 `~/.ssh/authorized_keys.bak-20261025-181503`。起因：`auth.log` 中 127 次 `Failed password` 扫描，而密码认证当时处于开启状态
+- **chore**: 安装 fail2ban 1.1.0 — `sshd` jail + `nftables` 封禁，10 分钟内失败 5 次封 1 小时，已 `enable` 开机自启；功能性验证（ban/unban 后 nftables 规则正确增删）
+- **docs**: `DEPLOY.md` 新增「SSH 加固」小节 — 记录生效配置表、`00-hardening.conf` 必须用 `00-` 前缀的原因（sshd 取「先读到的值」，而 `50-cloud-init.conf` 会把 `PasswordAuthentication` 设回 `yes`，写 `99-` 会被静默压掉）、`sshd -t` + `reload`（非 restart）校验方式、`authorized_keys` 收敛清单、fail2ban 部署命令、完整回滚步骤、fail2ban 误封 CI 出口的处理
+- **docs**: `CLAUDE.md` 版本、进度与关键决策记录同步
+
 ## v1.10.7 (2026-10-25)
 
 - **docs**: `DEPLOY.md` 新增「部署会触发「境外异常登录」告警（正常现象）」小节 — CI 的 deploy job 以 `ubuntu` 身份 SSH 登录生产机，GitHub 托管 runner 出口在境外，腾讯云主机安全几乎每次都会报「中危异常登录」；固化三步判定法（时间对齐 deploy job / 用 `api.github.com/meta` 校验来源 IP 是否属 `actions` 网段 / 会话十几秒内断开且只跑 compose 命令）、误判与真入侵的分流处置、加固项（关闭密码登录、收敛 authorized_keys）
